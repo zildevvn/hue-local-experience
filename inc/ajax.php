@@ -1,0 +1,3 @@
+<?php
+
+// AJAX Category Filter
