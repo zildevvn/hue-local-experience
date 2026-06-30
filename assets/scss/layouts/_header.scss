@@ -1,0 +1,302 @@
+.header-main {
+    background-color: #ffffff;
+    border-bottom: 1px solid #dcdcdc;
+    position: relative;
+    z-index: 1000;
+    padding: 10px 0;
+
+    &__logo {
+        img {
+            width: 100%;
+            height: auto;
+            max-width: 100px;
+            display: block;
+
+            @include media-breakpoint-down(md) {
+                max-width: 80px;
+            }
+        }
+    }
+
+
+    ul {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+
+        &.primary-menu {
+            gap: 32px;
+
+            @include media-breakpoint-down(lg) {
+                gap: 20px;
+            }
+
+            // Target top-level menu items
+            >li {
+                position: relative;
+                padding: 5px 0; // consistent height and hover zone
+
+                >a {
+                    font-family: $font-primary;
+                    font-size: 1rem;
+                    font-weight: 500;
+                    color: $color-text;
+                    padding: 4px 0;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: $transition-base;
+                    position: relative;
+                    text-decoration: none;
+
+                    // Subtle bottom border transition on hover
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 2px;
+                        background-color: $color-primary;
+                        transform: scaleX(0);
+                        transform-origin: right;
+                        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                    }
+                }
+
+                // Add drop indicator arrow
+                &.menu-item-has-children {
+                    >a {
+                        padding-right: 12px;
+
+                        &::after {
+                            content: "";
+                            position: absolute;
+                            right: 0;
+                            top: 50%;
+                            width: 6px;
+                            height: 6px;
+                            border-right: 1.5px solid currentColor;
+                            border-bottom: 1.5px solid currentColor;
+                            transform: translateY(-50%) rotate(45deg);
+                            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                        }
+                    }
+
+                    &:hover,
+                    &:focus-within {
+                        >a::after {
+                            transform: translateY(-25%) rotate(225deg);
+                        }
+                    }
+                }
+
+                &:hover>a,
+                &.current_page_item>a,
+                &:focus-within>a {
+                    color: $color-primary;
+
+                    &::before {
+                        transform: scaleX(1);
+                        transform-origin: left;
+                    }
+                }
+            }
+        }
+
+        li {
+            list-style-type: none;
+
+            // Sub-menu dropdown list styling
+            ul.sub-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                display: block; // overrides flex layouts
+                min-width: 240px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                padding: 12px 0;
+                margin: 0;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(10px);
+                transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                z-index: 100;
+
+                // Invisible hover bridge to prevent menu closing when mouse is in the gap
+                &::before {
+                    content: "";
+                    position: absolute;
+                    top: -24px;
+                    left: 0;
+                    width: 100%;
+                    height: 24px;
+                    background: transparent;
+                }
+
+                li {
+                    width: 100%;
+                    padding: 0;
+
+                    a {
+                        display: block;
+                        padding: 10px 20px;
+                        color: $color-text;
+                        font-family: $font-second;
+                        font-size: 0.9375rem;
+                        font-weight: 500;
+                        transition: all 0.25s ease;
+                        position: relative;
+                        background: transparent;
+                        text-decoration: none;
+
+                        &::before,
+                        &::after {
+                            display: none !important; // remove indicators from standard sub-menu links
+                        }
+                    }
+
+                    // Sub-menu items states
+                    &:hover>a,
+                    &.current_page_item>a,
+                    &:focus-within>a {
+                        color: $color-primary;
+                        background-color: rgba($color-primary, 0.04);
+                        padding-left: 24px; // subtle indent animation on hover
+                    }
+
+                    // Nested sub-menu support (Multi-level drop-right)
+                    &.menu-item-has-children {
+                        >a {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+
+                            &::after {
+                                display: block !important;
+                                content: "" !important;
+                                width: 6px;
+                                height: 6px;
+                                border-right: 1.5px solid currentColor;
+                                border-bottom: 1.5px solid currentColor;
+                                transform: rotate(-45deg); // point right
+                                transition: transform 0.3s ease;
+                                margin-left: auto;
+                            }
+                        }
+
+                        &:hover,
+                        &:focus-within {
+                            >a::after {
+                                transform: rotate(135deg);
+                            }
+                        }
+
+                        ul.sub-menu {
+                            top: 0;
+                            left: 100%;
+                            margin-top: -12px;
+                            margin-left: 0;
+
+                            // Horizontal hover bridge
+                            &::before {
+                                top: 0;
+                                left: -20px;
+                                width: 20px;
+                                height: 100%;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Keyboard/hover trigger
+            &.menu-item-has-children {
+
+                &:hover>ul.sub-menu,
+                &:focus-within>ul.sub-menu {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateY(0);
+                }
+            }
+        }
+    }
+
+    &__cta {
+        .hle-button {
+            @media (min-width: 768px) and (max-width: 1023.98px) {
+                height: 44px;
+            }
+        }
+    }
+
+
+    &__search {
+        border: 1.5px solid;
+        border-color: rgba($color: $color-primary, $alpha: 0.8);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: $transition-base;
+        outline: none;
+        background: #fff;
+
+        @include media-breakpoint-down(lg) {
+            height: 42px;
+            width: 42px;
+        }
+
+        @include media-breakpoint-down(md) {
+            height: 40px;
+            width: 40px;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            max-width: 22px;
+            display: block;
+            transition: $transition-base;
+
+            @include media-breakpoint-down(lg) {
+                max-width: 20px;
+            }
+
+            @include media-breakpoint-down(md) {
+                max-width: 18px;
+            }
+
+            path {
+                stroke: $color-primary;
+                stroke-width: 2;
+                transition: $transition-base;
+            }
+        }
+
+        &:hover,
+        &:focus-visible,
+        &.is-active {
+            background-color: $color-primary;
+            border-color: $color-primary;
+            // box-shadow: 0 0 0 4px rgba($color-primary, 0.25);
+
+            svg {
+                transform: scale(1.05);
+
+                path {
+                    stroke: #ffffff;
+                }
+            }
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+    }
+}

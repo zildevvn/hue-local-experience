@@ -8,6 +8,7 @@
  */
 
 do_action('hle_hook_footer');
+do_action('hle_hook_search');
 wp_footer();
 ?>
 </body>

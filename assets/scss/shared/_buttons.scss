@@ -1,0 +1,25 @@
+.hle-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    gap: 8px;
+    padding: 0px 24px;
+    background-color: $color-primary;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: $transition-base;
+    border: 2px solid $color-primary;
+
+    &:hover {
+        background-color: #fff;
+        color: $color-primary;
+    }
+
+    @include media-breakpoint-down(md) {
+        font-size: 14px;
+        height: 40px;
+        padding: 0 16px;
+    }
+}
