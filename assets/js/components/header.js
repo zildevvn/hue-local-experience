@@ -2,14 +2,7 @@
   "use strict";
 
 
-
-  $(window).on("load", function () {
-
-  })
-
-
-
-  $(document).ready(function () {
+  function hleModalSearch() {
     const $searchTrigger = $('.header-main__search');
     const $searchModal = $('#search-modal');
     const $searchClose = $('#search-modal-close');
@@ -33,6 +26,7 @@
       $searchTrigger.focus();
     }
 
+
     $searchTrigger.on('click', function (e) {
       e.preventDefault();
       openSearch();
@@ -52,6 +46,16 @@
         closeSearch();
       }
     });
+  }
+
+
+  $(window).on("load", function () {
+
+  })
+
+
+  $(document).ready(function () {
+    hleModalSearch()
   });
 
 })(jQuery);
