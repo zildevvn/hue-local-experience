@@ -42,7 +42,8 @@ $cta_header = get_field('cta_header', 'option');
                 <?php endif; ?>
 
                 <div class="header-humberger d-block d-md-none ">
-                    <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+                    <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Toggle menu"
+                        aria-expanded="false" aria-controls="mobile-menu-drawer">
                         <span></span>
                         <span></span>
                         <span></span>
@@ -52,3 +53,37 @@ $cta_header = get_field('cta_header', 'option');
         </div>
     </div>
 </header>
+
+<div id="mobile-menu-drawer" class="mobile-menu-drawer" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="mobile-menu-drawer__overlay"></div>
+    <div class="mobile-menu-drawer__content">
+        <div class="mobile-menu-drawer__header d-flex align-items-center justify-content-end">
+            <button type="button" id="mobile-menu-close" class="mobile-menu-drawer__close"
+                aria-label="<?php esc_attr_e('Close menu', 'hle'); ?>">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="mobile-menu-drawer__body">
+            <nav class="mobile-navigation">
+                <?php if (has_nav_menu('primary-menu')): ?>
+                    <?php wp_nav_menu(array(
+                        'theme_location' => 'primary-menu',
+                        'menu_class' => 'mobile-primary-menu',
+                        'container' => false
+                    )) ?>
+                <?php endif; ?>
+            </nav>
+            <?php if (!empty($cta_header)): ?>
+                <div class="mobile-menu-drawer__cta mt-4">
+                    <a class="hle-button w-100" href="<?php echo $cta_header['url']; ?>">
+                        <?php echo $cta_header['title']; ?>
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

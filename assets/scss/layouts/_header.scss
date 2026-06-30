@@ -40,7 +40,7 @@
                 >a {
                     font-family: $font-primary;
                     font-size: 1rem;
-                    font-weight: 500;
+                    font-weight: 600;
                     color: $color-text;
                     padding: 4px 0;
                     display: inline-flex;
@@ -146,7 +146,6 @@
                         display: block;
                         padding: 10px 20px;
                         color: $color-text;
-                        font-family: $font-second;
                         font-size: 0.9375rem;
                         font-weight: 500;
                         transition: all 0.25s ease;
@@ -297,6 +296,253 @@
 
         &:active {
             transform: scale(0.95);
+        }
+    }
+}
+
+/* Mobile Hamburger Button */
+.menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+    z-index: 1001;
+    position: relative;
+    padding: 10px 5px;
+    background: $color-primary;
+    border-radius: 4px;
+
+
+    span {
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: #fff;
+        border-radius: 2px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transform-origin: left center;
+    }
+
+    &.is-active {
+        span:nth-child(1) {
+            transform: rotate(45deg) translate(1px, -1px);
+        }
+
+        span:nth-child(2) {
+            opacity: 0;
+            width: 0;
+        }
+
+        span:nth-child(3) {
+            transform: rotate(-45deg) translate(1px, 1px);
+        }
+    }
+}
+
+/* Mobile Drawer Container */
+.mobile-menu-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &__overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(27, 54, 93, 0.4);
+        backdrop-filter: blur(4px);
+        transition: opacity 0.4s ease;
+    }
+
+    &__content {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        max-width: 320px;
+        height: 100%;
+        background-color: #ffffff;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        padding: 20px;
+        z-index: 2;
+    }
+
+    &__header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        padding-bottom: 16px;
+        margin-bottom: 20px;
+    }
+
+    &__logo {
+        img {
+            max-width: 120px;
+            height: auto;
+            display: block;
+        }
+    }
+
+    &__close {
+        background: none;
+        border: none;
+        color: $color-text;
+        cursor: pointer;
+        padding: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: $color-primary;
+        transition: all 0.3s ease;
+        outline: none;
+        width: 40px;
+        height: 40px;
+
+        svg {
+            width: 20px;
+            height: 20px;
+            stroke: #fff;
+        }
+
+        // &:hover,
+        // &:focus-visible {
+        //     background-color: rgba(0, 0, 0, 0.1);
+        //     color: $color-primary;
+        // }
+    }
+
+    &__body {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+    }
+
+    // Active State
+    &.is-active {
+        opacity: 1;
+        visibility: visible;
+
+        .mobile-menu-drawer__content {
+            transform: translateX(0);
+        }
+    }
+}
+
+// Body lock
+body.mobile-menu-open {
+    overflow: hidden;
+}
+
+/* Mobile Menu Navigation List */
+.mobile-navigation {
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: block;
+
+        li {
+            position: relative;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+
+            a {
+                display: block;
+                padding: 12px 0;
+                color: $color-text;
+                font-family: $font-primary;
+                font-size: 1.05rem;
+                font-weight: 500;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            &:hover>a,
+            &.current-page-item>a {
+                color: $color-primary;
+            }
+
+            // Accordion toggle button next to links with children
+            .sub-menu-toggle {
+                position: absolute;
+                right: 0;
+                top: 8px;
+                width: 32px;
+                height: 32px;
+                background-color: rgba($color-primary, 0.04);
+                border: none;
+                border-radius: 4px;
+                color: $color-text;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                outline: none;
+
+                svg {
+                    transition: transform 0.3s ease;
+                }
+
+                &:hover,
+                &:focus-visible {
+                    background-color: rgba($color-primary, 0.1);
+                    color: $color-primary;
+                }
+
+                &.is-active {
+                    background-color: $color-primary;
+                    color: #ffffff;
+
+                    svg {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+
+            // Sub-menu specific styling
+            ul.sub-menu {
+                display: none;
+                padding-left: 16px;
+                margin: 0;
+                border-left: 2px solid rgba($color-primary, 0.15);
+                margin-bottom: 8px;
+
+                li {
+                    border-bottom: none;
+
+                    a {
+                        padding: 8px 0;
+                        font-size: 0.9375rem;
+                        font-weight: 500;
+                    }
+                }
+            }
         }
     }
 }
