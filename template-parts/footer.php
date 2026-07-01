@@ -12,7 +12,7 @@ $socials = get_field('socials', 'option');
 <footer class="main-footer">
     <div class="main-footer-top">
         <div class="main-footer-top__bg">
-            <img src="http://localhost:10026/wp-content/uploads/2026/06/bg-footer.png" alt="" srcset="">
+            <img src="<?php echo get_template_directory_uri(); ?>/assets/images/bg-footer.png" alt="image for footer" />
         </div>
         <div class="container">
             <div class="main-footer-inner">

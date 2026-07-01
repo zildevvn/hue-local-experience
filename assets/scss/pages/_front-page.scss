@@ -1,0 +1,89 @@
+.hero-section {
+    &-sliders {
+        .slider-item {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            align-content: center;
+            justify-content: center;
+
+            &__bg {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                inset: 0;
+
+                &::before {
+                    content: " ";
+                    display: inline-block;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba($color: #000, $alpha: .3);
+                    position: absolute;
+                    inset: 0;
+                }
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: center;
+                }
+            }
+
+            .container {
+                position: relative;
+                z-index: 2;
+                text-align: center;
+                text-align: center;
+                max-width: 600px;
+            }
+
+            h1,
+            p {
+                color: #fff;
+            }
+        }
+
+        .swiper-pagination {
+            bottom: 40px !important;
+            z-index: 10;
+
+            .swiper-pagination-bullet {
+                width: 10px;
+                height: 10px;
+                background-color: #fff;
+                opacity: 1;
+                margin: 0 5px !important;
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.8);
+                }
+
+                &-active {
+                    width: 28px;
+                    border-radius: 5px;
+                    background-color: $color-primary;
+                }
+            }
+
+            @include media-breakpoint-down(md) {
+                bottom: 30px;
+            }
+        }
+    }
+
+
+    &__overlay {
+        position: absolute;
+        inset: 0;
+
+        background: linear-gradient(to bottom,
+                rgba(0, 0, 0, 0.2) 0%,
+                transparent 50%,
+                #fcf9f8 100%);
+        // z-index: 1;
+    }
+}

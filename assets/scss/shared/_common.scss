@@ -11,3 +11,10 @@ html {
     scroll-behavior: smooth;
     scroll-padding-top: 64px;
 }
+
+.hle-section {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 1;
+}

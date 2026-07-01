@@ -6177,6 +6177,13 @@ html {
   scroll-padding-top: 64px;
 }
 
+.hle-section {
+  width: 100%;
+  height: auto;
+  position: relative;
+  z-index: 1;
+}
+
 .hle-button {
   display: inline-flex;
   align-items: center;
@@ -6190,6 +6197,7 @@ html {
   text-decoration: none;
   transition: all 0.3s ease;
   border: 2px solid #9615b5;
+  font-weight: 500;
 }
 .hle-button:hover {
   background-color: #fff;
@@ -7152,4 +7160,75 @@ body.mobile-menu-open {
     width: 18px;
     height: 18px;
   }
+}
+
+.hero-section-sliders .slider-item {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+}
+.hero-section-sliders .slider-item__bg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+.hero-section-sliders .slider-item__bg::before {
+  content: " ";
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  position: absolute;
+  inset: 0;
+}
+.hero-section-sliders .slider-item__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.hero-section-sliders .slider-item .container {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  text-align: center;
+  max-width: 600px;
+}
+.hero-section-sliders .slider-item h1, .hero-section-sliders .slider-item .h1,
+.hero-section-sliders .slider-item p {
+  color: #fff;
+}
+.hero-section-sliders .swiper-pagination {
+  bottom: 40px !important;
+  z-index: 10;
+}
+.hero-section-sliders .swiper-pagination .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background-color: #fff;
+  opacity: 1;
+  margin: 0 5px !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-section-sliders .swiper-pagination .swiper-pagination-bullet:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+.hero-section-sliders .swiper-pagination .swiper-pagination-bullet-active {
+  width: 28px;
+  border-radius: 5px;
+  background-color: #9615b5;
+}
+@media (max-width: 767.98px) {
+  .hero-section-sliders .swiper-pagination {
+    bottom: 30px;
+  }
+}
+.hero-section__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, transparent 50%, #fcf9f8 100%);
 }

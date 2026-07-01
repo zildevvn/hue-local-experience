@@ -11,9 +11,28 @@ import 'swiper/css/effect-fade';
 (function ($) {
     "use strict";
 
-    // function initHeaderScroll() {
+    function hleHeroSliders() {
+        if ($('.hero-section-sliders').length > 0) {
+            new Swiper('.hero-section-sliders', {
+                modules: [Pagination, Navigation, Autoplay, EffectFade],
+                slidesPerView: 1,
+                loop: true,
+                effect: 'fade',
+                fadeEffect: {
+                    crossFade: true
+                },
+                pagination: {
+                    el: '.hero-section-sliders .swiper-pagination',
+                    clickable: true,
+                },
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
 
-    // }
+            });
+        }
+    }
 
     function initBackToTop() {
         const $backToTop = $('#backToTop');
@@ -39,7 +58,8 @@ import 'swiper/css/effect-fade';
     $(document).ready(function () {
 
         // initHeaderScroll();
-        initBackToTop();
+        initBackToTop()
+        hleHeroSliders()
 
     });
 })(jQuery); 
