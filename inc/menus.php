@@ -2,7 +2,8 @@
 add_action('after_setup_theme', function () {
 	register_nav_menus([
 		'primary-menu' => esc_html__('Primary Menu', 'hle'),
-		'footer-menu' => esc_html__('Footer Menu', 'hle'),
+		'tours-menu' => esc_html__('Tours Menu', 'hle'),
+		'company-menu' => esc_html__('Company Menu', 'hle'),
 	]);
 });
 

@@ -3,11 +3,11 @@
     "title": "Footer Options",
     "fields": [
         {
-            "key": "field_69e795ba80db7",
-            "label": "Company name",
-            "name": "company_name_ft",
+            "key": "field_69e795da80db8",
+            "label": "About Text",
+            "name": "about_text_ft",
             "aria-label": "",
-            "type": "text",
+            "type": "textarea",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -19,9 +19,9 @@
             "default_value": "",
             "maxlength": "",
             "allow_in_bindings": 0,
+            "rows": 3,
             "placeholder": "",
-            "prepend": "",
-            "append": ""
+            "new_lines": ""
         },
         {
             "key": "field_69e795ebd6096",
@@ -43,27 +43,6 @@
             "placeholder": "",
             "prepend": "",
             "append": ""
-        },
-        {
-            "key": "field_69e795da80db8",
-            "label": "Address",
-            "name": "address_ft",
-            "aria-label": "",
-            "type": "textarea",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "100",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "maxlength": "",
-            "allow_in_bindings": 0,
-            "rows": 3,
-            "placeholder": "",
-            "new_lines": ""
         }
     ],
     "location": [
@@ -85,7 +64,5 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "allow_ai_access": false,
-    "ai_description": "",
-    "modified": 1776870408
+    "modified": 1782811648
 }
