@@ -6376,11 +6376,18 @@ body.search-modal-open {
 }
 
 .header-main {
-  background-color: #ffffff;
-  border-bottom: 1px solid #dcdcdc;
+  background-color: rgba(0, 0, 0, 0.4);
   position: relative;
   z-index: 1000;
   padding: 10px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+body.logged-in .header-main {
+  top: 32px;
 }
 .header-main__logo img {
   width: 100%;
@@ -6415,7 +6422,7 @@ body.search-modal-open {
   font-family: "Roboto", sans-serif;
   font-size: 1rem;
   font-weight: 600;
-  color: #222222;
+  color: white;
   padding: 4px 0;
   display: inline-flex;
   align-items: center;

@@ -95,18 +95,18 @@
 
     // Mobile Sub-menu accordion
     const $menuItemsWithChildren = $('.mobile-navigation .menu-item-has-children');
-    
+
     $menuItemsWithChildren.each(function () {
       const $li = $(this);
       const $a = $li.children('a');
-      
+
       const $toggleButton = $('<button type="button" class="sub-menu-toggle" aria-expanded="false" aria-label="Toggle sub-menu"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>');
       $a.after($toggleButton);
 
       $toggleButton.on('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         const $subMenu = $li.children('ul.sub-menu');
         const isExpanded = $toggleButton.attr('aria-expanded') === 'true';
 
