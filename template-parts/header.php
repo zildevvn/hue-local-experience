@@ -2,7 +2,30 @@
 $custom_logo_id = get_theme_mod('custom_logo');
 $logo_url = wp_get_attachment_url($custom_logo_id);
 $cta_header = get_field('cta_header', 'option');
+$socials = get_field('socials', 'option');
 ?>
+
+
+<div class="header-top">
+    <div class="container">
+        <div class="header-top-wrap d-flex align-items-center justify-content-between">
+            <div class="header-top-left"> Welcome! Get the latest updates and Edukas response here. </div>
+            <div class="header-top-right">
+                <?php if (!empty($socials)): ?>
+                    <div class="header-top__socials d-flex align-items-center">
+                        <?php foreach ($socials as $social): ?>
+                            <div class="item-social">
+                                <a href="<?= $social['link'] ?>" class="d-flex align-items-center justify-content-center">
+                                    <img src="<?= $social['icon'] ?>" alt="icon-footer">
+                                </a>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
 
 <header id="site-header" class="header-main">
     <div class="container">

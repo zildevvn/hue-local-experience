@@ -19,9 +19,10 @@
                     display: inline-block;
                     width: 100%;
                     height: 100%;
-                    background-color: rgba($color: #000, $alpha: .3);
+                    background-color: rgba($color: #000, $alpha: .6);
                     position: absolute;
                     inset: 0;
+                    opacity: unset;
                 }
 
                 img {
@@ -43,6 +44,14 @@
             h1,
             p {
                 color: #fff;
+            }
+
+            h1 {
+                span {
+                    -webkit-text-stroke: 2px $color-primary;
+                    -webkit-text-fill-color: transparent;
+                    color: $color-primary;
+                }
             }
         }
 
@@ -71,6 +80,68 @@
 
             @include media-breakpoint-down(md) {
                 bottom: 30px;
+            }
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #ffffff;
+            transition: all 0.3s ease;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
+            z-index: 10;
+
+            &::after {
+                content: none;
+            }
+
+            svg {
+                width: 100%;
+                width: 24px;
+                height: auto;
+
+                path {
+                    stroke: #ffffff;
+                    stroke-width: 1.5px;
+                }
+            }
+
+            &:hover {
+                background-color: $color-primary;
+                color: #ffffff;
+            }
+
+            &.swiper-button-disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+
+            @include media-breakpoint-down(md) {
+                width: 40px;
+                height: 40px;
+
+                &::after {
+                    font-size: 16px;
+                }
+            }
+        }
+
+        .swiper-button-prev {
+            left: 40px !important;
+
+            @include media-breakpoint-down(md) {
+                left: 15px !important;
+            }
+        }
+
+        .swiper-button-next {
+            right: 40px !important;
+
+            @include media-breakpoint-down(md) {
+                right: 15px !important;
             }
         }
     }

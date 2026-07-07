@@ -25,6 +25,10 @@ import 'swiper/css/effect-fade';
                     el: '.hero-section-sliders .swiper-pagination',
                     clickable: true,
                 },
+                navigation: {
+                    nextEl: '.hero-section-sliders .swiper-button-next',
+                    prevEl: '.hero-section-sliders .swiper-button-prev',
+                },
                 autoplay: {
                     delay: 5000,
                     disableOnInteraction: false,

@@ -127,9 +127,63 @@
   })
 
 
+  function hleStickyHeader() {
+    const $header = $('.header-main');
+    if ($header.length === 0) return;
+
+    // Create a placeholder to prevent content jump/flickering when header becomes fixed
+    const $placeholder = $('<div class="header-main-placeholder"></div>');
+    $placeholder.hide();
+    $header.before($placeholder);
+
+    let isFixed = false;
+    let headerOffset = $header.offset().top;
+
+    // Recalculate offset on window resize
+    $(window).on('resize', function () {
+      if (!isFixed) {
+        headerOffset = $header.offset().top;
+      }
+    });
+
+    function toggleSticky() {
+      const scrollTop = $(window).scrollTop();
+
+      if (scrollTop > headerOffset) {
+        if (!isFixed) {
+          $placeholder.height($header.outerHeight()).show();
+          $header.addClass('fixed-top');
+          isFixed = true;
+        }
+      } else {
+        if (isFixed) {
+          $header.removeClass('fixed-top');
+          $placeholder.hide().height(0);
+          isFixed = false;
+        }
+      }
+    }
+
+    // Use requestAnimationFrame for smooth and optimized scroll handling
+    let ticking = false;
+    $(window).on('scroll', function () {
+      if (!ticking) {
+        window.requestAnimationFrame(function () {
+          toggleSticky();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    // Run once on load to ensure correct initial state
+    toggleSticky();
+  }
+
   $(document).ready(function () {
     hleModalSearch();
     hleMobileMenu();
+    // hleStickyHeader();
   });
 
 })(jQuery);

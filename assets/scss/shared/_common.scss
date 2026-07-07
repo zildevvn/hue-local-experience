@@ -18,3 +18,13 @@ html {
     position: relative;
     z-index: 1;
 }
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
