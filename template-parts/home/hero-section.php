@@ -1,7 +1,37 @@
 <?php
 $sliders = get_field('sliders_hero_home');
-?>
 
+if (!function_exists('hle_split_words_preserve_html')) {
+    function hle_split_words_preserve_html($html)
+    {
+        if (empty($html))
+            return '';
+        // Match HTML tags, whitespace sequences, or words
+        preg_match_all('/(<[^>]+>)|(\s+)|([^<>\s]+)/', $html, $matches);
+
+        $word_count = 0;
+        foreach ($matches[0] as $token) {
+            if (!preg_match('/^<[^>]+>$/', $token) && !preg_match('/^\s+$/', $token)) {
+                $word_count++;
+            }
+        }
+
+        $result = '';
+        $current_word = 0;
+        foreach ($matches[0] as $token) {
+            if (preg_match('/^<[^>]+>$/', $token) || preg_match('/^\s+$/', $token)) {
+                $result .= $token;
+            } else {
+                // Calculate reverse index so right-most words animate first
+                $reverse_index = $word_count - $current_word - 1;
+                $result .= '<span class="split-word" style="--word-index: ' . $reverse_index . ';">' . $token . '</span>';
+                $current_word++;
+            }
+        }
+        return $result;
+    }
+}
+?>
 <?php if (!empty($sliders) && isset($sliders)): ?>
     <section class="hle-section hero-section">
         <div class="hero-section-sliders swiper">
@@ -15,12 +45,12 @@ $sliders = get_field('sliders_hero_home');
 
                             <?php if (!empty($slider['heading'])): ?>
                                 <h1>
-                                    <?= $slider['heading'] ?>
+                                    <?= hle_split_words_preserve_html($slider['heading']) ?>
                                 </h1>
                             <?php endif; ?>
 
                             <?php if (!empty($slider['sub_heading'])): ?>
-                                <p>
+                                <p class="sub-heading">
                                     <?= $slider['sub_heading'] ?>
                                 </p>
                             <?php endif; ?>
