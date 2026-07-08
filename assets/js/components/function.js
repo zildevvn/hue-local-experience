@@ -65,5 +65,7 @@ import 'swiper/css/effect-fade';
         initBackToTop()
         hleHeroSliders()
 
+        AOS.init();
+
     });
 })(jQuery); 

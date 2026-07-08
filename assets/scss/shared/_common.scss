@@ -19,6 +19,22 @@ html {
     z-index: 1;
 }
 
+.hle-heading {
+    color: $color-text;
+    position: relative;
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 30px;
+        height: 4px;
+        border-radius: 2px;
+        background-color: $color-primary;
+    }
+}
+
 @keyframes slideDown {
     from {
         transform: translateY(-100%);
@@ -26,5 +42,15 @@ html {
 
     to {
         transform: translateY(0);
+    }
+}
+
+@keyframes dashed_border_running {
+    0% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dashoffset: 200;
     }
 }
