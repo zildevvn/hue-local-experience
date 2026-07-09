@@ -1,0 +1,26 @@
+<?php
+$bg = get_field('bg_vide_hp');
+$link_video = get_field('link_video_hp');
+?>
+
+<?php if (!empty($link_video) && isset($link_video)): ?>
+    <section class="hle-section video-section">
+        <div class="container">
+            <div class="video-section-inner">
+                <?php if (!empty($bg)): ?>
+                    <img src="<?= esc_url($bg); ?>" alt="background image for video">
+                <?php endif; ?>
+
+                <button class="btn-play-video" type="button" data-bs-toggle="modal" data-bs-target="#videoModal">
+                    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        color="#000000" stroke-width="1.5">
+                        <path
+                            d="M6.90588 4.53682C6.50592 4.2998 6 4.58808 6 5.05299V18.947C6 19.4119 6.50592 19.7002 6.90588 19.4632L18.629 12.5162C19.0211 12.2838 19.0211 11.7162 18.629 11.4838L6.90588 4.53682Z"
+                            fill="#000000" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>

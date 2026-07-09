@@ -12,6 +12,7 @@ get_header();
     <?php get_template_part('template-parts/home/why-choose-us-section'); ?>
     <?php get_template_part('template-parts/home/achievements-section'); ?>
     <?php get_template_part('template-parts/home/featured-tours'); ?>
+    <?php get_template_part('template-parts/home/video-section'); ?>
 </main>
 <?php
 get_footer();
