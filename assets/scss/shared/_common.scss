@@ -48,6 +48,18 @@ html {
         border-radius: 2px;
         background-color: $color-primary;
     }
+
+    &.center {
+        &::before {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    }
+}
+
+.hle-sub-heading {
+    margin: 10px 0 0 0;
+
 }
 
 @keyframes slideDown {
