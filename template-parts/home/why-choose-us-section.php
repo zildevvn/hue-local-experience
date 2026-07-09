@@ -79,7 +79,7 @@ $phone = get_field('phone__wcu_hp');
 
                                     <div class="feature-item__content">
                                         <?php if (!empty($feature['number'])): ?>
-                                            <p class="feature-item__number h3 mb-0">
+                                            <p class="hle-counter feature-item__number h3 mb-0">
                                                 <?= $feature['number'] ?>
                                             </p>
                                         <?php endif; ?>

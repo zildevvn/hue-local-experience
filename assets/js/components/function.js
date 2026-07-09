@@ -61,7 +61,7 @@ import { CountUp } from 'countup.js';
     }
 
     function hleInitCounters() {
-        const counters = document.querySelectorAll('.feature-item__number');
+        const counters = document.querySelectorAll('.hle-counter');
         if (!counters.length) return;
 
         const parseValue = (text) => {
@@ -102,7 +102,7 @@ import { CountUp } from 'countup.js';
                             console.error(countUp.error);
                         }
                     }
-                    
+
                     obs.unobserve(el);
                 }
             });
