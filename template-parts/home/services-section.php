@@ -13,7 +13,7 @@ $services = get_field('items_sr_hp');
                         </span>
 
                         <?php if (!empty($service['icon']) && isset($service['icon'])): ?>
-                            <div class="service-item__icon">
+                            <div class="service-item__icon d-flex align-items-center align-content-center justify-content-center">
                                 <img src="<?= $service['icon'] ?>" alt="icon-service for <?= $service['heading'] ?? '' ?>">
                             </div>
                         <?php endif; ?>

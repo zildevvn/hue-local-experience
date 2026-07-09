@@ -9,10 +9,10 @@ $phone = get_field('phone__wcu_hp');
 ?>
 <section class="hle-section wcu-section">
     <div class="container">
-        <div class="wcu-section-warp d-flex justify-content-between">
-            <div class="wcu-section__left ">
+        <div class="wcu-section-warp d-flex justify-content-between flex-wrap flex-lg-nowrap">
+            <div class="wcu-section__left " data-aos="fade-up">
                 <?php if ($images): ?>
-                    <div class="wcu-images d-flex justify-content-between">
+                    <div class="wcu-images d-flex justify-content-between flex-wrap flex-sm-nowrap">
                         <div class="wcu-images__left ">
                             <?php if (!empty($images['image_large'])): ?>
                                 <img class="image_large" src="<?php echo esc_url($images['image_large']); ?>"
@@ -59,14 +59,14 @@ $phone = get_field('phone__wcu_hp');
                     </div>
                 <?php endif; ?>
             </div>
-            <div class="wcu-section__right">
+            <div class="wcu-section__right" data-aos="fade-up" data-aos-delay="150">
                 <h2 class="hle-heading mb-0">Why Choose Us?</h2>
 
                 <?php if ($descriptions): ?>
                     <p class="wcu-section__desc"><?= $descriptions ?></p>
                 <?php endif; ?>
 
-                <div class="wcu-section__right-warp d-flex gap-3">
+                <div class="wcu-section__right-warp d-flex gap-3 flex-wrap flex-sm-nowrap">
                     <?php if (!empty($features)): ?>
                         <div class="features">
                             <?php foreach ($features as $key => $feature): ?>

@@ -8,7 +8,7 @@ $socials = get_field('socials', 'option');
 
 <div class="header-top">
     <div class="container">
-        <div class="header-top-wrap d-flex align-items-center justify-content-between">
+        <div class="header-top-wrap d-flex align-items-center justify-content-between gap-3">
             <div class="header-top-left"> Welcome! Get the latest updates and Edukas response here. </div>
             <div class="header-top-right">
                 <?php if (!empty($socials)): ?>

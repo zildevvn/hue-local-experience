@@ -30,6 +30,7 @@
     "aos": "^2.3.4",
     "bootstrap": "^5.3.3",
     "classnames": "^2.5.1",
+    "countup.js": "^2.10.1",
     "gsap": "^3.12.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
