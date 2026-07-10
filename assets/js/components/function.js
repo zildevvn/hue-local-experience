@@ -1,7 +1,7 @@
 
 
 import Swiper from 'swiper';
-import { Pagination, Navigation, Autoplay, EffectFade } from 'swiper/modules';
+import { Pagination, Navigation, Autoplay, EffectFade, Keyboard } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
@@ -163,7 +163,7 @@ import { CountUp } from 'countup.js';
             // Calculate progress (0 = enters viewport bottom, 1 = leaves viewport top)
             const totalScrollableDistance = viewHeight + rect.height;
             const currentScrolledDistance = viewHeight - rect.top;
-            
+
             let progress = currentScrolledDistance / totalScrollableDistance;
             progress = Math.max(0, Math.min(1, progress)); // Clamp [0, 1]
             const normalizedProgress = progress - 0.5; // [-0.5, 0.5]
@@ -198,6 +198,61 @@ import { CountUp } from 'countup.js';
         $(window).on('scroll resize', scheduleUpdate);
     }
 
+    function hleInitCarsSlider() {
+        const $slider = $('.cars-section__list.swiper');
+        if (!$slider.length) return;
+
+        if (typeof Swiper === 'undefined') {
+            console.warn('Swiper is not loaded.');
+            return;
+        }
+
+        $slider.each(function () {
+            const $this = $(this);
+
+            // Prevent duplicate initialization
+            if ($this.hasClass('swiper-initialized') || $this.data('swiper')) {
+                return;
+            }
+
+            new Swiper(this, {
+                modules: [Navigation, Pagination, Autoplay, Keyboard],
+                slidesPerView: 1,
+                spaceBetween: 16,
+                loop: true,
+                speed: 800,
+
+                autoplay: {
+                    delay: 4000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                },
+                pagination: {
+                    el: $this.find('.swiper-pagination')[0],
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: $this.find('.swiper-button-next')[0],
+                    prevEl: $this.find('.swiper-button-prev')[0],
+                },
+                breakpoints: {
+                    768: {
+                        slidesPerView: 2,
+                        spaceBetween: 20,
+                    },
+                    1024: {
+                        slidesPerView: 3,
+                        spaceBetween: 24,
+                    },
+                    1400: {
+                        slidesPerView: 4,
+                        spaceBetween: 24,
+                    }
+                }
+            });
+        });
+    }
+
     $(document).ready(function () {
 
         // initHeaderScroll();
@@ -205,6 +260,7 @@ import { CountUp } from 'countup.js';
         hleHeroSliders()
         hleInitCounters()
         hleInitParallax()
+        hleInitCarsSlider()
 
         AOS.init();
 

@@ -24,3 +24,11 @@
         padding: 0 16px;
     }
 }
+
+.hle-button-container {
+    margin-top: 32px;
+
+    @include media-breakpoint-down(md) {
+        margin-top: 24px;
+    }
+}

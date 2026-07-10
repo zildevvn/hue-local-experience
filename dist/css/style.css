@@ -6220,6 +6220,21 @@ html {
   margin: 10px 0 0 0;
 }
 
+.section-heading {
+  text-align: center;
+  width: 100%;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.section-heading > h2, .section-heading > .h2,
+.section-heading > p {
+  text-align: center;
+}
+.section-heading .hle-sub-heading {
+  margin: 10px 0 0 0;
+}
+
 @keyframes slideDown {
   from {
     transform: translateY(-100%);
@@ -6272,6 +6287,15 @@ html {
     font-size: 14px;
     height: 40px;
     padding: 0 16px;
+  }
+}
+
+.hle-button-container {
+  margin-top: 32px;
+}
+@media (max-width: 767.98px) {
+  .hle-button-container {
+    margin-top: 24px;
   }
 }
 
@@ -8056,6 +8080,19 @@ body.mobile-menu-open {
   border-radius: 20px 20px 0 20px;
 }
 
+.video-section {
+  padding-bottom: 90px;
+}
+@media (max-width: 1023.98px) {
+  .video-section {
+    padding-bottom: 60px;
+  }
+}
+@media (max-width: 767.98px) {
+  .video-section {
+    padding-bottom: 40px;
+  }
+}
 .video-section img {
   width: 100%;
   height: 350px;
@@ -8100,4 +8137,200 @@ body.mobile-menu-open {
 .video-section .btn-play-video svg path {
   fill: #fff;
   stroke: #fff;
+}
+
+.cars-section {
+  background: #F2F3F5;
+  padding: 90px 0;
+}
+.cars-section__list {
+  margin-top: 48px;
+}
+@media (max-width: 1023.98px) {
+  .cars-section__list {
+    margin-top: 32px;
+  }
+}
+.cars-section__list .car-item {
+  position: relative;
+  background: #fff;
+  border-radius: 50px 50px 50px 0;
+  overflow: hidden;
+  box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.05);
+  text-decoration: none;
+}
+.cars-section__list .car-item:hover .car-item__thumb img {
+  transform: scale(1.1);
+}
+.cars-section__list .car-item__thumb {
+  overflow: hidden;
+}
+.cars-section__list .car-item__thumb img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  transform: scale(1);
+  transition: all 3s cubic-bezier(0.11, 0.52, 0.53, 0.79) 0s;
+}
+.cars-section__list .car-item-content {
+  padding: 16px;
+}
+.cars-section__list .car-item-content h3, .cars-section__list .car-item-content .h3 {
+  font-weight: 700;
+  color: #19232B;
+  margin: 0;
+}
+.cars-section__list .car-item-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #19232B;
+}
+.cars-section__list .car-item-info svg {
+  width: 100%;
+  height: auto;
+  max-width: 18px;
+}
+.cars-section__list .car-item-info svg path {
+  stroke: #9615b5;
+}
+.cars-section__list .car-item-info.luggage svg {
+  margin-left: -1px;
+}
+.cars-section__list .car-item-info.air-conditioning svg {
+  margin-left: -1px;
+}
+.cars-section__list .car-item .hle-button {
+  border: none;
+  background: transparent;
+  color: #19232B;
+  padding: 0;
+  height: auto;
+  margin-top: 16px;
+}
+.cars-section__list .car-item .hle-button:hover {
+  color: #9615b5;
+}
+.cars-section__list .car-item .hle-button:hover svg {
+  transform: translateX(3px);
+}
+.cars-section__list .car-item .hle-button:hover svg path {
+  stroke: #9615b5;
+}
+.cars-section__list .car-item .hle-button svg {
+  width: 100%;
+  height: auto;
+  max-width: 14px;
+  transition: all 0.3s ease;
+}
+.cars-section__list .car-item .hle-button svg path {
+  stroke: #19232B;
+  stroke-width: 2px;
+}
+.cars-section__list .car-item .hle-button:hover {
+  background: transparent;
+}
+.cars-section__list:hover .swiper-button-prev,
+.cars-section__list:hover .swiper-button-next {
+  opacity: 1;
+  visibility: visible;
+}
+.cars-section .swiper-button-prev,
+.cars-section .swiper-button-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  z-index: 10;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+.cars-section .swiper-button-prev::after,
+.cars-section .swiper-button-next::after {
+  content: none;
+}
+.cars-section .swiper-button-prev svg,
+.cars-section .swiper-button-next svg {
+  width: 20px;
+  height: auto;
+}
+.cars-section .swiper-button-prev svg path,
+.cars-section .swiper-button-next svg path {
+  stroke: #19232B;
+  transition: stroke 0.3s ease;
+}
+.cars-section .swiper-button-prev:hover,
+.cars-section .swiper-button-next:hover {
+  background: #9615b5;
+}
+.cars-section .swiper-button-prev:hover svg path,
+.cars-section .swiper-button-next:hover svg path {
+  stroke: #fff;
+}
+.cars-section .swiper-button-prev.swiper-button-disabled,
+.cars-section .swiper-button-next.swiper-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cars-section .swiper-button-prev {
+  left: 15px;
+}
+.cars-section .swiper-button-next {
+  right: 15px;
+}
+.cars-section .swiper-pagination {
+  position: relative;
+  margin-top: 30px;
+  bottom: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+.cars-section .swiper-pagination .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background-color: rgba(0, 0, 0, 0.15);
+  opacity: 1;
+  margin: 0 !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.cars-section .swiper-pagination .swiper-pagination-bullet:hover {
+  background-color: #9615b5;
+}
+.cars-section .swiper-pagination .swiper-pagination-bullet-active {
+  width: 28px;
+  border-radius: 5px;
+  background-color: #9615b5;
+}
+@media (min-width: 1025px) {
+  .cars-section .swiper-button-prev,
+  .cars-section .swiper-button-next {
+    display: flex;
+  }
+  .cars-section .swiper-pagination {
+    display: none;
+  }
+}
+@media (max-width: 1024px) {
+  .cars-section .swiper-button-prev,
+  .cars-section .swiper-button-next {
+    display: none;
+  }
+  .cars-section .swiper-pagination {
+    display: flex;
+  }
 }

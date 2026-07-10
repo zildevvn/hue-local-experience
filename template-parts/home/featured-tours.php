@@ -164,6 +164,10 @@ if ($query->have_posts()): ?>
                 <?php endwhile; ?>
                 <?php wp_reset_postdata(); ?>
             </div>
+
+            <div class="d-flex justify-content-center hle-button-container">
+                <a class="hle-button" href="/tours" role="button"> View All</a>
+            </div>
         </div>
     </section>
 <?php endif; ?>

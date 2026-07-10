@@ -41,6 +41,39 @@ if (!function_exists('hle_create_custom_post_type')) {
 			'rewrite' => array('slug' => 'news-item'),
 		));
 
+
+		register_post_type('cars', array(
+			'labels' => array(
+				'name' => __('Cars'),
+				'singular_name' => __('Car'),
+				'add_new' => __('Add New'),
+				'add_new_item' => __('Add New Car'),
+				'edit_item' => __('Edit Car'),
+				'new_item' => __('New Car'),
+				'view_item' => __('View Car'),
+				'search_items' => __('Search Cars'),
+				'not_found' => __('No cars found'),
+				'not_found_in_trash' => __('No cars found in trash'),
+				'all_items' => __('All Cars'),
+				'menu_name' => __('Cars'),
+			),
+			'label' => __('Cars', 'hle'),
+			'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'page-attributes'),
+			'menu_icon' => 'dashicons-car',
+			'hierarchical' => false,
+			'public' => true,
+			'show_ui' => true,
+			'show_in_menu' => true,
+			'menu_position' => 5,
+			'show_in_admin_bar' => true,
+			'show_in_nav_menus' => true,
+			'can_export' => true,
+			'has_archive' => false,
+			'exclude_from_search' => false,
+			'publicly_queryable' => true,
+			'show_in_rest' => true,
+			'rewrite' => array('slug' => 'cars'),
+		));
 	}
 
 	add_action('init', 'hle_create_custom_post_type', 0);
