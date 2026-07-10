@@ -79,6 +79,28 @@ html {
     }
 }
 
+@keyframes effectDeformY {
+    0% {
+        transform: none;
+    }
+
+    25% {
+        transform: scaleY(1.05) skewY(2deg);
+    }
+
+    50% {
+        transform: none;
+    }
+
+    75% {
+        transform: scaleY(1.05) skewY(-2deg);
+    }
+
+    100% {
+        transform: none;
+    }
+}
+
 @keyframes slideDown {
     from {
         transform: translateY(-100%);
