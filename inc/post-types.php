@@ -41,7 +41,6 @@ if (!function_exists('hle_create_custom_post_type')) {
 			'rewrite' => array('slug' => 'news-item'),
 		));
 
-
 		register_post_type('cars', array(
 			'labels' => array(
 				'name' => __('Cars'),

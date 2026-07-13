@@ -8735,6 +8735,9 @@ body.mobile-menu-open {
     padding-bottom: 60px;
   }
 }
+.posts-section__list .post-item:hover .post-item__thumb img {
+  transform: scale(1.1);
+}
 .posts-section__list .post-item .hle-button {
   position: absolute;
   left: 20px;
@@ -8749,7 +8752,8 @@ body.mobile-menu-open {
   width: 100%;
   height: 250px;
   object-fit: cover;
-  transition: all 0.3s ease;
+  transform: scale(1);
+  transition: 3s cubic-bezier(0.11, 0.52, 0.53, 0.79);
 }
 .posts-section__list .post-item__date {
   position: absolute;
@@ -8793,4 +8797,90 @@ body.mobile-menu-open {
 }
 .posts-section__list .post-item__excerpt p:last-child {
   margin-bottom: 0;
+}
+
+.team-section {
+  padding: 90px 0;
+  background: #F2F3F5;
+}
+@media (max-width: 1023.98px) {
+  .team-section {
+    padding: 60px 0;
+  }
+}
+@media (max-width: 767.98px) {
+  .team-section {
+    padding: 40px 0;
+  }
+}
+.team-section__list {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+@media (max-width: 1023.98px) {
+  .team-section__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 767.98px) {
+  .team-section__list {
+    grid-template-columns: 1fr;
+  }
+}
+.team-section__list .team-item {
+  position: relative;
+  background: #fff;
+  padding: 20px 20px 20px 20px;
+  border-radius: 50px 50px 50px 0;
+  box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.05);
+  border-bottom: 5px solid #9615b5;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.team-section__list .team-item:hover {
+  transform: translateY(-5px);
+}
+.team-section__list .team-item:hover .team-item__thumb img {
+  transform: scale(1.05);
+}
+.team-section__list .team-item__thumb {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px 30px 30px 0;
+  margin-bottom: 20px;
+}
+.team-section__list .team-item__thumb img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+.team-section__list .team-item__content {
+  padding-bottom: 10px;
+}
+.team-section__list .team-item__name {
+  color: #19232B;
+  margin-bottom: 4px;
+}
+.team-section__list .team-item__position {
+  display: block;
+  color: #757f95;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+.team-section__list .team-item .hle-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+}
+.team-section__list .team-item .hle-button:hover svg path {
+  fill: #9615b5;
+}
+.team-section__list .team-item .hle-button svg {
+  width: 20px;
+  height: 20px;
 }
