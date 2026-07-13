@@ -8691,3 +8691,106 @@ body.mobile-menu-open {
 .testimonials-section .testimonials-carousel .testimonial-item__icon svg path {
   fill: #fff;
 }
+
+.posts-section {
+  padding: 90px 0;
+}
+@media (max-width: 1023.98px) {
+  .posts-section {
+    padding: 60px 0;
+  }
+}
+@media (max-width: 767.98px) {
+  .posts-section {
+    padding: 40px 0;
+  }
+}
+.posts-section__list {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+@media (max-width: 1023.98px) {
+  .posts-section__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 767.98px) {
+  .posts-section__list {
+    grid-template-columns: 1fr;
+  }
+}
+.posts-section__list .post-item {
+  position: relative;
+  padding: 20px 20px 15px 20px;
+  border-radius: 50px 50px 50px 0;
+  box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.05);
+  border-bottom: 5px solid #9615b5;
+  text-decoration: none;
+  padding-bottom: 82px;
+}
+@media (max-width: 767.98px) {
+  .posts-section__list .post-item {
+    padding-bottom: 60px;
+  }
+}
+.posts-section__list .post-item .hle-button {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+}
+.posts-section__list .post-item__thumb {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px 30px 30px 0;
+}
+.posts-section__list .post-item__thumb img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+.posts-section__list .post-item__date {
+  position: absolute;
+  padding: 4px 12px 4px 12px;
+  right: -10px;
+  top: 40px;
+  font-weight: 500;
+  background: #9615b5;
+  color: #fff;
+  border-radius: 50px 50px 50px 0;
+  box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.05);
+  z-index: 2;
+  font-size: 15px;
+}
+.posts-section__list .post-item__date svg {
+  width: 100%;
+  height: auto;
+  max-width: 16px;
+}
+.posts-section__list .post-item__date svg path {
+  stroke: #fff;
+  stroke-width: 2;
+}
+.posts-section__list .post-item__content {
+  padding: 20px 0;
+}
+.posts-section__list .post-item__content h3, .posts-section__list .post-item__content .h3 {
+  color: #19232B;
+}
+.posts-section__list .post-item__excerpt {
+  color: #757f95;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  margin-top: 16px;
+}
+.posts-section__list .post-item__excerpt p {
+  margin-bottom: 12px;
+}
+.posts-section__list .post-item__excerpt p:last-child {
+  margin-bottom: 0;
+}

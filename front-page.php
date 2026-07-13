@@ -17,6 +17,7 @@ get_header();
     <?php get_template_part('template-parts/home/how-to-book-section'); ?>
     <?php get_template_part('template-parts/home/faqs-section'); ?>
     <?php get_template_part('template-parts/home/testimonials-section'); ?>
+    <?php get_template_part('template-parts/home/posts-section'); ?>
 </main>
 <?php
 get_footer();
