@@ -221,7 +221,6 @@ import { CountUp } from 'countup.js';
                 spaceBetween: 16,
                 loop: true,
                 speed: 800,
-
                 autoplay: {
                     delay: 4000,
                     disableOnInteraction: false,
@@ -253,6 +252,98 @@ import { CountUp } from 'countup.js';
         });
     }
 
+    function hleInitTestimonialsSlider() {
+        const testimonialsCarousel = document.querySelector('.testimonials-carousel')
+        if (!testimonialsCarousel) return;
+
+        const swiper = new Swiper(testimonialsCarousel, {
+            modules: [Navigation, Pagination, Autoplay],
+            slidesPerView: 1,
+            spaceBetween: 20,
+            observer: true,
+            observeParents: true,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                1400: {
+                    slidesPerView: 4,
+                },
+                1024: {
+                    slidesPerView: 3,
+                },
+                767: {
+                    slidesPerView: 2,
+                },
+            },
+            on: {
+                init: function () {
+                    setTimeout(() => {
+                        this.update();
+                    }, 50);
+                },
+                resize: function () {
+                    setTimeout(() => {
+                        this.update();
+                    }, 50);
+                }
+            }
+        });
+    }
+
+    function hleInitFaqs() {
+        const $faqsList = $('.faqs-list');
+        if (!$faqsList.length) return;
+
+        // Prevent duplicate event binding
+        $faqsList.off('click keydown', '.faq-question');
+
+        $faqsList.on('click keydown', '.faq-question', function (e) {
+            // Handle keydown: only trigger for Enter (13) or Space (32) keys
+            if (e.type === 'keydown' && e.which !== 13 && e.which !== 32) {
+                return;
+            }
+
+            // Prevent default page scroll behavior on Space key
+            if (e.which === 32) {
+                e.preventDefault();
+            }
+
+            const $question = $(this);
+            const $item = $question.closest('.faq-item');
+            const $answer = $item.find('.faq-answer');
+            const isActive = $item.hasClass('is-active') || $item.hasClass('active');
+
+            // Find other active items and close them smoothly
+            const $otherItems = $faqsList.find('.faq-item').not($item);
+            $otherItems.removeClass('is-active active');
+            $otherItems.find('.faq-question').attr('aria-expanded', 'false');
+            $otherItems.find('.faq-answer').slideUp(300);
+
+            if (isActive) {
+                // Toggle active class and slide up
+                $item.removeClass('is-active active');
+                $question.attr('aria-expanded', 'false');
+                $answer.slideUp(300);
+            } else {
+                // Toggle active class and slide down
+                $item.addClass('is-active active');
+                $question.attr('aria-expanded', 'true');
+                $answer.slideDown(300);
+            }
+        });
+    }
+
     $(document).ready(function () {
 
         // initHeaderScroll();
@@ -261,6 +352,8 @@ import { CountUp } from 'countup.js';
         hleInitCounters()
         hleInitParallax()
         hleInitCarsSlider()
+        hleInitTestimonialsSlider()
+        hleInitFaqs()
 
         AOS.init();
 

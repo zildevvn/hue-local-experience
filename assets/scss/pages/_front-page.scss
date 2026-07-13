@@ -700,6 +700,7 @@
             border-radius: 50px 50px 50px 0;
             box-shadow: 0 0 40px 5px rgb(0 0 0 / 5%);
             text-decoration: none;
+            border-bottom: 5px solid $color-primary;
 
             &:hover {
                 .tour-item__thumb .icon {
@@ -983,6 +984,7 @@
             overflow: hidden;
             box-shadow: 0 0 40px 5px rgb(0 0 0 / 5%);
             text-decoration: none;
+            border-bottom: 5px solid $color-primary;
 
             &:hover {
                 .car-item__thumb img {
@@ -1296,5 +1298,314 @@
             }
         }
 
+    }
+}
+
+
+.faqs-section {
+    &-inner {
+        padding: 90px 0;
+        gap: 40px;
+
+        >div {
+            width: 50%;
+        }
+
+        .hle-sub-heading {
+            margin-top: 24px;
+
+            @include media-breakpoint-down(md) {
+                margin-top: 20px;
+            }
+
+            >p:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+
+        .faqs-list {
+
+            .faq-item {
+                border: none;
+                margin-bottom: 30px;
+                background: #ffff;
+                border-radius: 30px 30px 30px 0 !important;
+                box-shadow: 0 0 40px 5px rgb(0 0 0 / 5%);
+
+                .faq-answer {
+                    display: none;
+                    padding: 0 20px 20px 20px;
+                    color: $color-body;
+                    font-size: 15px;
+                    line-height: 1.6;
+                }
+
+                &.is-active {
+                    .faq-question .arrow svg {
+                        transform: rotate(180deg);
+
+                        .vertical-line {
+                            transform: rotate(450deg);
+                        }
+                    }
+                }
+            }
+
+            .faq-question {
+                position: relative;
+                padding: 16px 20px;
+                cursor: pointer;
+                color: $color-text;
+
+                .icon {
+                    width: 45px;
+                    height: 45px;
+                    margin-right: 15px;
+                    background: $color-primary;
+                    border-radius: 50%;
+
+                    svg {
+                        path {
+                            stroke: #fff;
+                        }
+                    }
+                }
+
+                .arrow {
+                    position: absolute;
+                    right: 16px;
+                    top: 50%;
+                    transform: translateY(-50%);
+
+                    svg {
+                        width: 100%;
+                        max-width: 17px;
+                        height: auto;
+                        transition: transform .6s ease;
+
+                        rect {
+                            transition: all 800ms;
+                            transform: rotate(0);
+                            transform-origin: 50% 50%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.testimonials-section {
+    background: #F2F3F5;
+    padding: 90px 0;
+
+    @include media-breakpoint-down(lg) {
+        padding: 60px 0;
+    }
+
+    @include media-breakpoint-down(md) {
+        padding: 40px 0;
+    }
+
+    .testimonials-carousel {
+        margin-top: 48px;
+        min-width: 0;
+        width: 100%;
+
+        @include media-breakpoint-down(lg) {
+            margin-top: 32px;
+        }
+
+        &:hover {
+
+            .swiper-button-prev,
+            .swiper-button-next {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        .swiper-button-prev,
+        .swiper-button-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            z-index: 10;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+
+            &::after {
+                content: none;
+            }
+
+            svg {
+                width: 20px;
+                height: auto;
+
+                path {
+                    stroke: $color-text;
+                    transition: stroke 0.3s ease;
+                }
+            }
+
+            &:hover {
+                background: $color-primary;
+
+                svg path {
+                    stroke: #fff;
+                }
+            }
+
+            &.swiper-button-disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        }
+
+        .swiper-button-prev {
+            left: 0px;
+        }
+
+        .swiper-button-next {
+            right: 0;
+        }
+
+        .swiper-pagination {
+            position: relative;
+            margin-top: 30px;
+            bottom: 0 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+
+            .swiper-pagination-bullet {
+                width: 10px;
+                height: 10px;
+                background-color: rgba(0, 0, 0, 0.15);
+                opacity: 1;
+                margin: 0 !important;
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                cursor: pointer;
+
+                &:hover {
+                    background-color: $color-primary;
+                }
+
+                &-active {
+                    width: 28px;
+                    border-radius: 5px;
+                    background-color: $color-primary;
+                }
+            }
+        }
+
+        .testimonial-item {
+            background: #fff;
+            border-radius: 40px 40px 40px 0;
+            padding: 25px 25px;
+            position: relative;
+            border-bottom: 5px solid $color-primary;
+            box-sizing: border-box;
+
+            &__rate {
+                svg {
+                    width: 100%;
+                    height: auto;
+                    max-width: 18px;
+
+                    path {
+                        stroke: #FDA31B;
+                        fill: #FDA31B;
+                    }
+                }
+            }
+
+            &-content,
+            &__quote {
+                margin-top: 16px;
+            }
+
+            &__quote {
+                font-style: italic;
+                font-weight: 500;
+            }
+
+            &__avatar {
+                position: relative;
+                padding: 8px;
+
+                svg {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    animation: dashed_border_running 20s linear infinite both;
+                    animation-play-state: running;
+                    stroke-width: 1.5;
+                    stroke-dasharray: 4, 5;
+                    stroke-dashoffset: 8;
+                    stroke-linecap: round;
+                    fill: none;
+                    transition: 0.4s;
+                    stroke: $color-primary;
+                    z-index: 9;
+
+                    rect {
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+
+                img {
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    object-position: center;
+                }
+            }
+
+            &__name {
+                margin: 0;
+                color: $color-text
+            }
+
+            &__position {
+                font-weight: 500;
+                color: $color-primary;
+            }
+
+            &__icon {
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 40px;
+                height: 40px;
+                text-align: center;
+                background: $color-primary;
+                border-radius: 50px 50px 50px 0;
+
+                svg {
+                    path {
+                        fill: #fff;
+                    }
+                }
+            }
+        }
     }
 }

@@ -15,6 +15,8 @@ get_header();
     <?php get_template_part('template-parts/home/video-section'); ?>
     <?php get_template_part('template-parts/home/cars-section'); ?>
     <?php get_template_part('template-parts/home/how-to-book-section'); ?>
+    <?php get_template_part('template-parts/home/faqs-section'); ?>
+    <?php get_template_part('template-parts/home/testimonials-section'); ?>
 </main>
 <?php
 get_footer();
