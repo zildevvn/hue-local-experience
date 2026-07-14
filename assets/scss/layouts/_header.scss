@@ -50,22 +50,37 @@
     position: relative;
     z-index: 1000;
     padding: 10px 0;
+    position: sticky;
+    top: 0;
+    left: 0;
     width: 100%;
-    transition: box-shadow 0.3s ease, padding 0.3s ease;
+    z-index: 1029;
+    transition: all 0.6s cubic-bezier(.11, .52, .53, .79) 0s;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
 
-    &.fixed-top {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
-        animation: slide-down 0.7s;
-        z-index: 1030;
+    body.logged-in & {
+        top: 32px;
+    }
 
-        body.logged-in & {
-            top: 32px;
+    &.is-sticky {
+        .header-main__logo img {
+            max-width: 70px;
         }
     }
+
+    // &.fixed-top {
+    //     position: fixed;
+    //     top: 0;
+    //     left: 0;
+    //     width: 100%;
+    //     box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
+    //     animation: slide-down 0.7s;
+    //     z-index: 1030;
+
+    //     body.logged-in & {
+    //         top: 32px;
+    //     }
+    // }
 
     &__logo {
         img {
@@ -73,6 +88,7 @@
             height: auto;
             max-width: 100px;
             display: block;
+            transition: all 0.6s cubic-bezier(.11, .52, .53, .79) 0s;
 
             @include media-breakpoint-down(md) {
                 max-width: 80px;

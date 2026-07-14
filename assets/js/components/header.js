@@ -122,68 +122,51 @@
   }
 
 
-  $(window).on("load", function () {
-
-  })
-
-
   function hleStickyHeader() {
     const $header = $('.header-main');
-    if ($header.length === 0) return;
+    if (!$header.length) return;
 
-    // Create a placeholder to prevent content jump/flickering when header becomes fixed
-    const $placeholder = $('<div class="header-main-placeholder"></div>');
-    $placeholder.hide();
-    $header.before($placeholder);
+    const $sentinel = $('<div class="header-sticky-sentinel"></div>');
+    $header.before($sentinel);
 
-    let isFixed = false;
-    let headerOffset = $header.offset().top;
+    let ticking = false;
 
-    // Recalculate offset on window resize
-    $(window).on('resize', function () {
-      if (!isFixed) {
-        headerOffset = $header.offset().top;
-      }
-    });
-
-    function toggleSticky() {
-      const scrollTop = $(window).scrollTop();
-
-      if (scrollTop > headerOffset) {
-        if (!isFixed) {
-          $placeholder.height($header.outerHeight()).show();
-          $header.addClass('fixed-top');
-          isFixed = true;
+    function checkSticky() {
+      const sentinelRect = $sentinel[0].getBoundingClientRect();
+      const headerTop = parseInt($header.css('top'), 10) || 0;
+      
+      if (sentinelRect.bottom <= headerTop) {
+        if (!$header.hasClass('is-sticky')) {
+            $header.addClass('is-sticky');
         }
       } else {
-        if (isFixed) {
-          $header.removeClass('fixed-top');
-          $placeholder.hide().height(0);
-          isFixed = false;
+        if ($header.hasClass('is-sticky')) {
+            $header.removeClass('is-sticky');
         }
       }
     }
 
-    // Use requestAnimationFrame for smooth and optimized scroll handling
-    let ticking = false;
-    $(window).on('scroll', function () {
+    $(window).on('scroll resize', function () {
       if (!ticking) {
         window.requestAnimationFrame(function () {
-          toggleSticky();
+          checkSticky();
           ticking = false;
         });
         ticking = true;
       }
     });
 
-    // Run once on load to ensure correct initial state
-    toggleSticky();
+    checkSticky();
   }
+
+  $(window).on("load", function () {
+
+  })
 
   $(document).ready(function () {
     hleModalSearch();
     hleMobileMenu();
-    // hleStickyHeader();
+    hleStickyHeader();
   });
 
 })(jQuery);

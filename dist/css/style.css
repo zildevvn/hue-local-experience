@@ -6520,26 +6520,26 @@ body.search-modal-open {
   position: relative;
   z-index: 1000;
   padding: 10px 0;
-  width: 100%;
-  transition: box-shadow 0.3s ease, padding 0.3s ease;
-}
-.header-main.fixed-top {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
+  z-index: 1029;
+  transition: all 0.6s cubic-bezier(0.11, 0.52, 0.53, 0.79) 0s;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
-  animation: slide-down 0.7s;
-  z-index: 1030;
 }
-body.logged-in .header-main.fixed-top {
+body.logged-in .header-main {
   top: 32px;
+}
+.header-main.is-sticky .header-main__logo img {
+  max-width: 70px;
 }
 .header-main__logo img {
   width: 100%;
   height: auto;
   max-width: 100px;
   display: block;
+  transition: all 0.6s cubic-bezier(0.11, 0.52, 0.53, 0.79) 0s;
 }
 @media (max-width: 767.98px) {
   .header-main__logo img {
