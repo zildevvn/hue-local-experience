@@ -6,9 +6,9 @@ $link_video = get_field('link_video_hp');
 <?php if (!empty($link_video) && isset($link_video)): ?>
     <section class="hle-section video-section">
         <div class="container">
-            <div class="video-section-inner">
+            <div class="video-section-inner js-parallax-container">
                 <?php if (!empty($bg)): ?>
-                    <img src="<?= esc_url($bg); ?>" alt="background image for video">
+                    <img src="<?= esc_url($bg); ?>" alt="background image for video" data-parallax="true" data-parallax-speed="0.2">
                 <?php endif; ?>
 
                 <button class="btn-play-video" type="button" data-video-url="<?= esc_attr($link_video); ?>">

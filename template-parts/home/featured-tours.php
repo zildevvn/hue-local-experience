@@ -14,7 +14,7 @@ if ($query->have_posts()): ?>
     <section class="hle-section featured-tours-section">
         <div class="container">
             <div class="section-heading">
-                <h2 class="hle-heading center">
+                <h2 class="hle-heading center hle-heading-animation">
                     <?= $heading ?? '' ?>
                 </h2>
                 <p class="hle-sub-heading">

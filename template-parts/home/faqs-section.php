@@ -8,7 +8,7 @@ $faqs = get_field('faqs_list_hp');
         <div class="faqs-section-inner d-flex ">
             <div class="faqs-section-left">
                 <?php if (!empty($heading)): ?>
-                    <h2 class="hle-heading"><?php echo esc_html($heading); ?></h2>
+                    <h2 class="hle-heading hle-heading-animation"><?php echo esc_html($heading); ?></h2>
                 <?php endif; ?>
 
                 <?php if (!empty($description)): ?>

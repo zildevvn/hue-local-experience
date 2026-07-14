@@ -7,8 +7,9 @@ $steps = get_field('steps_htb_hp');
 ?>
 <section class="hle-section how-to-book-section">
     <?php if (!empty($bg)): ?>
-        <div class="hle-section__bg">
-            <img src="<?= esc_url($bg); ?>" alt=" background image for  <?= esc_attr($heading); ?>">
+        <div class="hle-section__bg js-parallax-container">
+            <img src="<?= esc_url($bg); ?>" alt=" background image for  <?= esc_attr($heading); ?>" data-parallax="true"
+                data-parallax-speed="0.2">
         </div>
     <?php endif; ?>
 
@@ -16,7 +17,7 @@ $steps = get_field('steps_htb_hp');
 
         <div class="section-heading">
             <?php if ($heading): ?>
-                <h2 class="hle-heading center"><?php echo esc_html($heading); ?></h2>
+                <h2 class="hle-heading center hle-heading-animation"><?php echo esc_html($heading); ?></h2>
             <?php endif; ?>
 
             <?php if ($sub_heading): ?>

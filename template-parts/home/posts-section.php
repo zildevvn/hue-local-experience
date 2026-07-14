@@ -15,7 +15,7 @@ $query = new WP_Query($args);
         <div class="container">
             <div class="section-heading">
                 <?php if ($heading): ?>
-                    <h2 class="hle-heading center"><?php echo esc_html($heading); ?></h2>
+                    <h2 class="hle-heading center hle-heading-animation"><?php echo esc_html($heading); ?></h2>
                 <?php endif; ?>
 
                 <?php if ($sub_heading): ?>

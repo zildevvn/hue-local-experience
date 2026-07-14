@@ -60,7 +60,7 @@ $phone = get_field('phone__wcu_hp');
                 <?php endif; ?>
             </div>
             <div class="wcu-section__right" data-aos="fade-up" data-aos-delay="150">
-                <h2 class="hle-heading mb-0">Why Choose Us?</h2>
+                <h2 class="hle-heading mb-0 hle-heading-animation">Why Choose Us?</h2>
 
                 <?php if ($descriptions): ?>
                     <p class="wcu-section__desc"><?= $descriptions ?></p>

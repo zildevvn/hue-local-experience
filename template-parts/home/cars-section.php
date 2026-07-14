@@ -16,7 +16,7 @@ $query = new WP_Query($args);
     <section class="hle-section cars-section">
         <div class="container">
             <div class="section-heading">
-                <h2 class="hle-heading center">
+                <h2 class="hle-heading center hle-heading-animation">
                     <?= $heading ?? '' ?>
                 </h2>
                 <p class="hle-sub-heading">

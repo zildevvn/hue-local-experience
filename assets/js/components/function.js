@@ -373,7 +373,7 @@ import { CountUp } from 'countup.js';
 
         function openModal(videoUrl) {
             let embedUrl = videoUrl;
-            
+
             if (videoUrl.includes('youtube.com/watch?v=')) {
                 const videoId = videoUrl.split('v=')[1].split('&')[0];
                 embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
@@ -398,7 +398,7 @@ import { CountUp } from 'countup.js';
             }, 300);
         }
 
-        $buttons.off('click.hleVideo').on('click.hleVideo', function(e) {
+        $buttons.off('click.hleVideo').on('click.hleVideo', function (e) {
             e.preventDefault();
             const videoUrl = $(this).attr('data-video-url');
             if (videoUrl) {
@@ -408,21 +408,186 @@ import { CountUp } from 'countup.js';
 
         $overlay.off('click.hleVideo').on('click.hleVideo', closeModal);
         $closeBtn.off('click.hleVideo').on('click.hleVideo', closeModal);
-        
-        $(document).off('keydown.hleVideo').on('keydown.hleVideo', function(e) {
+
+        $(document).off('keydown.hleVideo').on('keydown.hleVideo', function (e) {
             if (e.key === 'Escape' && $modal.hasClass('is-active')) {
                 closeModal();
             }
         });
     }
 
+    function hleInitImageParallax() {
+        const $parallaxElements = $('[data-parallax="true"]');
+        if (!$parallaxElements.length) return;
+
+        // Respect prefers-reduced-motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) return;
+
+        let requestId = null;
+
+        function updateParallax() {
+            const viewHeight = window.innerHeight;
+            const isMobile = window.matchMedia('(max-width: 767px)').matches;
+
+            $parallaxElements.each(function () {
+                const $el = $(this);
+                if (isMobile) {
+                    $el.css('transform', '');
+                    return;
+                }
+
+                const $container = $el.closest('.js-parallax-container');
+                if (!$container.length) return;
+
+                const rect = $container[0].getBoundingClientRect();
+
+                // Only calculate if in viewport
+                if (rect.top <= viewHeight && rect.bottom >= 0) {
+                    const speed = parseFloat($el.attr('data-parallax-speed')) || 0.15;
+                    const totalScrollableDistance = viewHeight + rect.height;
+                    const currentScrolledDistance = viewHeight - rect.top;
+
+                    let progress = currentScrolledDistance / totalScrollableDistance;
+                    progress = Math.max(0, Math.min(1, progress));
+                    const normalizedProgress = progress - 0.5;
+
+                    const maxTranslate = rect.height * speed;
+                    const translateY = normalizedProgress * maxTranslate;
+
+                    $el.css('transform', `translate3d(0, ${translateY}px, 0)`);
+                }
+            });
+
+            requestId = null;
+        }
+
+        function scheduleUpdate() {
+            if (!requestId) {
+                requestId = requestAnimationFrame(updateParallax);
+            }
+        }
+
+        if (window.hleImageParallaxObserver) {
+            window.hleImageParallaxObserver.disconnect();
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            let isAnyVisible = false;
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    $(entry.target).data('is-visible', true);
+                } else {
+                    $(entry.target).data('is-visible', false);
+                }
+            });
+
+            $parallaxElements.each(function () {
+                const $container = $(this).closest('.js-parallax-container');
+                if ($container.data('is-visible')) {
+                    isAnyVisible = true;
+                }
+            });
+
+            if (isAnyVisible) {
+                $(window).off('scroll.hleImgParallax resize.hleImgParallax').on('scroll.hleImgParallax resize.hleImgParallax', scheduleUpdate);
+                scheduleUpdate();
+            } else {
+                $(window).off('scroll.hleImgParallax resize.hleImgParallax');
+            }
+        }, {
+            threshold: 0,
+            rootMargin: '100px 0px 100px 0px'
+        });
+
+        window.hleImageParallaxObserver = observer;
+
+        $parallaxElements.each(function () {
+            const $container = $(this).closest('.js-parallax-container');
+            if ($container.length) {
+                observer.observe($container[0]);
+            }
+        });
+
+        scheduleUpdate();
+    }
+
+
+
+    function btAnimateText(selector, direction = 'right') {
+        const elements = document.querySelectorAll(selector);
+
+        elements.forEach(el => {
+            const originalText = el.textContent.trim();
+            let delay = 0;
+            const delayStep = 0.1;
+
+            el.setAttribute('aria-label', originalText);
+            el.classList.add('hle-animated', `hle-animation-${direction}`);
+
+            const words = originalText.split(' ');
+
+            const wordSpans = words.map(word => {
+                const letterSpans = word.split('').map(letter => {
+                    const span = document.createElement('span');
+                    span.className = 'hle-letter';
+                    // [WHY] Store delay in data attribute, apply only when in viewport
+                    span.dataset.delay = delay.toFixed(1);
+                    span.textContent = letter;
+                    delay += delayStep;
+                    return span;
+                });
+
+                const wordSpan = document.createElement('span');
+                wordSpan.className = 'hle-word';
+                wordSpan.setAttribute('aria-hidden', 'true');
+                letterSpans.forEach(ls => wordSpan.appendChild(ls));
+                return wordSpan;
+            });
+
+            el.textContent = '';
+            wordSpans.forEach((ws, i) => {
+                el.appendChild(ws);
+                if (i < wordSpans.length - 1) {
+                    el.appendChild(document.createTextNode(' '));
+                }
+            });
+        });
+
+        // [WHY] IntersectionObserver triggers animation only when heading enters viewport
+        // — better than scroll event listener (no debounce needed, runs off main thread)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+
+                // Apply animation-delay to each letter now that element is visible
+                entry.target.querySelectorAll('.hle-letter').forEach(letter => {
+                    letter.style.animationDelay = `${letter.dataset.delay}s`;
+                });
+
+                entry.target.classList.add('hle-in-view');
+
+                // [WHY] Unobserve after triggered — animation should only play once
+                observer.unobserve(entry.target);
+            });
+        }, {
+            threshold: 0.2, // trigger khi 20% element visible
+            rootMargin: '0px 0px -50px 0px' // trigger sớm hơn 50px trước khi vào viewport
+        });
+
+        document.querySelectorAll(selector).forEach(el => observer.observe(el));
+    }
+
+
     $(document).ready(function () {
 
-        // initHeaderScroll();
+        // Dùng:
+        btAnimateText('.hle-heading-animation', 'right');
         initBackToTop()
         hleHeroSliders()
         hleInitCounters()
         hleInitParallax()
+        hleInitImageParallax()
         hleInitCarsSlider()
         hleInitTestimonialsSlider()
         hleInitFaqs()

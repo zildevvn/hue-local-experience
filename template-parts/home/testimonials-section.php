@@ -8,7 +8,7 @@ $testimonials = get_field('testimonials_list_hp');
     <div class="container">
         <div class="section-heading">
             <?php if (!empty($heading)): ?>
-                <h2 class="hle-heading center">
+                <h2 class="hle-heading center hle-heading-animation">
                     <?php echo esc_html($heading); ?>
                 </h2>
             <?php endif; ?>
