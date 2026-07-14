@@ -11,7 +11,7 @@ $link_video = get_field('link_video_hp');
                     <img src="<?= esc_url($bg); ?>" alt="background image for video">
                 <?php endif; ?>
 
-                <button class="btn-play-video" type="button" data-bs-toggle="modal" data-bs-target="#videoModal">
+                <button class="btn-play-video" type="button" data-video-url="<?= esc_attr($link_video); ?>">
                     <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                         color="#000000" stroke-width="1.5">
                         <path

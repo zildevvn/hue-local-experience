@@ -344,6 +344,78 @@ import { CountUp } from 'countup.js';
         });
     }
 
+    function hleVideoPopup() {
+        const $buttons = $('.btn-play-video');
+        if (!$buttons.length) return;
+
+        if ($('#hle-video-modal').length === 0) {
+            const modalHtml = `
+                <div id="hle-video-modal" class="hle-video-modal" aria-hidden="true">
+                    <div class="hle-video-modal__overlay"></div>
+                    <div class="hle-video-modal__content">
+                        <button class="hle-video-modal__close" aria-label="Close video">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                        <div class="hle-video-modal__iframe-container">
+                            <iframe id="hle-video-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHtml);
+        }
+
+        const $modal = $('#hle-video-modal');
+        const $overlay = $modal.find('.hle-video-modal__overlay');
+        const $closeBtn = $modal.find('.hle-video-modal__close');
+        const $iframe = $('#hle-video-iframe');
+        const $body = $('body');
+
+        function openModal(videoUrl) {
+            let embedUrl = videoUrl;
+            
+            if (videoUrl.includes('youtube.com/watch?v=')) {
+                const videoId = videoUrl.split('v=')[1].split('&')[0];
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            } else if (videoUrl.includes('youtu.be/')) {
+                const videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            } else if (videoUrl.includes('vimeo.com/') && !videoUrl.includes('player.vimeo.com')) {
+                const videoId = videoUrl.split('vimeo.com/')[1].split('?')[0];
+                embedUrl = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+            }
+
+            $iframe.attr('src', embedUrl);
+            $modal.addClass('is-active').attr('aria-hidden', 'false');
+            $body.css('overflow', 'hidden');
+        }
+
+        function closeModal() {
+            $modal.removeClass('is-active').attr('aria-hidden', 'true');
+            $body.css('overflow', '');
+            setTimeout(() => {
+                $iframe.attr('src', '');
+            }, 300);
+        }
+
+        $buttons.off('click.hleVideo').on('click.hleVideo', function(e) {
+            e.preventDefault();
+            const videoUrl = $(this).attr('data-video-url');
+            if (videoUrl) {
+                openModal(videoUrl);
+            }
+        });
+
+        $overlay.off('click.hleVideo').on('click.hleVideo', closeModal);
+        $closeBtn.off('click.hleVideo').on('click.hleVideo', closeModal);
+        
+        $(document).off('keydown.hleVideo').on('keydown.hleVideo', function(e) {
+            if (e.key === 'Escape' && $modal.hasClass('is-active')) {
+                closeModal();
+            }
+        });
+    }
+
     $(document).ready(function () {
 
         // initHeaderScroll();
@@ -354,6 +426,7 @@ import { CountUp } from 'countup.js';
         hleInitCarsSlider()
         hleInitTestimonialsSlider()
         hleInitFaqs()
+        hleVideoPopup()
 
         AOS.init();
 
