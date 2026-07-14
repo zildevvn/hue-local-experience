@@ -1249,6 +1249,10 @@
         gap: 20px;
         margin-top: 48px;
 
+        @include media-breakpoint-down(lg) {
+            flex-wrap: wrap;
+        }
+
         @include media-breakpoint-down(md) {
             margin-top: 32px;
         }
@@ -1257,6 +1261,10 @@
             position: relative;
             text-align: center;
             color: #fff;
+
+            @include media-breakpoint-down(lg) {
+                width: calc(50% - 10px);
+            }
 
             h3 {
                 color: #fff;
@@ -1295,6 +1303,18 @@
                 position: absolute;
                 right: -14%;
                 top: 22%;
+
+                @include media-breakpoint-down(lg) {
+                    display: none;
+                }
+
+                img {
+                    @include media-breakpoint-down(xl) {
+                        width: 100%;
+                        height: auto;
+                        max-width: 50px;
+                    }
+                }
             }
         }
 
@@ -1307,8 +1327,17 @@
         padding: 90px 0;
         gap: 40px;
 
+        @include media-breakpoint-down(md) {
+            flex-wrap: wrap;
+            gap: 32px;
+        }
+
         >div {
             width: 50%;
+
+            @include media-breakpoint-down(md) {
+                width: 100%;
+            }
         }
 
         .hle-sub-heading {

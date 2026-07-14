@@ -5,7 +5,7 @@ $sub_heading = get_field('sub_heading_car_hp');
 
 $args = array(
     'post_type' => 'cars',
-    'posts_per_page' => 4,
+    'posts_per_page' => 8,
     'post_status' => 'publish',
 );
 $query = new WP_Query($args);

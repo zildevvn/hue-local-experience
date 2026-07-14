@@ -13,30 +13,48 @@ import { CountUp } from 'countup.js';
     "use strict";
 
     function hleHeroSliders() {
-        if ($('.hero-section-sliders').length > 0) {
-            new Swiper('.hero-section-sliders', {
+        const $sliders = $('.hero-section-sliders');
+        if ($sliders.length === 0) return;
+
+        $sliders.each(function () {
+            const $this = $(this);
+
+            if (this.swiper) {
+                return;
+            }
+
+            new Swiper(this, {
                 modules: [Pagination, Navigation, Autoplay, EffectFade],
                 slidesPerView: 1,
                 loop: true,
+                speed: 800,
                 effect: 'fade',
                 fadeEffect: {
                     crossFade: true
                 },
                 pagination: {
-                    el: '.hero-section-sliders .swiper-pagination',
+                    el: $this.find('.swiper-pagination')[0],
                     clickable: true,
                 },
                 navigation: {
-                    nextEl: '.hero-section-sliders .swiper-button-next',
-                    prevEl: '.hero-section-sliders .swiper-button-prev',
+                    nextEl: $this.find('.swiper-button-next')[0],
+                    prevEl: $this.find('.swiper-button-prev')[0],
+                    enabled: false
                 },
                 autoplay: {
                     delay: 5000,
                     disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
                 },
-
+                breakpoints: {
+                    768: {
+                        navigation: {
+                            enabled: true
+                        }
+                    }
+                }
             });
-        }
+        });
     }
 
     function initBackToTop() {
@@ -199,57 +217,38 @@ import { CountUp } from 'countup.js';
     }
 
     function hleInitCarsSlider() {
-        const $slider = $('.cars-section__list.swiper');
-        if (!$slider.length) return;
+        const container = document.querySelector('.cars-section__list');
+        if (!container) return null;
 
-        if (typeof Swiper === 'undefined') {
-            console.warn('Swiper is not loaded.');
-            return;
-        }
-
-        $slider.each(function () {
-            const $this = $(this);
-
-            // Prevent duplicate initialization
-            if ($this.hasClass('swiper-initialized') || $this.data('swiper')) {
-                return;
-            }
-
-            new Swiper(this, {
-                modules: [Navigation, Pagination, Autoplay, Keyboard],
-                slidesPerView: 1,
-                spaceBetween: 16,
-                loop: true,
-                speed: 800,
-                autoplay: {
-                    delay: 4000,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: true,
-                },
-                pagination: {
-                    el: $this.find('.swiper-pagination')[0],
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: $this.find('.swiper-button-next')[0],
-                    prevEl: $this.find('.swiper-button-prev')[0],
-                },
-                breakpoints: {
-                    768: {
-                        slidesPerView: 2,
-                        spaceBetween: 20,
-                    },
-                    1024: {
-                        slidesPerView: 3,
-                        spaceBetween: 24,
-                    },
-                    1400: {
-                        slidesPerView: 4,
-                        spaceBetween: 24,
-                    }
-                }
-            });
+        const swiper = new Swiper(container, {
+            modules: [Navigation, Pagination, Autoplay],
+            slidesPerView: 1,
+            spaceBetween: 20,
+            observer: true,
+            observeParents: true,
+            loop: true,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+            navigation: {
+                nextEl: '.cars-section .swiper-button-next',
+                prevEl: '.cars-section .swiper-button-prev',
+            },
+            pagination: {
+                el: '.cars-section .swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                1400: { slidesPerView: 4 },
+                1024: { slidesPerView: 3 },
+                767: { slidesPerView: 2 },
+            },
         });
+
+        // [WHY] Return instance so caller can call swiper.destroy() if needed (e.g. SPA navigation)
+        return swiper;
     }
 
     function hleInitTestimonialsSlider() {
@@ -260,8 +259,9 @@ import { CountUp } from 'countup.js';
             modules: [Navigation, Pagination, Autoplay],
             slidesPerView: 1,
             spaceBetween: 20,
-            observer: true,
-            observeParents: true,
+            // observer: true,
+            // observeParents: true,
+            loop: true,
             autoplay: {
                 delay: 4000,
                 disableOnInteraction: false,

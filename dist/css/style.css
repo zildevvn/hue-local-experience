@@ -6487,6 +6487,11 @@ body.search-modal-open {
 .header-top-left {
   color: #fff;
 }
+@media (max-width: 767.98px) {
+  .header-top-left {
+    font-size: 14px;
+  }
+}
 .header-top__socials {
   gap: 12px;
 }
@@ -8392,6 +8397,11 @@ body.mobile-menu-open {
   gap: 20px;
   margin-top: 48px;
 }
+@media (max-width: 1023.98px) {
+  .how-to-book-section .steps-list {
+    flex-wrap: wrap;
+  }
+}
 @media (max-width: 767.98px) {
   .how-to-book-section .steps-list {
     margin-top: 32px;
@@ -8401,6 +8411,11 @@ body.mobile-menu-open {
   position: relative;
   text-align: center;
   color: #fff;
+}
+@media (max-width: 1023.98px) {
+  .how-to-book-section .steps-list .step-item {
+    width: calc(50% - 10px);
+  }
 }
 .how-to-book-section .steps-list .step-item h3, .how-to-book-section .steps-list .step-item .h3 {
   color: #fff;
@@ -8433,13 +8448,36 @@ body.mobile-menu-open {
   right: -14%;
   top: 22%;
 }
+@media (max-width: 1023.98px) {
+  .how-to-book-section .steps-list .step-item__arrow {
+    display: none;
+  }
+}
+@media (max-width: 1199.98px) {
+  .how-to-book-section .steps-list .step-item__arrow img {
+    width: 100%;
+    height: auto;
+    max-width: 50px;
+  }
+}
 
 .faqs-section-inner {
   padding: 90px 0;
   gap: 40px;
 }
+@media (max-width: 767.98px) {
+  .faqs-section-inner {
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+}
 .faqs-section-inner > div {
   width: 50%;
+}
+@media (max-width: 767.98px) {
+  .faqs-section-inner > div {
+    width: 100%;
+  }
 }
 .faqs-section-inner .hle-sub-heading {
   margin-top: 24px;
