@@ -579,6 +579,226 @@ import { CountUp } from 'countup.js';
     }
 
 
+    const hleFilterTours = () => {
+        const $isBlock = $('.tours-list-section ')
+        if (!$isBlock.length) return;
+
+        const resultsElement = $isBlock.find('#hle-tours-results'),
+            paginationElement = $isBlock.find('#hle-tours-pagination'),
+            query = resultsElement.data('query'),
+            fieldSearch = $isBlock.find('#hle-tours-search-input');
+
+        const paxSlider = document.getElementById('hle-tours-pax-slider');
+        const $paxDisplay = $('#hle-tours-pax-display');
+        const $paxMinInput = $('#hle-tours-pax-min');
+        const $paxMaxInput = $('#hle-tours-pax-max');
+
+        const priceSlider = document.getElementById('hle-tours-price-slider');
+        const $priceDisplay = $('#hle-tours-price-display');
+        const $priceMinInput = $('#hle-tours-price-min');
+        const $priceMaxInput = $('#hle-tours-price-max');
+
+        const $catRadios = $isBlock.find('input[name="tour_cat"]');
+        
+        const $sortSelect = $('#hle-tours-sort');
+        const $clearFiltersBtn = $('#hle-clear-filters');
+        const $toursCount = $('#hle-tours-count');
+
+        let searchTimeout;
+        let currentAjaxRequest = null;
+        let currentPage = 1;
+
+        function updateClearFiltersVisibility(searchVal, paxMinVal, paxMaxVal, priceMinVal, priceMaxVal, catVal, sortVal) {
+            const isSearchActive = searchVal !== '';
+            const isPaxActive = parseInt(paxMinVal) !== 1 || parseInt(paxMaxVal) !== 50;
+            const isPriceActive = parseInt(priceMinVal) !== 0 || parseInt(priceMaxVal) !== 1000;
+            const isCatActive = catVal !== 'all';
+            const isSortActive = sortVal !== 'default';
+
+            if (isSearchActive || isPaxActive || isPriceActive || isCatActive || isSortActive) {
+                $clearFiltersBtn.show();
+            } else {
+                $clearFiltersBtn.hide();
+            }
+        }
+
+        function triggerSearch(resetPage = true) {
+            if (resetPage) {
+                currentPage = 1;
+            }
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function () {
+                const searchVal = fieldSearch.val().trim();
+                const paxMinVal = $paxMinInput.val();
+                const paxMaxVal = $paxMaxInput.val();
+                const priceMinVal = $priceMinInput.val();
+                const priceMaxVal = $priceMaxInput.val();
+                const catVal = $isBlock.find('input[name="tour_cat"]:checked').val();
+                const sortVal = $sortSelect.val();
+
+                updateClearFiltersVisibility(searchVal, paxMinVal, paxMaxVal, priceMinVal, priceMaxVal, catVal, sortVal);
+
+                __ajax_filter({
+                    keySeach: searchVal,
+                    pax_min: paxMinVal,
+                    pax_max: paxMaxVal,
+                    price_min: priceMinVal,
+                    price_max: priceMaxVal,
+                    tour_cat: catVal,
+                    sort: sortVal,
+                    query: query,
+                    currentpage: currentPage
+                });
+            }, 500);
+        }
+
+        $catRadios.on('change', () => triggerSearch(true));
+        $sortSelect.on('change', () => triggerSearch(true));
+
+        $clearFiltersBtn.on('click', function(e) {
+            e.preventDefault();
+            fieldSearch.val('');
+            
+            // Reset categories
+            $isBlock.find('input[name="tour_cat"][value="all"]').prop('checked', true);
+
+            // Reset sort
+            $sortSelect.val('default');
+
+            // Reset sliders
+            if (paxSlider && paxSlider.noUiSlider) {
+                paxSlider.noUiSlider.set([1, 50]);
+            }
+            if (priceSlider && priceSlider.noUiSlider) {
+                priceSlider.noUiSlider.set([0, 1000]);
+            }
+
+            triggerSearch(true);
+        });
+
+        if (paxSlider && typeof noUiSlider !== 'undefined') {
+            noUiSlider.create(paxSlider, {
+                start: [1, 50],
+                connect: true,
+                step: 1,
+                range: {
+                    'min': 1,
+                    'max': 50
+                },
+                format: {
+                    to: value => Math.round(value),
+                    from: value => value
+                }
+            });
+
+            paxSlider.noUiSlider.on('update', function (values, handle) {
+                $paxDisplay.text(values[0] + ' \u2013 ' + values[1] + ' pax');
+                $paxMinInput.val(values[0]);
+                $paxMaxInput.val(values[1]);
+            });
+
+            paxSlider.noUiSlider.on('change', () => triggerSearch(true));
+        }
+
+        if (priceSlider && typeof noUiSlider !== 'undefined') {
+            noUiSlider.create(priceSlider, {
+                start: [0, 1000],
+                connect: true,
+                step: 10,
+                range: {
+                    'min': 0,
+                    'max': 1000
+                },
+                format: {
+                    to: value => Math.round(value),
+                    from: value => value
+                }
+            });
+
+            priceSlider.noUiSlider.on('update', function (values, handle) {
+                $priceDisplay.text('$' + values[0] + ' \u2013 $' + values[1]);
+                $priceMinInput.val(values[0]);
+                $priceMaxInput.val(values[1]);
+            });
+
+            priceSlider.noUiSlider.on('change', () => triggerSearch(true));
+        }
+
+        fieldSearch.on('input', () => triggerSearch(true));
+
+        paginationElement.on('click', '.page-numbers:not(.disabled):not(.current)', function(e) {
+            e.preventDefault();
+            const selectedPage = parseInt($(this).attr('data-page'));
+            if (!isNaN(selectedPage)) {
+                currentPage = selectedPage;
+                triggerSearch(false);
+            }
+        });
+
+        function __ajax_filter(val = {}) {
+            if (currentAjaxRequest) {
+                currentAjaxRequest.abort();
+            }
+
+            const $contentWrapper = $isBlock.find('.tours-content');
+            const $sidebarWrapper = $isBlock.find('.tours-sidebar');
+
+            try {
+                $contentWrapper.addClass('is-loading');
+                $sidebarWrapper.addClass('is-loading');
+
+                currentAjaxRequest = $.ajax({
+                    type: "post",
+                    url: php_data.ajax_url,
+                    dataType: "json",
+                    data: {
+                        ...{ action: "hle_ajax_filter_tours" },
+                        ...val,
+                    },
+                    success: function (data) {
+
+                        if (!resultsElement.hasClass("results-filter")) {
+                            resultsElement.addClass('results-filter')
+                        }
+
+                        if (data.count !== undefined) {
+                            $toursCount.text(data.count);
+                        }
+
+                        resultsElement.html(data.items);
+                        paginationElement.html(data.pagination);
+
+                        if (data.items.trim() === '') {
+                            $('#hle-tours-empty').show();
+                        } else {
+                            $('#hle-tours-empty').hide();
+                        }
+
+                        // Smooth scroll to top of listing section when changing pages
+                        if (val.currentpage > 1 || (val.currentpage === 1 && $(window).scrollTop() > $isBlock.offset().top)) {
+                            $('html, body').animate({
+                                scrollTop: $isBlock.offset().top - 80 // Adjust offset for sticky header if needed
+                            }, 600);
+                        }
+                    },
+
+                    complete: function () {
+                        currentAjaxRequest = null;
+                        $contentWrapper.removeClass('is-loading');
+                        $sidebarWrapper.removeClass('is-loading');
+                    }
+                });
+
+            } catch (e) {
+                console.log(e);
+                $contentWrapper.removeClass('is-loading');
+                $sidebarWrapper.removeClass('is-loading');
+            }
+        }
+
+    }
+
     $(document).ready(function () {
 
         // Dùng:
@@ -592,8 +812,7 @@ import { CountUp } from 'countup.js';
         hleInitTestimonialsSlider()
         hleInitFaqs()
         hleVideoPopup()
-
+        hleFilterTours()
         AOS.init();
-
     });
-})(jQuery); 
+})(jQuery);

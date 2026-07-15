@@ -153,7 +153,10 @@ html {
     display: inline-block;
     opacity: 0; // ẩn mặc định
     transform: translateX(50px);
-    // [WHY] Không có animation ở đây — chỉ chạy khi parent có hle-in-view
+}
+
+.hle-word {
+    display: inline-block;
 }
 
 // Animation chỉ kích hoạt khi JS add class hle-in-view
