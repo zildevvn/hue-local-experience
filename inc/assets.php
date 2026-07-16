@@ -7,6 +7,9 @@ add_action('wp_enqueue_scripts', function () {
 	wp_enqueue_style('theme-styles', get_template_directory_uri() . '/dist/css/style.css', array(), uniqid());
 	wp_enqueue_script('theme-scripts', get_template_directory_uri() . '/dist/js/main.bundle.js', array('jquery'), uniqid(), true);
 
+	wp_enqueue_style('fancybox-css', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css', array(), '5.0');
+	wp_enqueue_script('fancybox-js', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js', array(), '5.0', true);
+
 	wp_localize_script('theme-scripts', 'php_data', [
 		'admin_logged' => in_array('administrator', wp_get_current_user()->roles) ? 'yes' : 'no',
 		'ajax_url' => admin_url('admin-ajax.php'),

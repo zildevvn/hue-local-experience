@@ -314,6 +314,27 @@
                     ]
                 }
             ]
+        },
+        {
+            "key": "field_6a58460a5c0e5",
+            "label": "Form Booking",
+            "name": "form_booking",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
         }
     ],
     "location": [
@@ -337,5 +358,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1783914720
+    "modified": 1784170002
 }

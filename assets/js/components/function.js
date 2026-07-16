@@ -302,13 +302,13 @@ import { CountUp } from 'countup.js';
     }
 
     function hleInitFaqs() {
-        const $faqsList = $('.faqs-list');
+        const $faqsList = $('.accordion-list');
         if (!$faqsList.length) return;
 
         // Prevent duplicate event binding
-        $faqsList.off('click keydown', '.faq-question');
+        $faqsList.off('click keydown', '.accordion-question');
 
-        $faqsList.on('click keydown', '.faq-question', function (e) {
+        $faqsList.on('click keydown', '.accordion-question', function (e) {
             // Handle keydown: only trigger for Enter (13) or Space (32) keys
             if (e.type === 'keydown' && e.which !== 13 && e.which !== 32) {
                 return;
@@ -320,15 +320,15 @@ import { CountUp } from 'countup.js';
             }
 
             const $question = $(this);
-            const $item = $question.closest('.faq-item');
-            const $answer = $item.find('.faq-answer');
+            const $item = $question.closest('.accordion-item');
+            const $answer = $item.find('.accordion-answer');
             const isActive = $item.hasClass('is-active') || $item.hasClass('active');
 
             // Find other active items and close them smoothly
-            const $otherItems = $faqsList.find('.faq-item').not($item);
+            const $otherItems = $faqsList.find('.accordion-item').not($item);
             $otherItems.removeClass('is-active active');
-            $otherItems.find('.faq-question').attr('aria-expanded', 'false');
-            $otherItems.find('.faq-answer').slideUp(300);
+            $otherItems.find('.accordion-question').attr('aria-expanded', 'false');
+            $otherItems.find('.accordion-answer').slideUp(300);
 
             if (isActive) {
                 // Toggle active class and slide up
@@ -554,6 +554,25 @@ import { CountUp } from 'countup.js';
             });
         });
 
+        /* -------------------------------------------------------------------------- */
+        /* SINGLE TOUR GALLERY LIGHTBOX (Fancybox)
+        /* -------------------------------------------------------------------------- */
+        if (typeof Fancybox !== "undefined") {
+            Fancybox.bind('[data-fancybox="tour-gallery"]', {
+                Thumbs: {
+                    type: "modern"
+                },
+                Toolbar: {
+                    display: {
+                        left: ["infobar"],
+                        middle: [],
+                        right: ["slideshow", "thumbs", "close"],
+                    },
+                },
+            });
+        }
+        /* -------------------------------------------------------------------------- */
+
         // [WHY] IntersectionObserver triggers animation only when heading enters viewport
         // — better than scroll event listener (no debounce needed, runs off main thread)
         const observer = new IntersectionObserver((entries) => {
@@ -599,7 +618,7 @@ import { CountUp } from 'countup.js';
         const $priceMaxInput = $('#hle-tours-price-max');
 
         const $catRadios = $isBlock.find('input[name="tour_cat"]');
-        
+
         const $sortSelect = $('#hle-tours-sort');
         const $clearFiltersBtn = $('#hle-clear-filters');
         const $toursCount = $('#hle-tours-count');
@@ -656,10 +675,10 @@ import { CountUp } from 'countup.js';
         $catRadios.on('change', () => triggerSearch(true));
         $sortSelect.on('change', () => triggerSearch(true));
 
-        $clearFiltersBtn.on('click', function(e) {
+        $clearFiltersBtn.on('click', function (e) {
             e.preventDefault();
             fieldSearch.val('');
-            
+
             // Reset categories
             $isBlock.find('input[name="tour_cat"][value="all"]').prop('checked', true);
 
@@ -727,7 +746,7 @@ import { CountUp } from 'countup.js';
 
         fieldSearch.on('input', () => triggerSearch(true));
 
-        paginationElement.on('click', '.page-numbers:not(.disabled):not(.current)', function(e) {
+        paginationElement.on('click', '.page-numbers:not(.disabled):not(.current)', function (e) {
             e.preventDefault();
             const selectedPage = parseInt($(this).attr('data-page'));
             if (!isNaN(selectedPage)) {

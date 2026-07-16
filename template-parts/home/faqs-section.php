@@ -17,11 +17,11 @@ $faqs = get_field('faqs_list_hp');
             </div>
             <div class="faqs-section-right">
                 <?php if (!empty($faqs)): ?>
-                    <div class="faqs-list">
+                    <div class="faqs-list accordion-list">
                         <?php foreach ($faqs as $key => $faq): ?>
-                            <div class="faq-item" data-aos="fade-up" data-aos-delay="<?= $key * 100 ?>">
-                                <h3 class="faq-question h6 d-flex align-items-center" tabindex="0" role="button"
-                                    aria-expanded="false">
+                            <div class="faq-item accordion-item" data-aos="fade-up" data-aos-delay="<?= $key * 100 ?>">
+                                <h3 class="faq-question accordion-question h6 d-flex align-items-center" tabindex="0"
+                                    role="button" aria-expanded="false">
                                     <div class="icon d-flex align-items-center align-content-center justify-content-center">
                                         <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg" color="#000000">
@@ -44,7 +44,7 @@ $faqs = get_field('faqs_list_hp');
                                         </svg>
                                     </div>
                                 </h3>
-                                <div class="faq-answer">
+                                <div class="faq-answer accordion-answer">
                                     <?= $faq['answer'] ?>
                                 </div>
                             </div>

@@ -38,7 +38,7 @@ if (!function_exists('hle_create_custom_post_type')) {
 			'exclude_from_search' => false,
 			'publicly_queryable' => true,
 			'show_in_rest' => true,
-			'rewrite' => array('slug' => 'news-item'),
+			'rewrite' => array('slug' => 'hue-experience-all-tour'),
 		));
 
 		register_post_type('cars', array(
