@@ -1,70 +1,36 @@
 <?php
 
 function hle_post_item()
-{
-    $date = get_the_date('F j, Y');
-    $categories = get_the_category();
-    $external_link = get_field('external_link', get_the_ID());
-    $external_url = get_field('external_url', get_the_ID());
-    if ($external_link) {
-        $link_post = $external_url;
-        $target = '_blank';
-    } else {
-        $link_post = get_permalink();
-        $target = '_self';
-    }
-
-    ?>
-    <div class="item-post">
-        <div class="item-post__thumbnail">
-            <a href="<?= esc_url($link_post) ?>" target="<?= $target ?>" class="d-flex">
-                <?php the_post_thumbnail('full'); ?>
-
-                <?php if ($external_link && !empty($external_url)): ?>
-                    <span class="item-post__thumbnail--badge">Social Share</span>
-                <?php endif; ?>
-            </a>
+{ ?>
+    <a href="<?= the_permalink(); ?>" class="post-item" aria-label="read more <?= the_title(); ?>">
+        <div class="post-item__thumb">
+            <img src="<?= get_the_post_thumbnail_url(); ?>" alt="image for <?= the_title(); ?>">
         </div>
-
-        <h3 class="d-flex">
-            <a href="<?= esc_url($link_post) ?>" target="<?= $target ?>">
-                <?php the_title(); ?>
-            </a>
-        </h3>
-
-        <div class="item-post-meta d-flex align-items-center">
-            <p class="item-post__date d-flex align-items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" fill="none">
-                    <circle cx="4" cy="4.00012" r="4" fill="#1EACD4" />
-                </svg>
-                <?= $date ?>
-            </p>
-
-            <?php if (!empty($categories)): ?>
-                <div class="item-post__cate d-flex align-items-center">
-                    <?php foreach ($categories as $value): ?>
-                        <div class="item-cate d-flex align-items-center <?= $value->slug ?>">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" fill="none">
-                                <circle cx="4" cy="4.00012" r="4" fill="#1EACD4" />
-                            </svg>
-                            <?= $value->name ?>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <div class="item-post__excerpt" style="-webkit-box-orient:vertical"> <?= get_the_excerpt() ?> </div>
-
-        <a href="<?= esc_url($link_post) ?>" target="<?= $target ?>" class="d-flex align-items-center item-post__btn">
-            READ MORE
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                    d="M4 12.0001H16.25L11 6.75012L11.66 6.00012L18.16 12.5001L11.66 19.0001L11 18.2501L16.25 13.0001H4V12.0001Z"
-                    fill="#1EACD4" />
+        <div class="post-item__date d-flex align-items-center gap-2">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg" color="#000000">
+                <path d="M15 4V2M15 4V6M15 4H10.5M3 10V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V10H3Z"
+                    stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M3 10V6C3 4.89543 3.89543 4 5 4H7" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                <path d="M7 2V6" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M21 10V6C21 4.89543 20.1046 4 19 4H18.5" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
             </svg>
-        </a>
-    </div>
+            <?= get_the_date('F j, Y'); ?>
+        </div>
+        <div class="post-item__content">
+            <h3 class="post-item__title h4">
+                <?= the_title(); ?>
+            </h3>
+
+            <div class="post-item__excerpt">
+                <?= the_excerpt(); ?>
+            </div>
+
+            <button class="hle-button" aria-label="read more <?= the_title(); ?>"> Read More </button>
+        </div>
+    </a>
 <?php }
 
 function hle_breadcrumbs($title)

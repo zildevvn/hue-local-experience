@@ -152,3 +152,83 @@ function hle_ajax_filter_tours()
     ]);
     wp_die();
 }
+
+add_action('wp_ajax_hle_ajax_filter_posts', 'hle_ajax_filter_posts');
+add_action('wp_ajax_nopriv_hle_ajax_filter_posts', 'hle_ajax_filter_posts');
+function hle_ajax_filter_posts()
+{
+    $post_cat = isset($_POST['post_cat']) ? $_POST['post_cat'] : '';
+    $keySeach = isset($_POST['keySeach']) ? sanitize_text_field($_POST['keySeach']) : '';
+    $query = isset($_POST['query']) ? $_POST['query'] : [];
+    $currentpage = isset($_POST['currentpage']) ? intval($_POST['currentpage']) : 1;
+    $searchHd = '';
+
+    if (!empty($keySeach)) {
+        $query['s'] = $keySeach;
+    }
+
+    if (!empty($post_cat) && $post_cat != 'all') {
+        $query['cat'] = intval($post_cat);
+    }
+
+    $query['paged'] = $currentpage;
+
+    ob_start();
+    $the_query = new WP_Query($query);
+    $count = $the_query->found_posts;
+
+    if ($the_query->have_posts()) {
+        if (!empty($keySeach)) {
+            $searchHd = $the_query->found_posts;
+        }
+
+        while ($the_query->have_posts()) {
+            $the_query->the_post();
+            hle_post_item();
+        }
+    } else {
+        // Handled by frontend display:none JS logic, but output empty string.
+    }
+    $items = ob_get_clean();
+
+    ob_start();
+    $total_pages = $the_query->max_num_pages;
+    if ($total_pages > 1) {
+        echo '<div class="tours-pagination">';
+        
+        // Prev button
+        if ($currentpage > 1) {
+            echo '<button class="page-numbers prev" data-page="' . ($currentpage - 1) . '">&laquo; Prev</button>';
+        } else {
+            echo '<button class="page-numbers prev disabled" disabled>&laquo; Prev</button>';
+        }
+
+        // Page numbers
+        for ($i = 1; $i <= $total_pages; $i++) {
+            if ($i == $currentpage) {
+                echo '<span class="page-numbers current">' . $i . '</span>';
+            } else {
+                echo '<button class="page-numbers" data-page="' . $i . '">' . $i . '</button>';
+            }
+        }
+
+        // Next button
+        if ($currentpage < $total_pages) {
+            echo '<button class="page-numbers next" data-page="' . ($currentpage + 1) . '">Next &raquo;</button>';
+        } else {
+            echo '<button class="page-numbers next disabled" disabled>Next &raquo;</button>';
+        }
+        
+        echo '</div>';
+    }
+    $pagination = ob_get_clean();
+
+    wp_reset_postdata();
+    wp_send_json([
+        'items' => $items,
+        'searchHd' => $searchHd,
+        'pagination' => $pagination,
+        'count' => $count
+    ]);
+    wp_die();
+}

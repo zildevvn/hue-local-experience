@@ -126,7 +126,7 @@ $query = new WP_Query($args);
                         <?php
                         $total_pages = $query->max_num_pages;
                         if ($total_pages > 1) {
-                            echo '<div class="tours-pagination">';
+                            echo '<div class="tours-pagination hel-pagination">';
 
                             // Prev button
                             echo '<button class="page-numbers prev disabled" disabled>&laquo; Prev</button>';

@@ -818,6 +818,188 @@ import { CountUp } from 'countup.js';
 
     }
 
+    const hleFilterPosts = () => {
+        const $isBlock = $('.posts-list-section');
+        if (!$isBlock.length) return;
+
+        const resultsElement = $isBlock.find('#hle-posts-results'),
+            paginationElement = $isBlock.find('#hle-posts-pagination'),
+            query = resultsElement.data('query'),
+            fieldSearch = $isBlock.find('#hle-posts-search-input');
+
+        const $catRadios = $isBlock.find('input[name="post_cat"]');
+        
+        const $clearFiltersBtn = $('#hle-posts-clear-filters');
+        const $postsCount = $('#hle-posts-count');
+        
+        const $dropdown = $isBlock.find('.posts-category-dropdown');
+        const $trigger = $dropdown.find('.hle-dropdown-trigger');
+        const $menu = $dropdown.find('.hle-dropdown-menu');
+        const $label = $trigger.find('.hle-dropdown-label');
+        
+        let searchTimeout;
+        let currentAjaxRequest = null;
+        let currentPage = 1;
+
+        function updateClearFiltersVisibility(searchVal, catVal) {
+            const isSearchActive = searchVal !== '';
+            const isCatActive = catVal !== 'all';
+
+            if (isSearchActive || isCatActive) {
+                $clearFiltersBtn.show();
+            } else {
+                $clearFiltersBtn.hide();
+            }
+        }
+
+        function triggerSearch(resetPage = true) {
+            if (resetPage) {
+                currentPage = 1;
+            }
+
+            clearTimeout(searchTimeout);
+            
+            searchTimeout = setTimeout(() => {
+                const searchVal = fieldSearch.val().trim();
+                const catVal = $isBlock.find('input[name="post_cat"]:checked').val();
+
+                updateClearFiltersVisibility(searchVal, catVal);
+
+                __ajax_filter({
+                    keySeach: searchVal,
+                    post_cat: catVal,
+                    query: query,
+                    currentpage: currentPage
+                });
+            }, 500);
+        }
+
+        function updateDropdownLabel() {
+            const $checked = $catRadios.filter(':checked');
+            if ($checked.length) {
+                const labelText = $checked.attr('data-label') || $checked.siblings('.tours-category-name').text().trim();
+                $label.text(labelText);
+            }
+        }
+        
+        function openDropdown() {
+            $menu.addClass('is-open');
+            $trigger.attr('aria-expanded', 'true');
+        }
+
+        function closeDropdown() {
+            $menu.removeClass('is-open');
+            $trigger.attr('aria-expanded', 'false');
+        }
+
+        $trigger.on('click', function(e) {
+            e.preventDefault();
+            const isOpen = $menu.hasClass('is-open');
+            if (isOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        });
+
+        $(document).on('click', function(e) {
+            if ($dropdown.length && !$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
+                closeDropdown();
+            }
+        });
+
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape' && $menu.hasClass('is-open')) {
+                closeDropdown();
+            }
+        });
+
+        // Initialize label on load
+        updateDropdownLabel();
+
+        $catRadios.on('change', () => {
+            updateDropdownLabel();
+            closeDropdown();
+            triggerSearch(true);
+        });
+
+        $clearFiltersBtn.on('click', function (e) {
+            e.preventDefault();
+            fieldSearch.val('');
+
+            // Reset categories
+            $isBlock.find('input[name="post_cat"][value="all"]').prop('checked', true);
+            updateDropdownLabel();
+
+            triggerSearch(true);
+        });
+
+        fieldSearch.on('input', () => triggerSearch(true));
+
+        paginationElement.on('click', '.page-numbers:not(.disabled):not(.current)', function (e) {
+            e.preventDefault();
+            const selectedPage = parseInt($(this).attr('data-page'));
+            if (!isNaN(selectedPage)) {
+                currentPage = selectedPage;
+                triggerSearch(false);
+            }
+        });
+
+        function __ajax_filter(val = {}) {
+            if (currentAjaxRequest) {
+                currentAjaxRequest.abort();
+            }
+
+            const $contentWrapper = $isBlock.find('.posts-list-wrapper');
+
+            try {
+                $contentWrapper.addClass('is-loading');
+
+                currentAjaxRequest = $.ajax({
+                    type: "post",
+                    url: php_data.ajax_url,
+                    dataType: "json",
+                    data: {
+                        action: "hle_ajax_filter_posts",
+                        ...val
+                    },
+                    success: function (data) {
+                        if (data.count !== undefined) {
+                            $postsCount.text(data.count);
+                        }
+
+                        resultsElement.html(data.items);
+                        paginationElement.html(data.pagination);
+
+                        if (data.items.trim() === '') {
+                            $('#hle-posts-empty').show();
+                            $isBlock.find('.posts-main__header').hide();
+                        } else {
+                            $('#hle-posts-empty').hide();
+                            $isBlock.find('.posts-main__header').show();
+                        }
+
+                        // Smooth scroll to top of listing section when changing pages
+                        if (val.currentpage > 1 || (val.currentpage === 1 && $(window).scrollTop() > $isBlock.offset().top)) {
+                            $('html, body').animate({
+                                scrollTop: $isBlock.offset().top - 80 // Adjust offset for sticky header if needed
+                            }, 600);
+                        }
+                    },
+
+                    complete: function () {
+                        currentAjaxRequest = null;
+                        $contentWrapper.removeClass('is-loading');
+                    }
+                });
+
+            } catch (e) {
+                console.log(e);
+                $contentWrapper.removeClass('is-loading');
+            }
+        }
+    }
+
     $(document).ready(function () {
 
         // Dùng:
@@ -832,6 +1014,7 @@ import { CountUp } from 'countup.js';
         hleInitFaqs()
         hleVideoPopup()
         hleFilterTours()
+        hleFilterPosts()
         AOS.init();
     });
 })(jQuery);
