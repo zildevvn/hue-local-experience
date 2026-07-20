@@ -74,13 +74,59 @@
 
     >.container {
         background: #fff;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
-        border-radius: 15px 15px 15px 0px;
+        // box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
+        // border-radius: 15px 15px 15px 0px;
         padding-top: 10px;
         padding-bottom: 10px;
+        position: relative;
+        max-height: 99px;
+        fill: #fff;
+        filter: drop-shadow(0 4px 50px rgba(0, 0, 0, .1));
+
+        @include media-breakpoint-down(md) {
+            max-height: 84px;
+        }
+
+        &:before,
+        &:after {
+            content: "";
+            position: absolute;
+            display: inline-block;
+            height: 99px;
+            width: 70px;
+            // box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
+
+            @include media-breakpoint-down(md) {
+                height: 84px;
+            }
+        }
+
+        &:before {
+            top: 0;
+            left: -50px;
+            border: none;
+            background: #fff;
+            border-radius: 20px 0 0 20px;
+            transform: skewX(-15deg);
+        }
+
+        &::after {
+            top: 0;
+            border: none;
+            background: #fff;
+            left: auto;
+            right: -50px;
+            border-radius: 0 20px 20px 0;
+            transform: skewX(15deg);
+        }
 
         @include media-breakpoint-down(xl) {
             max-width: calc(100% - 40px);
+        }
+
+        >div {
+            position: relative;
+            z-index: 99;
         }
     }
 

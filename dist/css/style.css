@@ -6751,15 +6751,55 @@ body.logged-in .header-main {
 }
 .header-main > .container {
   background: #fff;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
-  border-radius: 15px 15px 15px 0px;
   padding-top: 10px;
   padding-bottom: 10px;
+  position: relative;
+  max-height: 99px;
+  fill: #fff;
+  filter: drop-shadow(0 4px 50px rgba(0, 0, 0, 0.1));
+}
+@media (max-width: 767.98px) {
+  .header-main > .container {
+    max-height: 84px;
+  }
+}
+.header-main > .container:before, .header-main > .container:after {
+  content: "";
+  position: absolute;
+  display: inline-block;
+  height: 99px;
+  width: 70px;
+}
+@media (max-width: 767.98px) {
+  .header-main > .container:before, .header-main > .container:after {
+    height: 84px;
+  }
+}
+.header-main > .container:before {
+  top: 0;
+  left: -50px;
+  border: none;
+  background: #fff;
+  border-radius: 20px 0 0 20px;
+  transform: skewX(-15deg);
+}
+.header-main > .container::after {
+  top: 0;
+  border: none;
+  background: #fff;
+  left: auto;
+  right: -50px;
+  border-radius: 0 20px 20px 0;
+  transform: skewX(15deg);
 }
 @media (max-width: 1199.98px) {
   .header-main > .container {
     max-width: calc(100% - 40px);
   }
+}
+.header-main > .container > div {
+  position: relative;
+  z-index: 99;
 }
 .header-main__logo img {
   width: 100%;
