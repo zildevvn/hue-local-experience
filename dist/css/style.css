@@ -6340,6 +6340,191 @@ html {
   }
 }
 
+/* ----------------------------------------- */
+/* NINJA FORMS OVERRIDES
+/* ----------------------------------------- */
+.nf-form-cont .nf-before-form-content {
+  display: none;
+}
+.nf-form-cont .nf-form-content {
+  padding: 0 !important;
+}
+.nf-form-cont .nf-form-content nf-fields-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.nf-form-cont .nf-form-content nf-field {
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+}
+.nf-form-cont .nf-form-content .nf-field-label {
+  margin-bottom: 8px !important;
+}
+.nf-form-cont .nf-form-content .nf-field-label label {
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  color: #19232B !important;
+}
+.nf-form-cont .nf-form-content {
+  /* Standard Inputs */
+}
+.nf-form-cont .nf-form-content input[type=text],
+.nf-form-cont .nf-form-content input[type=email],
+.nf-form-cont .nf-form-content input[type=tel],
+.nf-form-cont .nf-form-content input[type=number],
+.nf-form-cont .nf-form-content input[type=password],
+.nf-form-cont .nf-form-content input[type=date],
+.nf-form-cont .nf-form-content select,
+.nf-form-cont .nf-form-content textarea {
+  width: 100% !important;
+  height: 48px !important;
+  padding: 12px 16px !important;
+  background: #f9f9f9 !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 12px !important;
+  font-size: 15px !important;
+  color: #757f95 !important;
+  transition: all 0.3s ease !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+}
+.nf-form-cont .nf-form-content input[type=text]::placeholder,
+.nf-form-cont .nf-form-content input[type=email]::placeholder,
+.nf-form-cont .nf-form-content input[type=tel]::placeholder,
+.nf-form-cont .nf-form-content input[type=number]::placeholder,
+.nf-form-cont .nf-form-content input[type=password]::placeholder,
+.nf-form-cont .nf-form-content input[type=date]::placeholder,
+.nf-form-cont .nf-form-content select::placeholder,
+.nf-form-cont .nf-form-content textarea::placeholder {
+  color: #aaa !important;
+}
+.nf-form-cont .nf-form-content input[type=text]:hover,
+.nf-form-cont .nf-form-content input[type=email]:hover,
+.nf-form-cont .nf-form-content input[type=tel]:hover,
+.nf-form-cont .nf-form-content input[type=number]:hover,
+.nf-form-cont .nf-form-content input[type=password]:hover,
+.nf-form-cont .nf-form-content input[type=date]:hover,
+.nf-form-cont .nf-form-content select:hover,
+.nf-form-cont .nf-form-content textarea:hover {
+  border-color: #d0d0d0 !important;
+}
+.nf-form-cont .nf-form-content input[type=text]:focus,
+.nf-form-cont .nf-form-content input[type=email]:focus,
+.nf-form-cont .nf-form-content input[type=tel]:focus,
+.nf-form-cont .nf-form-content input[type=number]:focus,
+.nf-form-cont .nf-form-content input[type=password]:focus,
+.nf-form-cont .nf-form-content input[type=date]:focus,
+.nf-form-cont .nf-form-content select:focus,
+.nf-form-cont .nf-form-content textarea:focus {
+  outline: none !important;
+  border-color: #9615b5 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(150, 21, 181, 0.1) !important;
+}
+.nf-form-cont .nf-form-content textarea {
+  height: auto !important;
+  min-height: 120px !important;
+  resize: vertical !important;
+}
+.nf-form-cont .nf-form-content {
+  /* Select Dropdowns */
+}
+.nf-form-cont .nf-form-content select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 16px center !important;
+  background-size: 12px auto !important;
+  padding-right: 40px !important;
+}
+.nf-form-cont .nf-form-content {
+  /* Checkboxes & Radios */
+}
+.nf-form-cont .nf-form-content .nf-field-element ul {
+  margin: 0;
+  padding: 0;
+}
+.nf-form-cont .nf-form-content .nf-field-element ul li {
+  padding: 0;
+  margin-bottom: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nf-form-cont .nf-form-content .nf-field-element ul li::before {
+  display: none;
+}
+.nf-form-cont .nf-form-content .nf-field-element ul li input[type=checkbox],
+.nf-form-cont .nf-form-content .nf-field-element ul li input[type=radio] {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  cursor: pointer;
+  accent-color: #9615b5;
+}
+.nf-form-cont .nf-form-content .nf-field-element ul li label {
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  cursor: pointer;
+}
+.nf-form-cont .nf-form-content {
+  /* Submit Button */
+}
+.nf-form-cont .nf-form-content input[type=button],
+.nf-form-cont .nf-form-content input[type=submit] {
+  background: #9615b5 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 40px 40px 40px 0 !important;
+  padding: 14px 32px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+  height: auto !important;
+  font-family: inherit !important;
+}
+.nf-form-cont .nf-form-content input[type=button]:hover,
+.nf-form-cont .nf-form-content input[type=submit]:hover {
+  background: rgb(112.1287128713, 15.698019802, 135.301980198) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(150, 21, 181, 0.2) !important;
+}
+.nf-form-cont .nf-form-content input[type=button]:active,
+.nf-form-cont .nf-form-content input[type=submit]:active {
+  transform: translateY(0);
+}
+.nf-form-cont .nf-form-content {
+  /* Validation Errors */
+}
+.nf-form-cont .nf-form-content .nf-error-wrap .nf-error-msg {
+  color: #dc3545 !important;
+  font-size: 13px !important;
+  margin-top: 6px !important;
+  font-weight: 500 !important;
+}
+.nf-form-cont .nf-form-content .nf-error input,
+.nf-form-cont .nf-form-content .nf-error select,
+.nf-form-cont .nf-form-content .nf-error textarea {
+  border-color: #dc3545 !important;
+  background: #fff8f8 !important;
+}
+.nf-form-cont .nf-form-content .nf-error input:focus,
+.nf-form-cont .nf-form-content .nf-error select:focus,
+.nf-form-cont .nf-form-content .nf-error textarea:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+}
+.nf-form-cont .nf-form-content {
+  /* Loading state */
+}
+.nf-form-cont .nf-form-content .nf-pass input[type=submit] {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
 .search-modal {
   position: fixed;
   top: 0;
@@ -7470,9 +7655,15 @@ body.mobile-menu-open {
 }
 .team-section__list .team-item__thumb img {
   width: 100%;
-  height: 280px;
+  height: 235px;
   object-fit: cover;
+  object-position: top center;
   transition: all 0.3s ease;
+}
+@media (max-width: 767.98px) {
+  .team-section__list .team-item__thumb img {
+    height: 200px;
+  }
 }
 .team-section__list .team-item__content {
   padding-bottom: 10px;
@@ -7690,6 +7881,7 @@ body.mobile-menu-open {
   padding: 16px 20px;
   cursor: pointer;
   color: #19232B;
+  padding-right: 40px;
 }
 .accordion-list .accordion-item .accordion-question .icon {
   width: 45px;
@@ -7697,6 +7889,7 @@ body.mobile-menu-open {
   margin-right: 15px;
   background: #9615b5;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 .accordion-list .accordion-item .accordion-question .icon svg path {
   stroke: #fff;
@@ -10780,32 +10973,81 @@ body.single-tours .hle-tour-info .tour-main-content img {
 }
 body.single-tours .hle-tour-info .tour-gallery {
   margin-top: 40px;
+  position: relative;
 }
 body.single-tours .hle-tour-info .tour-gallery-grid {
   display: grid;
+  gap: 10px;
+  border-radius: 24px;
+  overflow: hidden;
   grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: 250px 250px;
-  gap: 16px;
+  grid-template-rows: 280px 280px;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 560px;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-2 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 560px;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-3 {
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 280px 280px;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-3 .tour-gallery-item:nth-child(1) {
+  grid-row: span 2;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-4 {
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 280px 280px;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-4 .tour-gallery-item:nth-child(1) {
+  grid-row: span 2;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-4 .tour-gallery-item:nth-child(2) {
+  grid-column: span 2;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-5 {
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 280px 280px;
+}
+body.single-tours .hle-tour-info .tour-gallery-grid.grid-count-5 .tour-gallery-item:nth-child(1) {
+  grid-row: span 2;
 }
 @media (max-width: 767.98px) {
   body.single-tours .hle-tour-info .tour-gallery-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 200px 150px;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    border-radius: 0;
+    margin: 0 -15px;
+    padding: 0 15px 15px 15px;
+    grid-template-columns: none;
+    grid-template-rows: none;
+  }
+  body.single-tours .hle-tour-info .tour-gallery-grid::-webkit-scrollbar {
+    display: none;
+  }
+  body.single-tours .hle-tour-info .tour-gallery-grid {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  body.single-tours .hle-tour-info .tour-gallery-grid .tour-gallery-item {
+    flex: 0 0 85%;
+    height: 300px;
+    scroll-snap-align: center;
+    border-radius: 16px;
+  }
+  body.single-tours .hle-tour-info .tour-gallery-grid .tour-gallery-item:nth-child(n) {
+    grid-row: auto;
+    grid-column: auto;
   }
 }
 body.single-tours .hle-tour-info .tour-gallery-item {
   position: relative;
-  border-radius: 16px;
   overflow: hidden;
-}
-body.single-tours .hle-tour-info .tour-gallery-item:nth-child(1) {
-  grid-row: span 2;
-}
-@media (max-width: 767.98px) {
-  body.single-tours .hle-tour-info .tour-gallery-item:nth-child(1) {
-    grid-column: span 2;
-    grid-row: span 1;
-  }
 }
 body.single-tours .hle-tour-info .tour-gallery-item a {
   display: block;
@@ -10816,33 +11058,60 @@ body.single-tours .hle-tour-info .tour-gallery-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+body.single-tours .hle-tour-info .tour-gallery-item .tour-gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 body.single-tours .hle-tour-info .tour-gallery-item:hover img {
   transform: scale(1.05);
 }
-body.single-tours .hle-tour-info .tour-gallery-item.has-more::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  transition: background 0.3s ease;
-  pointer-events: none;
+body.single-tours .hle-tour-info .tour-gallery-item:hover .tour-gallery-overlay {
+  opacity: 1;
 }
-body.single-tours .hle-tour-info .tour-gallery-item.has-more:hover::after {
-  background: rgba(0, 0, 0, 0.5);
+body.single-tours .hle-tour-info .tour-gallery:hover body.single-tours .hle-tour-info .tour-gallery-grid:hover body.single-tours .hle-tour-info .tour-gallery-item:not(:hover) .tour-gallery-overlay {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.3);
 }
-body.single-tours .hle-tour-info .tour-gallery-more {
+body.single-tours .hle-tour-info .tour-gallery .btn-view-all {
   position: absolute;
-  inset: 0;
+  bottom: 32px;
+  right: 32px;
+  background: #fff;
+  color: #19232B;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 24px;
-  font-weight: 700;
-  z-index: 2;
-  pointer-events: none;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+body.single-tours .hle-tour-info .tour-gallery .btn-view-all svg {
+  stroke: #19232B;
+}
+body.single-tours .hle-tour-info .tour-gallery .btn-view-all:hover {
+  background: #f8f8f8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+@media (max-width: 767.98px) {
+  body.single-tours .hle-tour-info .tour-gallery .btn-view-all {
+    bottom: 36px;
+    right: 24px;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
 }
 body.single-tours .main-section h1, body.single-tours .main-section .h1,
 body.single-tours .main-section h2,
@@ -11009,6 +11278,189 @@ body.single-tours .main-section-inner .main-section-left {
   body.single-tours .main-section-inner .main-section-left {
     width: 100%;
   }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices {
+  margin-top: 48px;
+  margin-bottom: 48px;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices h2, body.single-tours .main-section-inner .main-section-left .tour-prices .h2 {
+  margin-bottom: 24px;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card {
+    padding: 16px 10px;
+    gap: 16px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.private-price-card {
+  flex-direction: column;
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .price-card__title {
+    margin-bottom: 8px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  border-color: rgba(150, 21, 181, 0.2);
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(150, 21, 181, 0.08);
+  border-radius: 12px;
+  color: #9615b5;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__icon svg {
+  stroke: #9615b5;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__content {
+  flex: 1;
+  width: 100%;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__title {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__amount {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__amount .price-card__value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #9615b5;
+  line-height: 1;
+}
+@media (max-width: 1023.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__amount .price-card__value {
+    font-size: 24px;
+  }
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__amount .price-card__value {
+    font-size: 20px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__amount .price-card__unit {
+  font-size: 15px;
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+@media (max-width: 1023.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__amount .price-card__unit {
+    font-size: 13px;
+  }
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__amount .price-card__unit {
+    font-size: 11px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1023.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-item {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-item:hover {
+  border-color: rgba(150, 21, 181, 0.3);
+  background: #fff;
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-item {
+    padding: 12px 8px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #19232B;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-value strong {
+  font-size: 20px;
+  font-weight: 700;
+  color: #9615b5;
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-value strong {
+    font-size: 18px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-value small, body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-value .small {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-value small, body.single-tours .main-section-inner .main-section-left .tour-prices .price-card__grid-value .small {
+    font-size: 10px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 32px;
+  right: 32px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(150, 21, 181, 0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card:hover::before {
+  opacity: 1;
 }
 body.single-tours .main-section-inner .main-section-left .tour-inclusions {
   display: grid;
@@ -11189,189 +11641,6 @@ body.single-tours .main-section .booking-form-wrapper h2, body.single-tours .mai
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-body.single-tours .main-section .booking-form-wrapper {
-  /* ----------------------------------------- */
-  /* NINJA FORMS OVERRIDES
-  /* ----------------------------------------- */
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content {
-  padding: 0 !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content nf-fields-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content nf-field {
-  padding: 0 !important;
-  margin-bottom: 0 !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-field-label {
-  margin-bottom: 8px !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-field-label label {
-  font-weight: 500 !important;
-  font-size: 14px !important;
-  color: #19232B !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content {
-  /* Standard Inputs */
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=text],
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=email],
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=tel],
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=number],
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=password],
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=date],
-body.single-tours .main-section .booking-form-wrapper .nf-form-content select,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content textarea {
-  width: 100% !important;
-  height: 48px !important;
-  padding: 12px 16px !important;
-  background: #f9f9f9 !important;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 12px !important;
-  font-size: 15px !important;
-  color: #757f95 !important;
-  transition: all 0.3s ease !important;
-  box-sizing: border-box !important;
-  font-family: inherit !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=text]::placeholder,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=email]::placeholder,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=tel]::placeholder,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=number]::placeholder,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=password]::placeholder,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=date]::placeholder,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content select::placeholder,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content textarea::placeholder {
-  color: #aaa !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=text]:hover,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=email]:hover,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=tel]:hover,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=number]:hover,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=password]:hover,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=date]:hover,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content select:hover,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content textarea:hover {
-  border-color: #d0d0d0 !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=text]:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=email]:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=tel]:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=number]:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=password]:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=date]:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content select:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content textarea:focus {
-  outline: none !important;
-  border-color: #9615b5 !important;
-  background: #fff !important;
-  box-shadow: 0 0 0 3px rgba(150, 21, 181, 0.1) !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content textarea {
-  height: auto !important;
-  min-height: 120px !important;
-  resize: vertical !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content {
-  /* Select Dropdowns */
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 16px center !important;
-  background-size: 12px auto !important;
-  padding-right: 40px !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content {
-  /* Checkboxes & Radios */
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-field-element ul {
-  margin: 0;
-  padding: 0;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-field-element ul li {
-  padding: 0;
-  margin-bottom: 8px;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-field-element ul li::before {
-  display: none;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-field-element ul li input[type=checkbox],
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-field-element ul li input[type=radio] {
-  width: 18px !important;
-  height: 18px !important;
-  margin: 0 !important;
-  cursor: pointer;
-  accent-color: #9615b5;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-field-element ul li label {
-  font-size: 15px !important;
-  font-weight: 400 !important;
-  cursor: pointer;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content {
-  /* Submit Button */
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=button],
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=submit] {
-  background: #9615b5 !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 40px 40px 40px 0 !important;
-  padding: 14px 32px !important;
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  width: 100% !important;
-  height: auto !important;
-  font-family: inherit !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=button]:hover,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=submit]:hover {
-  background: rgb(112.1287128713, 15.698019802, 135.301980198) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(150, 21, 181, 0.2) !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=button]:active,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content input[type=submit]:active {
-  transform: translateY(0);
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content {
-  /* Validation Errors */
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-error-wrap .nf-error-msg {
-  color: #dc3545 !important;
-  font-size: 13px !important;
-  margin-top: 6px !important;
-  font-weight: 500 !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-error input,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-error select,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-error textarea {
-  border-color: #dc3545 !important;
-  background: #fff8f8 !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-error input:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-error select:focus,
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-error textarea:focus {
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content {
-  /* Loading state */
-}
-body.single-tours .main-section .booking-form-wrapper .nf-form-content .nf-pass input[type=submit] {
-  opacity: 0.7;
-  pointer-events: none;
 }
 body.single-tours .related-tour-section {
   padding: 90px 0;

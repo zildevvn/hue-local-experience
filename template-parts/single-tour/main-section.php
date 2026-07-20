@@ -3,13 +3,25 @@ $booking_form = get_field('form_booking', 'option');
 $included_tour = get_field('included_tour');
 $excluded_tour = get_field('excluded_tour');
 $itinerary_tour = get_field('itinerary_tour');
+$highlights = get_field('highlights_tour');
+$price_group = get_field('price_for_group_tour');
+$price_private = get_field('price_for_private_tour');
 ?>
 <section class="hle-section main-section">
     <div class="container">
         <div class="main-section-inner d-flex justify-content-between">
             <div class="main-section-left">
-                <h2>Overview Tour</h2>
-                <?php the_content() ?>
+
+                <div id="tour-overview">
+                    <h2>Overview Tour</h2>
+                    <?php the_content() ?>
+                </div>
+
+                <?php if (!empty($highlights)): ?>
+                    <div id="tour-highlights">
+                        <?= $highlights ?>
+                    </div>
+                <?php endif; ?>
 
                 <?php
                 if (!empty($included_tour) || !empty($excluded_tour)):
@@ -75,6 +87,84 @@ $itinerary_tour = get_field('itinerary_tour');
                     </div>
                 <?php endif; ?>
 
+                <?php if (!empty($price_group) || !empty($price_private)): ?>
+                    <div id="tour-prices" class="tour-prices">
+                        <h2>Tour Prices</h2>
+
+                        <div class="tour-prices__cards">
+                            <?php if (!empty($price_group)): ?>
+                                <div class="price-card group-price-card">
+                                    <div class="price-card__icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="9" cy="7" r="4"></circle>
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="price-card__content">
+                                        <h3 class="price-card__title"><?= esc_html($price_group['label']) ?></h3>
+                                        <div class="price-card__amount">
+                                            <span class="price-card__value"><?= esc_html($price_group['price']) ?></span>
+                                            <span class="price-card__unit">USD / Person</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($price_private)): ?>
+                                <div class="price-card private-price-card">
+                                    <div class="price-card__icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="price-card__content">
+                                        <h3 class="price-card__title">Private Tour Prices</h3>
+
+                                        <div class="price-card__grid">
+                                            <?php
+                                            $persons_map = [
+                                                '1_person' => '1 Person',
+                                                '2_persons' => '2 Persons',
+                                                '3_persons' => '3 Persons',
+                                                '4_persons' => '4 Persons',
+                                                '5_persons' => '5 Persons',
+                                                '6_persons' => '6 Persons',
+                                                '7_persons' => '7 Persons',
+                                                '8_persons' => '8 Persons',
+                                                '9_persons' => '9 Persons',
+                                                '10_persons' => '10 Persons',
+                                                '11_persons' => '11 Persons',
+                                                '12_persons' => '12 Persons',
+                                            ];
+
+                                            foreach ($persons_map as $key => $label):
+                                                if (!empty($price_private[$key])):
+                                                    ?>
+                                                    <div class="price-card__grid-item">
+                                                        <span class="price-card__grid-label"><?= esc_html($label) ?></span>
+                                                        <span class="price-card__grid-value">
+                                                            <strong><?= esc_html($price_private[$key]) ?></strong>
+                                                            <small>USD / Person</small>
+                                                        </span>
+                                                    </div>
+                                                    <?php
+                                                endif;
+                                            endforeach;
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+
                 <?php if (!empty($itinerary_tour)): ?>
                     <h2>Itinerary</h2>
                     <div class="accordion-list">
@@ -124,7 +214,7 @@ $itinerary_tour = get_field('itinerary_tour');
 
             <div class="main-section-right">
                 <div class="booking-form-wrapper">
-                    <h2 class="h4">Booking Tour</h2>
+                    <h2 class="h4">Tour Booking Request</h2>
                     <?php if ($booking_form)
                         echo do_shortcode($booking_form); ?>
                 </div>

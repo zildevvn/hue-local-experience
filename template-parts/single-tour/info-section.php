@@ -83,12 +83,12 @@ $max_pax = isset($paxs_tours['max']) ? $paxs_tours['max'] : '';
         <?php
         $gallery_tour = get_field('gallery_tour');
         if ($gallery_tour && is_array($gallery_tour)):
+            $image_count = count($gallery_tour);
             ?>
             <div class="tour-gallery">
-                <div class="tour-gallery-grid">
+                <div class="tour-gallery-grid <?php echo 'grid-count-' . min($image_count, 5); ?>">
                     <?php
-                    $image_count = count($gallery_tour);
-                    $display_count = min($image_count, 4); // Display up to 4 images
+                    $display_count = min($image_count, 5); // Display up to 5 images
                 
                     for ($i = 0; $i < $display_count; $i++):
                         $image = $gallery_tour[$i];
@@ -96,27 +96,33 @@ $max_pax = isset($paxs_tours['max']) ? $paxs_tours['max'] : '';
                         $img_alt = is_array($image) && !empty($image['alt']) ? $image['alt'] : get_the_title();
                         // Try to use 'large' size if available for the grid
                         $img_thumb = is_array($image) && isset($image['sizes']['large']) ? $image['sizes']['large'] : $img_url;
-                        $extra_class = ($i === 3 && $image_count > 4) ? 'has-more' : '';
                         ?>
-                        <div class="tour-gallery-item <?php echo $extra_class; ?>">
+                        <div class="tour-gallery-item">
                             <a href="<?php echo esc_url($img_url); ?>" data-fancybox="tour-gallery"
                                 data-caption="<?php echo esc_attr($img_alt); ?>">
                                 <img src="<?php echo esc_url($img_thumb); ?>" alt="<?php echo esc_attr($img_alt); ?>"
                                     loading="lazy">
-                                <?php if ($i === 3 && $image_count > 4): ?>
-                                    <div class="tour-gallery-more">
-                                        <span>+<?php echo $image_count - 4; ?> Photos</span>
-                                    </div>
-                                <?php endif; ?>
+                                <div class="tour-gallery-overlay"></div>
                             </a>
                         </div>
                     <?php endfor; ?>
                 </div>
 
+                <?php if ($image_count > 1): ?>
+                    <button class="btn-view-all" onclick="document.querySelector('.tour-gallery-item a').click();">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        View All Photos
+                    </button>
+                <?php endif; ?>
+
                 <?php
                 // Render the rest of the images hidden so Fancybox can loop them
-                if ($image_count > 4):
-                    for ($i = 4; $i < $image_count; $i++):
+                if ($image_count > 5):
+                    for ($i = 5; $i < $image_count; $i++):
                         $image = $gallery_tour[$i];
                         $img_url = is_array($image) ? $image['url'] : (is_numeric($image) ? wp_get_attachment_url($image) : $image);
                         $img_alt = is_array($image) && !empty($image['alt']) ? $image['alt'] : get_the_title();
