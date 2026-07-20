@@ -24,7 +24,7 @@ if (!function_exists('hle_create_custom_post_type')) {
 				'menu_name' => __('Tours'),
 			),
 			'label' => __('Tours', 'hle'),
-			'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'page-attributes'),
+			'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'page-attributes', 'comments'),
 			'menu_icon' => 'dashicons-admin-generic',
 			'hierarchical' => false,
 			'public' => true,

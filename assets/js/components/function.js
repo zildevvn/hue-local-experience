@@ -1000,6 +1000,74 @@ import { CountUp } from 'countup.js';
         }
     }
 
+    /**
+     * Tour Review — Interactive Star Picker
+     * Handles hover highlighting, click-to-select, and keyboard accessibility.
+     */
+    function hleInitStarPicker() {
+        const $picker = $('#star-picker');
+        if (!$picker.length) return;
+
+        const $labels  = $picker.find('.star-picker__label');
+        const $inputs  = $picker.find('.star-picker__input');
+        const $text    = $('#star-picker-text');
+
+        const ratingLabels = ['', 'Terrible', 'Poor', 'Average', 'Good', 'Excellent'];
+
+        function setHighlight(upTo) {
+            $labels.each(function (i) {
+                $(this).toggleClass('is-hovered', i < upTo);
+            });
+        }
+
+        function setActive(value) {
+            $labels.each(function (i) {
+                $(this).toggleClass('is-active', i < value);
+            });
+            $text.text(value ? ratingLabels[value] + ' (' + value + '/5)' : 'Select a rating');
+        }
+
+        $labels.on('mouseenter', function () {
+            setHighlight($labels.index(this) + 1);
+        }).on('mouseleave', function () {
+            const selected = parseInt($inputs.filter(':checked').val()) || 0;
+            setHighlight(selected);
+        });
+
+        $inputs.on('change', function () {
+            const val = parseInt($(this).val());
+            setActive(val);
+            setHighlight(val);
+        });
+
+        $inputs.on('keydown', function (e) {
+            const currentVal = parseInt($(this).val());
+            if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                const next = $inputs.filter('[value="' + Math.min(5, currentVal + 1) + '"]');
+                if (next.length) { next.prop('checked', true).trigger('change'); next.focus(); }
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                const prev = $inputs.filter('[value="' + Math.max(1, currentVal - 1) + '"]');
+                if (prev.length) { prev.prop('checked', true).trigger('change'); prev.focus(); }
+            }
+        });
+
+        $('#hle-review-form').on('submit', function (e) {
+            if (!$inputs.filter(':checked').length) {
+                e.preventDefault();
+                $picker.addClass('star-picker--error');
+                $text.text('Please select a rating!').css('color', '#dc3545');
+                $picker[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        $inputs.on('change', function () {
+            $picker.removeClass('star-picker--error');
+            $text.css('color', '');
+        });
+    }
+
     $(document).ready(function () {
 
         // Dùng:
@@ -1015,6 +1083,7 @@ import { CountUp } from 'countup.js';
         hleVideoPopup()
         hleFilterTours()
         hleFilterPosts()
+        hleInitStarPicker()
         AOS.init();
     });
 })(jQuery);

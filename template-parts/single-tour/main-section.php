@@ -210,6 +210,8 @@ $price_private = get_field('price_for_private_tour');
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
+
+                <?php get_template_part('template-parts/single-tour/review-section'); ?>
             </div>
 
             <div class="main-section-right">
