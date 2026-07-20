@@ -1,0 +1,681 @@
+body.single-post {
+    .main-section {
+        padding-top: 60px;
+        padding-bottom: 60px;
+
+        @include media-breakpoint-down(md) {
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: $color-text;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            line-height: 1.3;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+
+        b {
+            color: $color-text;
+        }
+
+        /* Shift hierarchy down by one level */
+
+        // H1 acts like H2
+        h1 {
+            font-size: calc(1.325rem + 0.9vw);
+
+            @include media-breakpoint-up(xl) {
+                font-size: 2rem;
+            }
+        }
+
+        // H2 acts like H3
+        h2 {
+            font-size: calc(1.3rem + 0.6vw);
+
+            @include media-breakpoint-up(xl) {
+                font-size: 1.75rem;
+            }
+        }
+
+        // H3 acts like H4
+        h3 {
+            font-size: calc(1.275rem + 0.3vw);
+
+            @include media-breakpoint-up(xl) {
+                font-size: 1.5rem;
+            }
+        }
+
+        // H4 acts like H5
+        h4 {
+            font-size: 1.25rem;
+        }
+
+        // H5 acts like H6
+        h5 {
+            font-size: 1rem;
+        }
+
+        // H6 becomes smallest distinct heading
+        h6 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: lighten($color-text, 15%);
+        }
+
+
+
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+
+        figure {
+            max-width: 100%;
+        }
+
+        .wp-caption-text {
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-top: 12px;
+            font-style: italic;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 24px 0;
+
+            li {
+                position: relative;
+                padding-left: 20px;
+                line-height: 1.8;
+                color: $color-body;
+                padding-bottom: 12px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                    border-bottom: none;
+                }
+
+                // Custom primary color marker
+                &::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 10px;
+                    width: 10px;
+                    height: 10px;
+                    background-color: rgba(150, 21, 181, 0.1); // $color-primary lighter
+                    border: 1.5px solid $color-primary;
+                    border-radius: 50%;
+                }
+
+                // Nested lists styling
+                ul {
+                    margin-top: 16px;
+                    margin-bottom: 0;
+
+                    li {
+                        padding-left: 24px;
+                        border-bottom: none;
+                        padding-bottom: 0;
+                        margin-bottom: 12px;
+
+                        // Distinct marker for nested lists (solid square)
+                        &::before {
+                            width: 6px;
+                            height: 6px;
+                            top: 12px;
+                            background-color: $color-primary;
+                            border: none;
+                            border-radius: 2px;
+                        }
+                    }
+                }
+            }
+
+            @include media-breakpoint-down(md) {
+                li {
+                    padding-left: 24px;
+
+                    &::before {
+                        width: 10px;
+                        height: 10px;
+                        top: 8px;
+                    }
+
+                    ul li {
+                        padding-left: 16px;
+                    }
+                }
+            }
+        }
+
+        blockquote {
+            margin: 32px 0;
+            padding: 24px 32px;
+            background: #F9FAFB;
+            border-left: 4px solid $color-primary;
+            border-radius: 0 16px 16px 0;
+            position: relative;
+            
+            p {
+                font-size: 18px;
+                line-height: 1.8;
+                font-style: italic;
+                color: $color-text;
+                margin-bottom: 0;
+                
+                &:not(:last-child) {
+                    margin-bottom: 16px;
+                }
+            }
+            
+            strong, b {
+                color: $color-text;
+                font-weight: 700;
+            }
+            
+            em, i {
+                color: $color-primary;
+            }
+            
+            cite {
+                display: block;
+                margin-top: 16px;
+                font-size: 15px;
+                font-weight: 600;
+                font-style: normal;
+                color: #6B7280;
+                
+                &::before {
+                    content: '— ';
+                }
+            }
+            
+            @include media-breakpoint-down(md) {
+                padding: 20px 24px;
+                margin: 24px 0;
+                
+                p {
+                    font-size: 16px;
+                }
+            }
+        }
+
+
+
+        .main-section-inner {
+            display: flex;
+            gap: 40px;
+
+            @include media-breakpoint-down(lg) {
+                flex-direction: column;
+                gap: 40px;
+            }
+        }
+
+        .main-section-left {
+            flex: 1;
+            min-width: 0;
+
+            &__thumb {
+                margin-bottom: 32px;
+                border-radius: 30px;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: auto;
+                    object-fit: cover;
+                    border-radius: 30px;
+                }
+            }
+
+            &__info.post-meta {
+                margin-bottom: 40px;
+                padding-bottom: 24px;
+                border-bottom: 1px solid #E5E7EB;
+
+                .post-meta__item {
+                    color: #4B5563;
+                    font-size: 15px;
+                    font-weight: 500;
+
+                    svg {
+                        color: $color-primary;
+                    }
+
+                    a {
+                        color: #111827;
+                        text-decoration: none;
+                        font-weight: 600;
+                        transition: color 0.3s ease;
+
+                        &:hover {
+                            color: $color-primary;
+                        }
+                    }
+                }
+            }
+
+            .post-comments-section {
+                margin-top: 60px;
+                padding-top: 40px;
+                border-top: 1px solid #E5E7EB;
+                
+                .widget-title {
+                    font-size: 24px;
+                    margin-bottom: 32px;
+                    font-weight: 700;
+                    color: #111827;
+                    position: relative;
+                    padding-bottom: 12px;
+                    
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 40px;
+                        height: 3px;
+                        background: $color-primary;
+                        border-radius: 2px;
+                    }
+                }
+                
+                .comment-list {
+                    list-style: none;
+                    margin: 0 0 40px 0;
+                    padding: 0;
+                    
+                    .comment {
+                        margin-bottom: 32px;
+                        
+                        &:last-child {
+                            margin-bottom: 0;
+                        }
+                        
+                        .comment-body {
+                            background: #F9FAFB;
+                            border-radius: 20px;
+                            padding: 24px;
+                            margin-bottom: 24px;
+                            position: relative;
+                            
+                            .comment-meta {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                margin-bottom: 16px;
+                                flex-wrap: wrap;
+                                gap: 12px;
+                                
+                                .comment-author {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 12px;
+                                    
+                                    .avatar {
+                                        width: 48px;
+                                        height: 48px;
+                                        border-radius: 50%;
+                                        object-fit: cover;
+                                    }
+                                    
+                                    .fn {
+                                        font-size: 16px;
+                                        font-weight: 700;
+                                        color: #111827;
+                                        font-style: normal;
+                                        
+                                        a {
+                                            color: inherit;
+                                            text-decoration: none;
+                                            transition: color 0.3s ease;
+                                            
+                                            &:hover {
+                                                color: $color-primary;
+                                            }
+                                        }
+                                    }
+                                    
+                                    .says {
+                                        display: none;
+                                    }
+                                }
+                                
+                                .comment-metadata {
+                                    font-size: 14px;
+                                    color: #6B7280;
+                                    
+                                    a {
+                                        color: inherit;
+                                        text-decoration: none;
+                                        
+                                        &:hover {
+                                            color: $color-primary;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            .comment-content {
+                                p {
+                                    margin-bottom: 16px;
+                                    color: #4B5563;
+                                    line-height: 1.6;
+                                    
+                                    &:last-child {
+                                        margin-bottom: 0;
+                                    }
+                                }
+                            }
+                            
+                            .reply {
+                                margin-top: 16px;
+                                
+                                .comment-reply-link {
+                                    display: inline-flex;
+                                    align-items: center;
+                                    font-size: 14px;
+                                    font-weight: 600;
+                                    color: $color-primary;
+                                    text-decoration: none;
+                                    transition: all 0.3s ease;
+                                    
+                                    &::before {
+                                        content: '↩';
+                                        margin-right: 6px;
+                                        font-size: 16px;
+                                    }
+                                    
+                                    &:hover {
+                                        color: darken($color-primary, 10%);
+                                    }
+                                }
+                            }
+                            
+                            .comment-awaiting-moderation {
+                                display: block;
+                                margin-top: 12px;
+                                font-size: 14px;
+                                color: #D97706;
+                                font-style: italic;
+                            }
+                        }
+                        
+                        // Nested Comments
+                        .children {
+                            list-style: none;
+                            margin: 0 0 0 40px;
+                            padding: 0;
+                            
+                            @include media-breakpoint-down(md) {
+                                margin-left: 20px;
+                            }
+                            
+                            .comment {
+                                .comment-body {
+                                    background: #fff;
+                                    border: 1px solid #E5E7EB;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                .comment-respond {
+                    margin-top: 48px;
+                    
+                    .hle-comment-form {
+                        .form-control {
+                            width: 100%;
+                            padding: 14px 20px;
+                            border-radius: 12px;
+                            border: 1px solid #E5E7EB;
+                            font-size: 15px;
+                            transition: all 0.3s ease;
+                            background: #fff;
+                            
+                            &:focus {
+                                border-color: $color-primary;
+                                box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
+                                outline: none;
+                            }
+                        }
+                        
+                        textarea.form-control {
+                            min-height: 120px;
+                            resize: vertical;
+                        }
+                        
+                        .form-submit {
+                            margin-top: 24px;
+                            margin-bottom: 0;
+                        }
+                        
+                        .logged-in-as {
+                            margin-bottom: 24px;
+                            font-size: 15px;
+                            color: #4B5563;
+                            
+                            a {
+                                color: $color-primary;
+                                text-decoration: none;
+                                
+                                &:hover {
+                                    text-decoration: underline;
+                                }
+                            }
+                        }
+                        
+                        p.comment-notes {
+                            font-size: 14px;
+                            color: #6B7280;
+                            margin-bottom: 24px;
+                        }
+                        
+                        .comment-reply-title {
+                            small {
+                                margin-left: 12px;
+                                font-size: 14px;
+                                font-weight: 500;
+                                
+                                a {
+                                    color: #EF4444;
+                                    text-decoration: none;
+                                    
+                                    &:hover {
+                                        text-decoration: underline;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .main-section-right {
+            width: 350px;
+            flex-shrink: 0;
+
+            @include media-breakpoint-down(lg) {
+                width: 100%;
+            }
+
+            .sidebar-widget {
+                background: #F9FAFB;
+                border-radius: 20px;
+                padding: 32px;
+                margin-bottom: 32px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                .widget-title {
+                    font-size: 20px;
+                    margin-bottom: 24px;
+                    font-weight: 700;
+                    color: #111827;
+                    position: relative;
+                    padding-bottom: 12px;
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 40px;
+                        height: 3px;
+                        background: $color-primary;
+                        border-radius: 2px;
+                    }
+                }
+            }
+
+            .widget-search {
+                .search-input-wrapper {
+                    position: relative;
+
+                    .search-field {
+                        width: 100%;
+                        padding: 14px 48px 14px 20px;
+                        border-radius: 50px;
+                        border: 1px solid #E5E7EB;
+                        font-size: 15px;
+                        transition: all 0.3s ease;
+                        background: #fff;
+
+                        &:focus {
+                            border-color: $color-primary;
+                            box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
+                            outline: none;
+                        }
+                    }
+
+                    .search-submit {
+                        position: absolute;
+                        right: 8px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        background: $color-primary;
+                        border: none;
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #fff;
+                        transition: all 0.3s ease;
+
+                        &:hover {
+                            background: darken($color-primary, 10%);
+                        }
+
+                        svg {
+                            width: 16px;
+                            height: 16px;
+                        }
+                    }
+                }
+            }
+
+            .widget-recent-posts {
+                .recent-post-item {
+                    margin-bottom: 20px;
+                    padding-bottom: 20px;
+                    border-bottom: 1px solid #E5E7EB;
+
+                    &:last-child {
+                        margin-bottom: 0;
+                        padding-bottom: 0;
+                        border-bottom: none;
+                    }
+
+                    &__thumb {
+                        width: 80px;
+                        height: 80px;
+                        flex-shrink: 0;
+                        border-radius: 12px;
+                        overflow: hidden;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            transition: transform 0.3s ease;
+                        }
+
+                        .placeholder-thumb {
+                            width: 100%;
+                            height: 100%;
+                            background: #E5E7EB;
+                        }
+
+                        &:hover img {
+                            transform: scale(1.1);
+                        }
+                    }
+
+                    &__info {
+                        flex: 1;
+                        min-width: 0;
+                    }
+
+                    &__title {
+                        font-size: 15px;
+                        line-height: 1.4;
+                        margin-bottom: 8px;
+
+                        a {
+                            color: #111827;
+                            text-decoration: none;
+                            transition: color 0.3s ease;
+                            display: -webkit-box;
+                            -webkit-line-clamp: 2;
+                            -webkit-box-orient: vertical;
+                            overflow: hidden;
+
+                            &:hover {
+                                color: $color-primary;
+                            }
+                        }
+                    }
+
+                    &__date {
+                        font-size: 13px;
+                        color: #6B7280;
+
+                        svg {
+                            color: $color-primary;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

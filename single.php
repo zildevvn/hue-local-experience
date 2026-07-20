@@ -8,8 +8,10 @@
 get_header();
 ?>
 <div class="single-post-page">
-    <main id="primary" class="site-main article-main">
-        this single post
+    <main id="primary" class="site-main">
+        <?php get_template_part('template-parts/single-post/hero-section'); ?>
+        <?php get_template_part('template-parts/single-post/main-section'); ?>
+        <?php get_template_part('template-parts/shared/team-section'); ?>
     </main>
 </div>
 <?php
