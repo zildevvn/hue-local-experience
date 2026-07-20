@@ -12,6 +12,64 @@ $price_private = get_field('price_for_private_tour');
         <div class="main-section-inner d-flex justify-content-between">
             <div class="main-section-left">
 
+                <?php
+                // Build array of menu items to display dynamically
+                $nav_items = [];
+                
+                // Overview (always exists if there's content or title)
+                $nav_items['tour-overview'] = [
+                    'label' => __('Overview', 'hue-local-experience'),
+                    'show'  => true
+                ];
+
+                // Highlights
+                $nav_items['tour-highlights'] = [
+                    'label' => __('Highlights', 'hue-local-experience'),
+                    'show'  => !empty($highlights)
+                ];
+
+                // Inclusions
+                $nav_items['tour-inclusions'] = [
+                    'label' => __('Inclusions', 'hue-local-experience'),
+                    'show'  => (!empty($included_tour) || !empty($excluded_tour))
+                ];
+
+                // Prices
+                $nav_items['tour-prices'] = [
+                    'label' => __('Prices', 'hue-local-experience'),
+                    'show'  => (!empty($price_group) || !empty($price_private))
+                ];
+
+                // Itinerary
+                $nav_items['tour-itinerary'] = [
+                    'label' => __('Itinerary', 'hue-local-experience'),
+                    'show'  => !empty($itinerary_tour)
+                ];
+
+                // Reviews
+                $nav_items['tour-review'] = [
+                    'label' => __('Reviews', 'hue-local-experience'),
+                    'show'  => (comments_open() || get_comments_number() > 0)
+                ];
+                ?>
+
+                <!-- Anchor Navigation Menu -->
+                <nav class="tour-nav" id="hle-tour-nav" aria-label="<?php esc_attr_e('Tour navigation', 'hue-local-experience'); ?>">
+                    <div class="tour-nav__inner">
+                        <ul class="tour-nav__list">
+                            <?php foreach ($nav_items as $id => $item): 
+                                if (!$item['show']) continue;
+                            ?>
+                                <li class="tour-nav__item">
+                                    <a href="#<?php echo esc_attr($id); ?>" class="tour-nav__link">
+                                        <?php echo esc_html($item['label']); ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                </nav>
+
                 <div id="tour-overview">
                     <h2>Overview Tour</h2>
                     <?php the_content() ?>
@@ -26,7 +84,7 @@ $price_private = get_field('price_for_private_tour');
                 <?php
                 if (!empty($included_tour) || !empty($excluded_tour)):
                     ?>
-                    <div class="tour-inclusions">
+                    <div id="tour-inclusions" class="tour-inclusions">
                         <?php if (!empty($included_tour)): ?>
                             <div class="inclusion-card card-included">
                                 <h3>
@@ -165,51 +223,54 @@ $price_private = get_field('price_for_private_tour');
                 <?php endif; ?>
 
 
-                <?php if (!empty($itinerary_tour)): ?>
-                    <h2>Itinerary</h2>
-                    <div class="accordion-list">
-                        <?php foreach ($itinerary_tour as $index => $item): ?>
-                            <?php
-                            $title = $item['title'];
-                            $image = $item['image'];
-                            $desc = $item['desc'];
-                            ?>
-                            <div class="accordion-item" data-aos="fade-up" data-aos-delay="<?= $key * 100 ?>">
-                                <h3 class="accordion-question h6 d-flex align-items-center" tabindex="0" role="button"
-                                    aria-expanded="false">
-                                    <div class="icon d-flex align-items-center align-content-center justify-content-center">
-                                        <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg" color="#000000">
-                                            <path
-                                                d="M7.90039 8.07954C7.90039 3.30678 15.4004 3.30682 15.4004 8.07955C15.4004 11.4886 11.9913 10.8067 11.9913 14.8976"
-                                                stroke="#000000" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round"></path>
-                                            <path d="M12 19.01L12.01 18.9989" stroke="#000000" stroke-width="1.5"
-                                                stroke-linecap="round" stroke-linejoin="round"></path>
-                                        </svg>
+                <div id="tour-itinerary">
+                    <?php if (!empty($itinerary_tour)): ?>
+                        <h2>Itinerary</h2>
+                        <div class="accordion-list">
+                            <?php foreach ($itinerary_tour as $index => $item): ?>
+                                <?php
+                                $title = $item['title'];
+                                $image = $item['image'];
+                                $desc = $item['desc'];
+                                ?>
+                                <div class="accordion-item" data-aos="fade-up" data-aos-delay="<?= $key * 100 ?>">
+                                    <h3 class="accordion-question h6 d-flex align-items-center" tabindex="0" role="button"
+                                        aria-expanded="false">
+                                        <div class="icon d-flex align-items-center align-content-center justify-content-center">
+                                            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg" color="#000000">
+                                                <path
+                                                    d="M7.90039 8.07954C7.90039 3.30678 15.4004 3.30682 15.4004 8.07955C15.4004 11.4886 11.9913 10.8067 11.9913 14.8976"
+                                                    stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                                    stroke-linejoin="round"></path>
+                                                <path d="M12 19.01L12.01 18.9989" stroke="#000000" stroke-width="1.5"
+                                                    stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </div>
+
+                                        <?= $title ?>
+
+                                        <div class="arrow">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="plus" width="18" height="18"
+                                                viewBox="0 0 160 160">
+                                                <rect class="vertical-line" x="70" width="15" height="160" rx="7" ry="7"></rect>
+                                                <rect class="horizontal-line" y="70" width="160" height="15" rx="7" ry="7">
+                                                </rect>
+                                            </svg>
+                                        </div>
+                                    </h3>
+                                    <div class="accordion-answer">
+                                        <?= $desc ?>
+
+                                        <?php if (!empty($image)): ?>
+                                            <img src="<?= $image ?>" alt="image for itinerary <?= $title ?>" />
+                                        <?php endif; ?>
                                     </div>
-
-                                    <?= $title ?>
-
-                                    <div class="arrow">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="plus" width="18" height="18"
-                                            viewBox="0 0 160 160">
-                                            <rect class="vertical-line" x="70" width="15" height="160" rx="7" ry="7"></rect>
-                                            <rect class="horizontal-line" y="70" width="160" height="15" rx="7" ry="7"></rect>
-                                        </svg>
-                                    </div>
-                                </h3>
-                                <div class="accordion-answer">
-                                    <?= $desc ?>
-
-                                    <?php if (!empty($image)): ?>
-                                        <img src="<?= $image ?>" alt="image for itinerary <?= $title ?>" />
-                                    <?php endif; ?>
                                 </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <?php get_template_part('template-parts/single-tour/review-section'); ?>
             </div>

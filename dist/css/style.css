@@ -6741,6 +6741,11 @@ body.search-modal-open {
   z-index: 1029;
   transition: all 0.6s cubic-bezier(0.11, 0.52, 0.53, 0.79) 0s;
 }
+@media (max-width: 767.98px) {
+  .header-main {
+    position: absolute;
+  }
+}
 body.logged-in .header-main {
   top: 32px;
 }
@@ -12103,5 +12108,126 @@ body.single-tours .related-tour-section__list {
   body.single-tours .related-tour-section__list {
     grid-template-columns: 1fr;
     margin-top: 28px;
+  }
+}
+
+/* Anchor Navigation Bar */
+.tour-nav {
+  position: sticky;
+  top: 105px;
+  /* Right below the fixed main header */
+  z-index: 99;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  margin-bottom: 40px;
+  padding: 4px 16px;
+  transition: top 0.3s ease;
+}
+@media (max-width: 767.98px) {
+  .tour-nav {
+    top: 0;
+    padding: 4px;
+  }
+}
+body.logged-in .tour-nav {
+  top: 140px;
+}
+@media (max-width: 767.98px) {
+  body.logged-in .tour-nav {
+    top: 0;
+  }
+}
+.tour-nav__inner {
+  width: 100%;
+}
+.tour-nav__list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
+}
+@media (max-width: 767.98px) {
+  .tour-nav__list {
+    gap: 4px;
+  }
+}
+.tour-nav__list::-webkit-scrollbar {
+  display: none;
+  /* Safari and Chrome */
+}
+.tour-nav__item {
+  flex-shrink: 0;
+  padding: 0 !important;
+}
+.tour-nav__item::before {
+  content: none !important;
+}
+.tour-nav__link {
+  display: inline-block;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #757f95;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  position: relative;
+  outline: none;
+}
+@media (max-width: 767.98px) {
+  .tour-nav__link {
+    padding: 8px 6px;
+    font-size: 10px;
+  }
+}
+.tour-nav__link:hover {
+  color: #9615b5;
+  background-color: rgba(150, 21, 181, 0.04);
+}
+.tour-nav__link:focus-visible {
+  outline: 2px solid #9615b5;
+  outline-offset: -2px;
+}
+.tour-nav__link.is-active {
+  color: #fff;
+  background-color: #9615b5;
+  box-shadow: 0 4px 12px rgba(150, 21, 181, 0.2);
+}
+
+#tour-overview,
+#tour-highlights,
+#tour-inclusions,
+#tour-prices,
+#tour-itinerary,
+#tour-review {
+  scroll-margin-top: 150px;
+}
+body.logged-in #tour-overview,
+body.logged-in #tour-highlights,
+body.logged-in #tour-inclusions,
+body.logged-in #tour-prices,
+body.logged-in #tour-itinerary,
+body.logged-in #tour-review {
+  scroll-margin-top: 182px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
   }
 }

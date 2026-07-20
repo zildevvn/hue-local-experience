@@ -1068,6 +1068,119 @@ import { CountUp } from 'countup.js';
         });
     }
 
+    /**
+     * Single Tour Anchor Navigation Bar
+     * Smooth scrolling, active highlighting with IntersectionObserver,
+     * and horizontal mobile auto-scroll.
+     */
+    function hleInitTourAnchorNav() {
+        const $nav = $('#hle-tour-nav');
+        if (!$nav.length) return;
+
+        const $links = $nav.find('.tour-nav__link');
+        const $list = $nav.find('.tour-nav__list');
+
+        // Map IDs to section elements that actually exist in DOM
+        const sections = [];
+        $links.each(function() {
+            const id = $(this).attr('href');
+            const $sec = $(id);
+            if ($sec.length) {
+                sections.push($sec[0]);
+            }
+        });
+
+        if (!sections.length) return;
+
+        // Active link helper
+        function makeActive(id) {
+            $links.removeClass('is-active');
+            const $activeLink = $links.filter(`[href="#${id}"]`);
+            $activeLink.addClass('is-active');
+
+            // Automatically scroll the active mobile menu item into view
+            if ($activeLink.length) {
+                const listWidth = $list.outerWidth();
+                const listScrollLeft = $list.scrollLeft();
+                const linkOffsetLeft = $activeLink.position().left;
+                const linkWidth = $activeLink.outerWidth();
+
+                // Scroll if link is partially or fully out of view
+                if (linkOffsetLeft < 0 || (linkOffsetLeft + linkWidth) > listWidth) {
+                    $list.animate({
+                        scrollLeft: listScrollLeft + linkOffsetLeft - (listWidth / 2) + (linkWidth / 2)
+                    }, 300);
+                }
+            }
+        }
+
+        // Smooth scroll click handler
+        $links.on('click', function (e) {
+            e.preventDefault();
+            const targetId = $(this).attr('href');
+            const $targetSec = $(targetId);
+            if ($targetSec.length) {
+                const offset = $('body').hasClass('logged-in') ? 182 : 150;
+                const targetScrollTop = $targetSec.offset().top - offset + 2;
+
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                if (prefersReducedMotion) {
+                    window.scrollTo(0, targetScrollTop);
+                    makeActive(targetId.replace('#', ''));
+                    // Update hash without scrolling
+                    history.pushState(null, null, targetId);
+                } else {
+                    $('html, body').stop().animate({
+                        scrollTop: targetScrollTop
+                    }, 500, function() {
+                        makeActive(targetId.replace('#', ''));
+                        history.pushState(null, null, targetId);
+                    });
+                }
+            }
+        });
+
+        // IntersectionObserver logic
+        const observerOptions = {
+            root: null,
+            rootMargin: '-160px 0px -60% 0px',
+            threshold: [0, 0.1, 0.2]
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    makeActive(entry.target.id);
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(sec => observer.observe(sec));
+
+        // Backup logic: fallback if scrolled to the very bottom
+        $(window).on('scroll', function() {
+            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 50) {
+                const lastId = sections[sections.length - 1].id;
+                makeActive(lastId);
+            }
+        });
+
+        // Handle initial URL hash on load
+        const initialHash = window.location.hash;
+        if (initialHash) {
+            const $targetSec = $(initialHash);
+            if ($targetSec.length && $links.filter(`[href="${initialHash}"]`).length) {
+                setTimeout(() => {
+                    const offset = $('body').hasClass('logged-in') ? 182 : 150;
+                    const targetScrollTop = $targetSec.offset().top - offset + 2;
+                    $('html, body').scrollTop(targetScrollTop);
+                    makeActive(initialHash.replace('#', ''));
+                }, 150);
+            }
+        }
+    }
+
     $(document).ready(function () {
 
         // Dùng:
@@ -1084,6 +1197,7 @@ import { CountUp } from 'countup.js';
         hleFilterTours()
         hleFilterPosts()
         hleInitStarPicker()
+        hleInitTourAnchorNav()
         AOS.init();
     });
 })(jQuery);
