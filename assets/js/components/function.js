@@ -11,8 +11,7 @@ import { CountUp } from 'countup.js';
 
 (function ($) {
     "use strict";
-
-    function hleHeroSliders() {
+    const hleHeroSliders = () => {
         const $sliders = $('.hero-section-sliders');
         if ($sliders.length === 0) return;
 
@@ -57,25 +56,25 @@ import { CountUp } from 'countup.js';
         });
     }
 
-    function initBackToTop() {
-        const $backToTop = $('#backToTop');
-        if ($backToTop.length) {
-            $(window).on('scroll', function () {
-                if ($(this).scrollTop() > 300) {
-                    $backToTop.addClass('show');
-                } else {
-                    $backToTop.removeClass('show');
-                }
-            });
 
-            $backToTop.on('click', function (e) {
-                e.preventDefault();
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+    const initBackToTop = () => {
+        const $backToTop = $('#backToTop');
+        if (!$backToTop.length) return;
+        $(window).on('scroll', function () {
+            if ($(this).scrollTop() > 300) {
+                $backToTop.addClass('show');
+            } else {
+                $backToTop.removeClass('show');
+            }
+        });
+
+        $backToTop.on('click', function (e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
             });
-        }
+        });
     }
 
     function hleInitCounters() {
@@ -129,7 +128,8 @@ import { CountUp } from 'countup.js';
         counters.forEach(counter => observer.observe(counter));
     }
 
-    function hleInitParallax() {
+
+    const hleInitParallax = () => {
         const $section = $('.achievements-section');
         if (!$section.length) return;
 
@@ -216,7 +216,8 @@ import { CountUp } from 'countup.js';
         $(window).on('scroll resize', scheduleUpdate);
     }
 
-    function hleInitCarsSlider() {
+
+    const hleInitCarsSlider = () => {
         const container = document.querySelector('.cars-section__list');
         if (!container) return null;
 
@@ -251,7 +252,8 @@ import { CountUp } from 'countup.js';
         return swiper;
     }
 
-    function hleInitTestimonialsSlider() {
+
+    const hleInitTestimonialsSlider = () => {
         const testimonialsCarousel = document.querySelector('.testimonials-carousel')
         if (!testimonialsCarousel) return;
 
@@ -301,7 +303,8 @@ import { CountUp } from 'countup.js';
         });
     }
 
-    function hleInitFaqs() {
+
+    const hleInitFaqs = () => {
         const $faqsList = $('.accordion-list');
         if (!$faqsList.length) return;
 
@@ -344,7 +347,7 @@ import { CountUp } from 'countup.js';
         });
     }
 
-    function hleVideoPopup() {
+    const hleVideoPopup = () => {
         const $buttons = $('.btn-play-video');
         if (!$buttons.length) return;
 
@@ -416,7 +419,7 @@ import { CountUp } from 'countup.js';
         });
     }
 
-    function hleInitImageParallax() {
+    const hleInitImageParallax = () => {
         const $parallaxElements = $('[data-parallax="true"]');
         if (!$parallaxElements.length) return;
 
@@ -513,8 +516,7 @@ import { CountUp } from 'countup.js';
     }
 
 
-
-    function btAnimateText(selector, direction = 'right') {
+    const btAnimateText = (selector, direction = 'right') => {
         const elements = document.querySelectorAll(selector);
 
         elements.forEach(el => {
@@ -828,15 +830,15 @@ import { CountUp } from 'countup.js';
             fieldSearch = $isBlock.find('#hle-posts-search-input');
 
         const $catRadios = $isBlock.find('input[name="post_cat"]');
-        
+
         const $clearFiltersBtn = $('#hle-posts-clear-filters');
         const $postsCount = $('#hle-posts-count');
-        
+
         const $dropdown = $isBlock.find('.posts-category-dropdown');
         const $trigger = $dropdown.find('.hle-dropdown-trigger');
         const $menu = $dropdown.find('.hle-dropdown-menu');
         const $label = $trigger.find('.hle-dropdown-label');
-        
+
         let searchTimeout;
         let currentAjaxRequest = null;
         let currentPage = 1;
@@ -858,7 +860,7 @@ import { CountUp } from 'countup.js';
             }
 
             clearTimeout(searchTimeout);
-            
+
             searchTimeout = setTimeout(() => {
                 const searchVal = fieldSearch.val().trim();
                 const catVal = $isBlock.find('input[name="post_cat"]:checked').val();
@@ -881,7 +883,7 @@ import { CountUp } from 'countup.js';
                 $label.text(labelText);
             }
         }
-        
+
         function openDropdown() {
             $menu.addClass('is-open');
             $trigger.attr('aria-expanded', 'true');
@@ -892,7 +894,7 @@ import { CountUp } from 'countup.js';
             $trigger.attr('aria-expanded', 'false');
         }
 
-        $trigger.on('click', function(e) {
+        $trigger.on('click', function (e) {
             e.preventDefault();
             const isOpen = $menu.hasClass('is-open');
             if (isOpen) {
@@ -902,13 +904,13 @@ import { CountUp } from 'countup.js';
             }
         });
 
-        $(document).on('click', function(e) {
+        $(document).on('click', function (e) {
             if ($dropdown.length && !$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
                 closeDropdown();
             }
         });
 
-        $(document).on('keydown', function(e) {
+        $(document).on('keydown', function (e) {
             if (e.key === 'Escape' && $menu.hasClass('is-open')) {
                 closeDropdown();
             }
@@ -1004,13 +1006,14 @@ import { CountUp } from 'countup.js';
      * Tour Review — Interactive Star Picker
      * Handles hover highlighting, click-to-select, and keyboard accessibility.
      */
-    function hleInitStarPicker() {
+
+    const hleInitStarPicker = () => {
         const $picker = $('#star-picker');
         if (!$picker.length) return;
 
-        const $labels  = $picker.find('.star-picker__label');
-        const $inputs  = $picker.find('.star-picker__input');
-        const $text    = $('#star-picker-text');
+        const $labels = $picker.find('.star-picker__label');
+        const $inputs = $picker.find('.star-picker__input');
+        const $text = $('#star-picker-text');
 
         const ratingLabels = ['', 'Terrible', 'Poor', 'Average', 'Good', 'Excellent'];
 
@@ -1082,7 +1085,7 @@ import { CountUp } from 'countup.js';
 
         // Map IDs to section elements that actually exist in DOM
         const sections = [];
-        $links.each(function() {
+        $links.each(function () {
             const id = $(this).attr('href');
             const $sec = $(id);
             if ($sec.length) {
@@ -1133,7 +1136,7 @@ import { CountUp } from 'countup.js';
                 } else {
                     $('html, body').stop().animate({
                         scrollTop: targetScrollTop
-                    }, 500, function() {
+                    }, 500, function () {
                         makeActive(targetId.replace('#', ''));
                         history.pushState(null, null, targetId);
                     });
@@ -1159,7 +1162,7 @@ import { CountUp } from 'countup.js';
         sections.forEach(sec => observer.observe(sec));
 
         // Backup logic: fallback if scrolled to the very bottom
-        $(window).on('scroll', function() {
+        $(window).on('scroll', function () {
             if ($(window).scrollTop() + $(window).height() >= $(document).height() - 50) {
                 const lastId = sections[sections.length - 1].id;
                 makeActive(lastId);
@@ -1181,9 +1184,24 @@ import { CountUp } from 'countup.js';
         }
     }
 
-    $(document).ready(function () {
 
-        // Dùng:
+    const hleHeaderTopMobile = () => {
+
+        if ($(window).width() >= 768) return;
+
+        const headerTop = $('#header-top-bar-tour');
+        if (!headerTop.length) return;
+
+        $(window).on('scroll', function () {
+            if ($(this).scrollTop() > 100) {
+                headerTop.addClass('is-active');
+            } else {
+                headerTop.removeClass('is-active');
+            }
+        });
+    }
+
+    $(document).ready(function () {
         btAnimateText('.hle-heading-animation', 'right');
         initBackToTop()
         hleHeroSliders()
@@ -1199,5 +1217,6 @@ import { CountUp } from 'countup.js';
         hleInitStarPicker()
         hleInitTourAnchorNav()
         AOS.init();
+        hleHeaderTopMobile()
     });
 })(jQuery);

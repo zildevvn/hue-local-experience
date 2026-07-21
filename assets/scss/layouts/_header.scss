@@ -64,18 +64,16 @@
 
     @include media-breakpoint-down(md) {
         position: absolute;
+        overflow: hidden;
     }
-
-    // box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
 
     body.logged-in & {
         top: 32px;
     }
 
+
     >.container {
         background: #fff;
-        // box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
-        // border-radius: 15px 15px 15px 0px;
         padding-top: 10px;
         padding-bottom: 10px;
         position: relative;
@@ -98,6 +96,7 @@
 
             @include media-breakpoint-down(md) {
                 height: 84px;
+
             }
         }
 

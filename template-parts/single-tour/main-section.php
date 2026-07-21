@@ -15,51 +15,53 @@ $price_private = get_field('price_for_private_tour');
                 <?php
                 // Build array of menu items to display dynamically
                 $nav_items = [];
-                
+
                 // Overview (always exists if there's content or title)
                 $nav_items['tour-overview'] = [
                     'label' => __('Overview', 'hue-local-experience'),
-                    'show'  => true
+                    'show' => true
                 ];
 
                 // Highlights
                 $nav_items['tour-highlights'] = [
                     'label' => __('Highlights', 'hue-local-experience'),
-                    'show'  => !empty($highlights)
+                    'show' => !empty($highlights)
                 ];
 
                 // Inclusions
                 $nav_items['tour-inclusions'] = [
                     'label' => __('Inclusions', 'hue-local-experience'),
-                    'show'  => (!empty($included_tour) || !empty($excluded_tour))
+                    'show' => (!empty($included_tour) || !empty($excluded_tour))
                 ];
 
                 // Prices
                 $nav_items['tour-prices'] = [
                     'label' => __('Prices', 'hue-local-experience'),
-                    'show'  => (!empty($price_group) || !empty($price_private))
+                    'show' => (!empty($price_group) || !empty($price_private))
                 ];
 
                 // Itinerary
                 $nav_items['tour-itinerary'] = [
                     'label' => __('Itinerary', 'hue-local-experience'),
-                    'show'  => !empty($itinerary_tour)
+                    'show' => !empty($itinerary_tour)
                 ];
 
                 // Reviews
                 $nav_items['tour-review'] = [
                     'label' => __('Reviews', 'hue-local-experience'),
-                    'show'  => (comments_open() || get_comments_number() > 0)
+                    'show' => (comments_open() || get_comments_number() > 0)
                 ];
                 ?>
 
                 <!-- Anchor Navigation Menu -->
-                <nav class="tour-nav" id="hle-tour-nav" aria-label="<?php esc_attr_e('Tour navigation', 'hue-local-experience'); ?>">
+                <nav class="tour-nav" id="hle-tour-nav"
+                    aria-label="<?php esc_attr_e('Tour navigation', 'hue-local-experience'); ?>">
                     <div class="tour-nav__inner">
                         <ul class="tour-nav__list">
-                            <?php foreach ($nav_items as $id => $item): 
-                                if (!$item['show']) continue;
-                            ?>
+                            <?php foreach ($nav_items as $id => $item):
+                                if (!$item['show'])
+                                    continue;
+                                ?>
                                 <li class="tour-nav__item">
                                     <a href="#<?php echo esc_attr($id); ?>" class="tour-nav__link">
                                         <?php echo esc_html($item['label']); ?>
@@ -277,7 +279,7 @@ $price_private = get_field('price_for_private_tour');
 
             <div class="main-section-right">
                 <div class="booking-form-wrapper">
-                    <h2 class="h4">Tour Booking Request</h2>
+                    <h2 id="tour-booking-form" class="h4">Tour Booking Request</h2>
                     <?php if ($booking_form)
                         echo do_shortcode($booking_form); ?>
                 </div>
