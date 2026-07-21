@@ -66,7 +66,7 @@
 
 .team-section {
     padding: 90px 0;
-    background: #F2F3F5;
+    background: $color-bg;
 
 
     @include media-breakpoint-down(lg) {
@@ -601,6 +601,206 @@
         &.next {
             font-weight: 600;
             padding: 0 16px;
+        }
+    }
+}
+
+.car-item {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    text-decoration: none;
+    height: 100%;
+    border-radius: 40px 40px 40px 0;
+    position: relative;
+    border-bottom: 5px solid $color-primary;
+    box-sizing: border-box;
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        &:hover {
+            transform: none;
+        }
+    }
+
+    // ── Image Panel ────────────────────────────────────────────
+    &__image-wrap {
+        position: relative;
+        flex-shrink: 0;
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+        background-color: #f0f0f0;
+    }
+
+    &__image-inner {
+        position: absolute;
+        inset: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1);
+            display: block;
+            transition: 3s cubic-bezier(0.11, 0.52, 0.53, 0.79);
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
+        }
+    }
+
+    &:hover .car-item__image-inner img {
+        transform: scale(1.1);
+    }
+
+    &__image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom,
+                rgba(0, 0, 0, 0) 50%,
+                rgba(0, 0, 0, 0.28) 100%);
+        pointer-events: none;
+
+        @include media-breakpoint-up(lg) {
+            background: linear-gradient(to right,
+                    rgba(0, 0, 0, 0) 60%,
+                    rgba(0, 0, 0, 0.15) 100%);
+        }
+    }
+
+    // ── Content Panel ──────────────────────────────────────────
+    &__body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 24px;
+
+        @include media-breakpoint-down(md) {
+            padding: 20px;
+        }
+    }
+
+    // ── Title ──────────────────────────────────────────────────
+    &__title {
+        color: $color-text;
+    }
+
+    &:hover &__title {
+        color: $color-primary;
+    }
+
+    // ── Excerpt ────────────────────────────────────────────────
+    &__excerpt {
+        color: $color-body;
+        margin: 0 0 16px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        font-size: 14px;
+    }
+
+    // ── Badges ─────────────────────────────────────────────────
+    &__badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: space-between;
+    }
+
+    &__badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 20px 20px 20px 0;
+        background: rgba($color-primary, 0.07);
+        border: 1px solid rgba($color-primary, 0.15);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: $color-primary;
+        white-space: nowrap;
+        line-height: 100%;
+
+        svg {
+            flex-shrink: 0;
+            width: 100%;
+            height: auto;
+            max-width: 17px;
+
+            path {
+                stroke: $color-primary;
+                stroke-width: 2;
+            }
+        }
+    }
+
+    &__meta {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(0, 0, 0, 0.07);
+    }
+
+    // ── Pricing ────────────────────────────────────────────────
+    &__pricing {
+        display: flex;
+        align-items: baseline;
+        // flex-wrap: wrap;
+        gap: 5px;
+        flex-shrink: 0;
+        min-width: fit-content;
+
+    }
+
+    &__price-original {
+
+        color: $color-text;
+        text-decoration: line-through;
+        font-weight: 500;
+        width: 100%;
+    }
+
+    &__price-discount {
+        font-size: 22px;
+        font-weight: 700;
+        color: $color-primary;
+        line-height: 1;
+        width: 100%;
+    }
+
+    // ── CTA ────────────────────────────────────────────────────
+    &__cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+        margin-top: 0;
+        max-width: 50%;
+        padding: 0px 10px;
+        height: 40px;
+        font-size: 14px;
+
+        svg {
+            flex-shrink: 0;
+            transition: transform 0.25s ease;
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
+        }
+
+        &:hover svg,
+        &:focus-visible svg {
+            transform: translateX(4px);
         }
     }
 }

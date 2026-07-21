@@ -1201,6 +1201,71 @@ import { CountUp } from 'countup.js';
         });
     }
 
+    const hleFilterCars = () => {
+        const $isBlock = $('.list-cars-section');
+        if (!$isBlock.length) return;
+
+        const resultsElement = $isBlock.find('#hle-cars-results'),
+            paginationElement = $isBlock.find('#hle-cars-pagination'),
+            query = resultsElement.data('query');
+
+        let currentAjaxRequest = null;
+        let currentPage = resultsElement.data('currentpage') || 1;
+
+        paginationElement.on('click', '.page-numbers:not(.disabled):not(.current)', function (e) {
+            e.preventDefault();
+            const selectedPage = parseInt($(this).attr('data-page'));
+            if (!isNaN(selectedPage)) {
+                currentPage = selectedPage;
+                __ajax_filter({
+                    query: query,
+                    currentpage: currentPage
+                });
+            }
+        });
+
+        function __ajax_filter(val = {}) {
+            if (currentAjaxRequest) {
+                currentAjaxRequest.abort();
+            }
+
+            const $contentWrapper = $isBlock.find('.list-cars-wrapper');
+
+            try {
+                $contentWrapper.addClass('is-loading');
+
+                currentAjaxRequest = $.ajax({
+                    type: "post",
+                    url: php_data.ajax_url,
+                    dataType: "json",
+                    data: {
+                        ...{ action: "hle_ajax_filter_cars" },
+                        ...val,
+                    },
+                    success: function (data) {
+                        resultsElement.html(data.items);
+                        paginationElement.html(data.pagination);
+
+                        // Smooth scroll to top of listing section when changing pages
+                        if (val.currentpage > 1 || (val.currentpage === 1 && $(window).scrollTop() > $isBlock.offset().top)) {
+                            $('html, body').animate({
+                                scrollTop: $isBlock.offset().top - 80 // Adjust offset for sticky header if needed
+                            }, 600);
+                        }
+                    },
+                    complete: function () {
+                        currentAjaxRequest = null;
+                        $contentWrapper.removeClass('is-loading');
+                    }
+                });
+
+            } catch (e) {
+                console.log(e);
+                $contentWrapper.removeClass('is-loading');
+            }
+        }
+    }
+
     $(document).ready(function () {
         btAnimateText('.hle-heading-animation', 'right');
         initBackToTop()
@@ -1214,6 +1279,7 @@ import { CountUp } from 'countup.js';
         hleVideoPopup()
         hleFilterTours()
         hleFilterPosts()
+        hleFilterCars()
         hleInitStarPicker()
         hleInitTourAnchorNav()
         AOS.init();

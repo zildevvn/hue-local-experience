@@ -232,3 +232,63 @@ function hle_ajax_filter_posts()
     ]);
     wp_die();
 }
+
+add_action('wp_ajax_hle_ajax_filter_cars', 'hle_ajax_filter_cars');
+add_action('wp_ajax_nopriv_hle_ajax_filter_cars', 'hle_ajax_filter_cars');
+function hle_ajax_filter_cars()
+{
+    $query = isset($_POST['query']) ? $_POST['query'] : [];
+    $currentpage = isset($_POST['currentpage']) ? intval($_POST['currentpage']) : 1;
+
+    $query['paged'] = $currentpage;
+
+    ob_start();
+    $the_query = new WP_Query($query);
+
+    if ($the_query->have_posts()) {
+        while ($the_query->have_posts()) {
+            $the_query->the_post();
+            hle_car_tour_item();
+        }
+    }
+    $items = ob_get_clean();
+
+    ob_start();
+    $total_pages = $the_query->max_num_pages;
+    if ($total_pages > 1) {
+        echo '<div class="hle-pagination">';
+        
+        // Prev button
+        if ($currentpage > 1) {
+            echo '<button class="page-numbers prev" data-page="' . ($currentpage - 1) . '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span>' . __('Prev', 'hue-local-experience') . '</span></button>';
+        } else {
+            echo '<button class="page-numbers prev disabled" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span>' . __('Prev', 'hue-local-experience') . '</span></button>';
+        }
+
+        // Page numbers
+        for ($i = 1; $i <= $total_pages; $i++) {
+            if ($i == $currentpage) {
+                echo '<span class="page-numbers current">' . $i . '</span>';
+            } else {
+                echo '<button class="page-numbers" data-page="' . $i . '">' . $i . '</button>';
+            }
+        }
+
+        // Next button
+        if ($currentpage < $total_pages) {
+            echo '<button class="page-numbers next" data-page="' . ($currentpage + 1) . '"><span>' . __('Next', 'hue-local-experience') . '</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>';
+        } else {
+            echo '<button class="page-numbers next disabled" disabled><span>' . __('Next', 'hue-local-experience') . '</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>';
+        }
+        
+        echo '</div>';
+    }
+    $pagination = ob_get_clean();
+
+    wp_reset_postdata();
+    wp_send_json([
+        'items' => $items,
+        'pagination' => $pagination,
+    ]);
+    wp_die();
+}

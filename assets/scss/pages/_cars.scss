@@ -1,1 +1,662 @@
-body.page-template-cars-template {}
+body.page-template-cars-template {
+    .list-cars-section {
+        padding: 90px 0;
+
+        @include media-breakpoint-down(lg) {
+            padding: 60px 0;
+        }
+
+        @include media-breakpoint-down(md) {
+            padding: 40px 0;
+        }
+
+        &__cars {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 48px;
+
+            @include media-breakpoint-down(lg) {
+                margin-top: 32px;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            @include media-breakpoint-down(md) {
+                margin-top: 28px;
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+            .car-item {
+                box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        .list-cars-wrapper {
+            position: relative;
+
+            &.is-loading {
+                .list-cars-section__cars {
+                    opacity: 0.5;
+                    pointer-events: none;
+                }
+
+                .cars-loading-overlay {
+                    opacity: 1;
+                    visibility: visible;
+                }
+            }
+        }
+
+        .cars-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
+
+            .tours-loading-spinner {
+                position: relative;
+                width: 64px;
+                height: 64px;
+                margin-bottom: 20px;
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    border-radius: 50%;
+                    border: 2px dashed rgba(150, 21, 181, 0.4);
+                    animation: tours-spin 8s linear infinite;
+                }
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    inset: 8px;
+                    border-radius: 50%;
+                    border: 3px solid transparent;
+                    border-top-color: $color-primary;
+                    border-bottom-color: $color-primary;
+                    box-shadow: 0 0 12px rgba(150, 21, 181, 0.2);
+                    animation: tours-spin 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+                }
+
+                .spinner-dot {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 14px;
+                    height: 14px;
+                    background-color: $color-primary;
+                    border-radius: 50%;
+                    box-shadow: 0 0 10px rgba(150, 21, 181, 0.6);
+                    animation: tours-pulse-dot 2s ease-in-out infinite;
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+
+                    &::before,
+                    &::after,
+                    .spinner-dot {
+                        animation: none;
+                    }
+
+                    &::after {
+                        border-color: $color-primary;
+                        border-style: solid;
+                        box-shadow: none;
+                    }
+                }
+            }
+
+            .tours-loading-text {
+                font-size: 15px;
+                font-weight: 600;
+                color: $color-text;
+                letter-spacing: 0.3px;
+                animation: tours-pulse-text 2s ease-in-out infinite;
+
+                @media (prefers-reduced-motion: reduce) {
+                    animation: none;
+                }
+            }
+        }
+    }
+
+    // ── Pagination ─────────────────────────────────────────────────────────────
+    .hle-pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 56px;
+
+        @include media-breakpoint-down(md) {
+            margin-top: 40px;
+        }
+
+        // paginate_links( type: 'list' ) outputs a <ul>
+        ul {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+        }
+
+        // Shared token for every link / span
+        a.page-numbers,
+        button.page-numbers,
+        span.page-numbers {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            min-width: 44px;
+            height: 44px;
+            padding: 0 14px;
+            border-radius: 10px;
+            font-family: $font-primary;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            text-decoration: none;
+            line-height: 1;
+            border: 1.5px solid rgba(0, 0, 0, 0.08);
+            background: #fff;
+            color: $color-text;
+            transition: background 0.22s ease, color 0.22s ease,
+                border-color 0.22s ease, box-shadow 0.22s ease;
+            cursor: pointer;
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
+
+            svg {
+                flex-shrink: 0;
+                transition: transform 0.2s ease;
+
+                @media (prefers-reduced-motion: reduce) {
+                    transition: none;
+                }
+            }
+        }
+
+        // Hover / focus state
+        a.page-numbers,
+        button.page-numbers:not(:disabled) {
+
+            &:hover,
+            &:focus-visible {
+                background: rgba($color-primary, 0.06);
+                border-color: $color-primary;
+                color: $color-primary;
+                outline: none;
+            }
+
+            &:focus-visible {
+                box-shadow: 0 0 0 3px rgba($color-primary, 0.22);
+            }
+        }
+
+        // Active page
+        span.page-numbers.current {
+            background: $color-primary;
+            border-color: $color-primary;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+            cursor: default;
+        }
+
+        // Dots (…)
+        span.page-numbers.dots {
+            border-color: transparent;
+            background: transparent;
+            color: $color-body;
+            min-width: 32px;
+            padding: 0;
+            cursor: default;
+        }
+
+        // Prev / Next arrow buttons
+        a.page-numbers.prev,
+        button.page-numbers.prev,
+        a.page-numbers.next,
+        button.page-numbers.next {
+            padding: 0 18px;
+
+            &:hover:not(:disabled) svg,
+            &:focus-visible:not(:disabled) svg {
+                transform: translateX(3px);
+            }
+        }
+
+        a.page-numbers.prev:hover:not(:disabled) svg,
+        button.page-numbers.prev:hover:not(:disabled) svg,
+        a.page-numbers.prev:focus-visible:not(:disabled) svg,
+        button.page-numbers.prev:focus-visible:not(:disabled) svg {
+            transform: translateX(-3px);
+        }
+
+        button.page-numbers:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    .popular-car-section {
+        padding: 90px 0;
+        background: $color-bg;
+
+
+        @include media-breakpoint-down(lg) {
+            padding: 60px 0;
+        }
+
+        @include media-breakpoint-down(md) {
+            padding: 40px 0;
+        }
+
+        .popular-car-price {
+
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+            border: 1px solid rgba(150, 21, 181, 0.12);
+            border-radius: 28px;
+            background:
+                radial-gradient(circle at 100% 0,
+                    rgba(150, 21, 181, 0.1),
+                    transparent 28%),
+                #fff;
+            box-shadow: 0 20px 60px rgba(47, 22, 53, 0.08);
+            margin-top: 48px;
+
+            @include media-breakpoint-down(lg) {
+                margin-top: 32px;
+            }
+
+            @include media-breakpoint-down(md) {
+                margin-top: 28px;
+            }
+
+            &__header {
+                @include media-breakpoint-down(md) {
+                    display: none !important;
+                }
+            }
+        }
+
+        /* Table */
+        .popular-car-price__table-wrapper {
+            overflow: hidden;
+            border: 1px solid rgba(51, 34, 55, 0.09);
+            border-radius: 20px;
+            background: #fff;
+        }
+
+        .popular-car-price__table {
+            width: 100%;
+        }
+
+        .popular-car-price__row {
+            display: grid;
+            grid-template-columns:
+                minmax(230px, 1.7fr) repeat(5, minmax(105px, 1fr));
+            transition:
+                background-color 0.25s ease,
+                transform 0.25s ease;
+
+            &:not(:last-child) {
+                border-bottom: 1px solid rgba(51, 34, 55, 0.07);
+            }
+
+            &:not(.popular-car-price__row--header):hover {
+                position: relative;
+                z-index: 1;
+                background: linear-gradient(90deg,
+                        rgba(150, 21, 181, 0.045),
+                        rgba(244, 132, 0, 0.035));
+
+                .popular-car-price__value {
+                    color: $color-primary;
+                    background: rgba(150, 21, 181, 0.08);
+                }
+
+                .popular-car-price__route-icon {
+                    color: #fff;
+                    background: $color-primary;
+                }
+            }
+        }
+
+        .popular-car-price__row--header {
+            color: #fff;
+            background: linear-gradient(110deg, #72118a, $color-primary 55%, #ad31c4);
+
+            .popular-car-price__cell {
+                min-height: 64px;
+                color: rgba(255, 255, 255, 0.92);
+                font-size: 13px;
+                font-weight: 700;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+            }
+        }
+
+        .popular-car-price__cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            min-height: 86px;
+            padding: 16px;
+            color: #332637;
+            font-size: 14px;
+            line-height: 1.4;
+
+            &:not(:last-child) {
+                border-right: 1px solid rgba(51, 34, 55, 0.07);
+            }
+        }
+
+        .popular-car-price__cell--destination {
+            justify-content: flex-start;
+            gap: 13px;
+            padding-left: 20px;
+        }
+
+        .popular-car-price__route-icon {
+            display: inline-flex;
+            flex: 0 0 42px;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            color: $color-primary;
+            background: rgba(150, 21, 181, 0.09);
+            transition:
+                color 0.25s ease,
+                background-color 0.25s ease;
+        }
+
+        .popular-car-price__route {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .popular-car-price__from {
+            color: #8a7e8d;
+            font-size: 11px;
+            font-weight: 650;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .popular-car-price__location {
+            overflow: hidden;
+            color: #281c2c;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.35;
+            text-overflow: ellipsis;
+        }
+
+        .popular-car-price__value {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 8px 11px;
+            border-radius: 10px;
+            color: #322536;
+            background: #f7f4f8;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            overflow-wrap: anywhere;
+            transition:
+                color 0.25s ease,
+                background-color 0.25s ease;
+        }
+
+        /* Footer */
+        .popular-car-price__footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 22px;
+        }
+
+        .popular-car-price__note {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #776d7a;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .popular-car-price__note-icon {
+            display: inline-flex;
+            flex: 0 0 24px;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            color: $color-primary;
+            background: rgba(150, 21, 181, 0.1);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+
+
+        @media (max-width: 1199px) {
+            .popular-car-price__table-wrapper {
+                overflow-x: auto;
+                overscroll-behavior-inline: contain;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(150, 21, 181, 0.35) transparent;
+
+                &::-webkit-scrollbar {
+                    height: 7px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    border-radius: 999px;
+                    background: rgba(150, 21, 181, 0.35);
+                }
+            }
+
+            .popular-car-price__table {
+                min-width: 950px;
+            }
+        }
+
+        /* Tablet dọc */
+        @media (max-width: 991px) {
+            .popular-car-price {
+                padding: 26px 22px;
+                border-radius: 23px;
+            }
+
+            .popular-car-price__heading {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .popular-car-price__footer {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        /* Mobile: chuyển mỗi route thành một card */
+        @media (max-width: 767px) {
+            .popular-car-price {
+                padding: 22px 15px;
+                border-radius: 19px;
+            }
+
+            .popular-car-price__heading {
+                margin-bottom: 20px;
+            }
+
+            .popular-car-price__legend {
+                width: 100%;
+                justify-content: center;
+                border-radius: 12px;
+            }
+
+            .popular-car-price__table-wrapper {
+                overflow: visible;
+                border: 0;
+                border-radius: 0;
+                background: transparent;
+            }
+
+            .popular-car-price__table {
+                display: grid;
+                min-width: 0;
+                gap: 14px;
+            }
+
+            .popular-car-price__row--header {
+                display: none;
+            }
+
+            .popular-car-price__row {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1px;
+                overflow: hidden;
+                border: 1px solid rgba(51, 34, 55, 0.09);
+                border-radius: 17px;
+                background: rgba(51, 34, 55, 0.08);
+                box-shadow: 0 8px 25px rgba(45, 26, 49, 0.06);
+
+                &:not(:last-child) {
+                    border-bottom: 1px solid rgba(51, 34, 55, 0.09);
+                }
+
+                &:hover {
+                    background: rgba(51, 34, 55, 0.08);
+                }
+            }
+
+            .popular-car-price__cell {
+                display: flex;
+                min-height: 76px;
+                padding: 13px;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: center;
+                gap: 6px;
+                border: 0 !important;
+                background: #fff;
+
+                &::before {
+                    color: #8a7f8d;
+                    content: attr(data-label);
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.05em;
+                    text-transform: uppercase;
+                }
+            }
+
+            .popular-car-price__cell--destination {
+                grid-column: 1 / -1;
+                min-height: 82px;
+                padding: 16px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                background:
+                    radial-gradient(circle at right top,
+                        rgba(244, 132, 0, 0.11),
+                        transparent 48%),
+                    linear-gradient(135deg,
+                        rgba(150, 21, 181, 0.08),
+                        rgba(150, 21, 181, 0.025));
+
+                &::before {
+                    display: none;
+                }
+            }
+
+            .popular-car-price__route-icon {
+                color: #fff;
+                background: $color-primary;
+            }
+
+            .popular-car-price__value {
+                min-height: auto;
+                padding: 0;
+                color: #2d2031;
+                background: transparent;
+                font-size: 15px;
+                text-align: left;
+            }
+
+            .popular-car-price__row:hover {
+                .popular-car-price__value {
+                    color: #2d2031;
+                    background: transparent;
+                }
+            }
+
+            .popular-car-price__footer {
+                margin-top: 18px;
+            }
+        }
+
+        @media (max-width: 389px) {
+            .popular-car-price__row {
+                grid-template-columns: 1fr;
+            }
+
+            .popular-car-price__cell--destination {
+                grid-column: 1;
+            }
+
+            .popular-car-price__cell {
+                min-height: 66px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .popular-car-price__row,
+            .popular-car-price__value,
+            .popular-car-price__route-icon {
+                transition: none;
+            }
+        }
+    }
+}

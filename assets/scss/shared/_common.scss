@@ -37,6 +37,7 @@ html {
 .hle-heading {
     color: $color-text;
     position: relative;
+    padding-bottom: 10px;
 
     &::before {
         content: "";
