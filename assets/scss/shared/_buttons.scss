@@ -12,6 +12,7 @@
     transition: $transition-base;
     border: 2px solid $color-primary;
     font-weight: 500;
+    border-radius: 40px 40px 40px 0;
 
     &:hover {
         background-color: #fff;

@@ -8,7 +8,7 @@ $price_tour = get_field('price_tour');
         <?php endif; ?>
 
         <a href="#tour-booking-form" class="hle-button" label="Book a tour" data-scroll-target="#tour-booking-form">
-            Book a tour
+            Book Now
         </a>
     </div>
 </div>

@@ -61,6 +61,19 @@ function hle_breadcrumbs($title)
             </span>
         <?php endif; ?>
 
+        <?php if (is_singular('cars')): ?>
+            <a href="<?= home_url('hue-car-rental') ?>">Cars</a>
+            <span>
+                <svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none"
+                    xmlns="http://www.w3.org/2000/svg" color="#000000">
+                    <path d="M13 6L19 12L13 18" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                    <path d="M5 6L11 12L5 18" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+            </span>
+        <?php endif; ?>
+
         <?php if (is_singular('post')): ?>
             <a href="<?= home_url('hue-travel-guide') ?>">Blog</a>
             <span>
@@ -261,6 +274,114 @@ function hle_tour_item()
 
                 </div>
             <?php endif; ?>
+        </div>
+    </a>
+<?php }
+
+
+function hle_car_tour_item($class = '')
+{
+    $duration = get_field('duration_car');
+    $group_size = get_field('group_size_car');
+    $original_price = get_field('original_price_car');
+    $discount_price = get_field('discount_price_car');
+    $thumb_url = get_the_post_thumbnail_url('', 'large');
+    ?>
+    <a class="car-item <?= esc_attr($class) ?>" href="<?= the_permalink(); ?>"
+        aria-label="View details for <?= esc_attr(get_the_title()); ?>">
+
+        <!-- Image Panel -->
+        <div class="car-item__image-wrap">
+            <div class="car-item__image-inner">
+                <?php if ($thumb_url): ?>
+                    <img src="<?= esc_url($thumb_url) ?>" alt="<?= esc_attr(get_the_title()); ?>" loading="lazy">
+                <?php endif; ?>
+                <div class="car-item__image-overlay" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        <!-- Content Panel -->
+        <div class="car-item__body">
+
+            <h3 class="car-item__title h5"><?= get_the_title(); ?></h3>
+
+            <div class="car-item__excerpt"> <?php the_content(); ?></div>
+
+            <!-- Icon Badges -->
+            <?php if (!empty($duration) || !empty($group_size)): ?>
+                <div class="car-item__badges">
+                    <?php if (!empty($duration)): ?>
+                        <span class="car-item__badge">
+                            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg" color="#000000">
+                                <path d="M17 13H12V8" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                <path d="M5 3.5L7 2" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                <path d="M19 3.5L17 2" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                <path
+                                    d="M12 22C16.9706 22 21 17.9706 21 13C21 8.02944 16.9706 4 12 4C7.02944 4 3 8.02944 3 13C3 17.9706 7.02944 22 12 22Z"
+                                    stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            <?= esc_html($duration) ?>
+                        </span>
+                    <?php endif; ?>
+
+                    <?php if (!empty($group_size)): ?>
+                        <span class="car-item__badge">
+                            <svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none"
+                                xmlns="http://www.w3.org/2000/svg" color="#000000">
+                                <path d="M7 18V17C7 14.2386 9.23858 12 12 12V12C14.7614 12 17 14.2386 17 17V18" stroke="#000000"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M1 18V17C1 15.3431 2.34315 14 4 14V14" stroke="#000000" stroke-width="1.5"
+                                    stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M23 18V17C23 15.3431 21.6569 14 20 14V14" stroke="#000000" stroke-width="1.5"
+                                    stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path
+                                    d="M12 12C13.6569 12 15 10.6569 15 9C15 7.34315 13.6569 6 12 6C10.3431 6 9 7.34315 9 9C9 10.6569 10.3431 12 12 12Z"
+                                    stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path
+                                    d="M4 14C5.10457 14 6 13.1046 6 12C6 10.8954 5.10457 10 4 10C2.89543 10 2 10.8954 2 12C2 13.1046 2.89543 14 4 14Z"
+                                    stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path
+                                    d="M20 14C21.1046 14 22 13.1046 22 12C22 10.8954 21.1046 10 20 10C18.8954 10 18 10.8954 18 12C18 13.1046 18.8954 14 20 14Z"
+                                    stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            <?= esc_html($group_size) ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="car-item__meta d-flex align-items-center justify-content-between">
+                <!-- Price -->
+                <?php if ($original_price || $discount_price): ?>
+                    <div class="car-item__pricing">
+                        <?php if ($discount_price): ?>
+                            <?php if ($original_price): ?>
+                                <span class="car-item__price-original">
+                                    <?= esc_html($original_price) ?>$
+                                </span>
+                            <?php endif; ?>
+                            <span class="car-item__price-discount">
+                                <?= esc_html($discount_price) ?>$
+                            </span>
+                        <?php else: ?>
+                            <span class="car-item__price-discount">
+                                <?= esc_html($original_price) ?>$
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- CTA -->
+                <span class="car-item__cta hle-button" role="button"
+                    aria-label="Book now for <?= esc_attr(get_the_title()); ?>">
+                    Book Now
+                </span>
+
+            </div>
         </div>
     </a>
 <?php }

@@ -69,9 +69,9 @@
     "location": [
         [
             {
-                "param": "post_type",
+                "param": "post_taxonomy",
                 "operator": "==",
-                "value": "cars"
+                "value": "car_category:car"
             }
         ]
     ],
@@ -87,5 +87,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1783651075
+    "modified": 1784601023
 }

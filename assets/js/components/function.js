@@ -242,7 +242,7 @@ import { CountUp } from 'countup.js';
                 clickable: true,
             },
             breakpoints: {
-                1400: { slidesPerView: 4 },
+                1400: { slidesPerView: 3 },
                 1024: { slidesPerView: 3 },
                 767: { slidesPerView: 2 },
             },
