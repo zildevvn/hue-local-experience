@@ -3,15 +3,16 @@ $duration = get_field('duration_car');
 $scenic_stopovers = get_field('scenic_stopovers_car');
 $pick_up = get_field('pick_up_car');
 $drop_off = get_field('drop_off_car');
-
-$min_pax = isset($paxs_tours['min']) ? $paxs_tours['min'] : '';
-$max_pax = isset($paxs_tours['max']) ? $paxs_tours['max'] : '';
+$driver = get_field('driver_car');
+$group_size = get_field('group_size_car');
+$original_price = get_field('original_price_car');
+$discount_price = get_field('discount_price_car');
 ?>
-<section class="hle-tour-info hle-section">
+<section class="hle-car-info hle-section">
     <div class="container">
-        <?php if ($location_tour || $time_tour || $price_tour || ($min_pax && $max_pax)): ?>
-            <div class="tour-info-card">
-                <?php if ($location_tour): ?>
+        <?php if ($duration || $scenic_stopovers || $pick_up || $drop_off || $driver || $group_size): ?>
+            <div class="car-info-card">
+                <?php if ($pick_up): ?>
                     <div class="info-item">
                         <div class="info-icon">
                             <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -21,13 +22,13 @@ $max_pax = isset($paxs_tours['max']) ? $paxs_tours['max'] : '';
                             </svg>
                         </div>
                         <div class="info-content">
-                            <span class="info-label">Location</span>
-                            <span class="info-value"><?php echo esc_html($location_tour); ?></span>
+                            <span class="info-label">Pick Up</span>
+                            <span class="info-value"><?php echo esc_html($pick_up); ?></span>
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <?php if ($time_tour): ?>
+                <?php if ($duration): ?>
                     <div class="info-item">
                         <div class="info-icon">
                             <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -38,12 +39,12 @@ $max_pax = isset($paxs_tours['max']) ? $paxs_tours['max'] : '';
                         </div>
                         <div class="info-content">
                             <span class="info-label">Duration</span>
-                            <span class="info-value"><?php echo esc_html($time_tour); ?></span>
+                            <span class="info-value"><?php echo esc_html($duration); ?></span>
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <?php if ($min_pax && $max_pax): ?>
+                <?php if ($group_size): ?>
                     <div class="info-item">
                         <div class="info-icon">
                             <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -56,24 +57,55 @@ $max_pax = isset($paxs_tours['max']) ? $paxs_tours['max'] : '';
                         </div>
                         <div class="info-content">
                             <span class="info-label">Group Size</span>
-                            <span class="info-value"><?php echo esc_html($min_pax) . '&ndash;' . esc_html($max_pax); ?>
-                                guests</span>
+                            <span class="info-value"><?php echo esc_html($group_size) ?></span>
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <?php if ($price_tour): ?>
+                <?php if ($drop_off): ?>
                     <div class="info-item">
                         <div class="info-icon">
                             <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="1" x2="12" y2="23"></line>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <span class="info-label">Drop Off</span>
+                            <span class="info-value "><?php echo $drop_off; ?></span>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Price -->
+                <?php if ($original_price || $discount_price): ?>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
                             </svg>
                         </div>
                         <div class="info-content">
                             <span class="info-label">Price</span>
-                            <span class="info-value price-value">$<?php echo number_format((float) $price_tour, 2); ?></span>
+                            <span class="info-value ">
+                                <?php if ($discount_price): ?>
+                                    <span class="car-item__price-discount">
+                                        <?= esc_html($discount_price) ?>$
+                                    </span>
+                                    <?php if ($original_price): ?>
+                                        <span class="car-item__price-original">
+                                            <?= esc_html($original_price) ?>$
+                                        </span>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span class="car-item__price-discount">
+                                        <?= esc_html($original_price) ?>$
+                                    </span>
+                                <?php endif; ?>
+                            </span>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -81,35 +113,35 @@ $max_pax = isset($paxs_tours['max']) ? $paxs_tours['max'] : '';
         <?php endif; ?>
 
         <?php
-        $gallery_tour = get_field('gallery_tour');
-        if ($gallery_tour && is_array($gallery_tour)):
-            $image_count = count($gallery_tour);
+        $gallery_car = get_field('gallery_car');
+        if ($gallery_car && is_array($gallery_car)):
+            $image_count = count($gallery_car);
             ?>
-            <div class="tour-gallery">
-                <div class="tour-gallery-grid <?php echo 'grid-count-' . min($image_count, 5); ?>">
+            <div class="car-gallery">
+                <div class="car-gallery-grid <?php echo 'grid-count-' . min($image_count, 5); ?>">
                     <?php
                     $display_count = min($image_count, 5); // Display up to 5 images
                 
                     for ($i = 0; $i < $display_count; $i++):
-                        $image = $gallery_tour[$i];
+                        $image = $gallery_car[$i];
                         $img_url = is_array($image) ? $image['url'] : (is_numeric($image) ? wp_get_attachment_url($image) : $image);
                         $img_alt = is_array($image) && !empty($image['alt']) ? $image['alt'] : get_the_title();
                         // Try to use 'large' size if available for the grid
                         $img_thumb = is_array($image) && isset($image['sizes']['large']) ? $image['sizes']['large'] : $img_url;
                         ?>
-                        <div class="tour-gallery-item">
-                            <a href="<?php echo esc_url($img_url); ?>" data-fancybox="tour-gallery"
+                        <div class="car-gallery-item">
+                            <a href="<?php echo esc_url($img_url); ?>" data-fancybox="car-gallery"
                                 data-caption="<?php echo esc_attr($img_alt); ?>">
                                 <img src="<?php echo esc_url($img_thumb); ?>" alt="<?php echo esc_attr($img_alt); ?>"
                                     loading="lazy">
-                                <div class="tour-gallery-overlay"></div>
+                                <div class="car-gallery-overlay"></div>
                             </a>
                         </div>
                     <?php endfor; ?>
                 </div>
 
                 <?php if ($image_count > 1): ?>
-                    <button class="btn-view-all" onclick="document.querySelector('.tour-gallery-item a').click();">
+                    <button class="btn-view-all" onclick="document.querySelector('.car-gallery-item a').click();">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -124,11 +156,11 @@ $max_pax = isset($paxs_tours['max']) ? $paxs_tours['max'] : '';
                 // Render the rest of the images hidden so Fancybox can loop them
                 if ($image_count > 5):
                     for ($i = 5; $i < $image_count; $i++):
-                        $image = $gallery_tour[$i];
+                        $image = $gallery_car[$i];
                         $img_url = is_array($image) ? $image['url'] : (is_numeric($image) ? wp_get_attachment_url($image) : $image);
                         $img_alt = is_array($image) && !empty($image['alt']) ? $image['alt'] : get_the_title();
                         ?>
-                        <a href="<?php echo esc_url($img_url); ?>" data-fancybox="tour-gallery"
+                        <a href="<?php echo esc_url($img_url); ?>" data-fancybox="car-gallery"
                             data-caption="<?php echo esc_attr($img_alt); ?>" style="display: none;"></a>
                     <?php endfor;
                 endif;

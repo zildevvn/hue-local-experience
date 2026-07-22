@@ -181,6 +181,10 @@
                 gap: 20px;
             }
 
+            @media (min-width: 768px) and (max-width: 1023.98px) {
+                gap: 16px;
+            }
+
             // Target top-level menu items
             >li {
                 position: relative;
@@ -198,6 +202,10 @@
                     transition: $transition-base;
                     position: relative;
                     text-decoration: none;
+
+                    @media (min-width: 768px) and (max-width: 1023.98px) {
+                        font-size: 14px;
+                    }
 
                     // Subtle bottom border transition on hover
                     &::before {
@@ -379,6 +387,8 @@
         .hle-button {
             @media (min-width: 768px) and (max-width: 1023.98px) {
                 height: 44px;
+                font-size: 14px;
+                padding: 0 20px;
             }
         }
     }

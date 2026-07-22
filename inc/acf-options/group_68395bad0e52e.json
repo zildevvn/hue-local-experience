@@ -316,8 +316,34 @@
             ]
         },
         {
+            "key": "field_6a59e97035b16",
+            "label": "Background Banner",
+            "name": "bg_banner",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "url",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "",
+            "allow_in_bindings": 0,
+            "preview_size": "thumbnail"
+        },
+        {
             "key": "field_6a58460a5c0e5",
-            "label": "Form Booking",
+            "label": "Form Tour Booking",
             "name": "form_booking",
             "aria-label": "",
             "type": "text",
@@ -337,11 +363,11 @@
             "append": ""
         },
         {
-            "key": "field_6a59e97035b16",
-            "label": "Background Banner",
-            "name": "bg_banner",
+            "key": "field_6a602ca999612",
+            "label": "Form Car Booking",
+            "name": "form_car_booking",
             "aria-label": "",
-            "type": "image",
+            "type": "text",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -350,17 +376,12 @@
                 "class": "",
                 "id": ""
             },
-            "return_format": "url",
-            "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": "",
+            "default_value": "",
+            "maxlength": "",
             "allow_in_bindings": 0,
-            "preview_size": "thumbnail"
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
         }
     ],
     "location": [
@@ -384,5 +405,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1784277420
+    "modified": 1784687818
 }

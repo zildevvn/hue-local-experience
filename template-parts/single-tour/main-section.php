@@ -54,16 +54,16 @@ $price_private = get_field('price_for_private_tour');
                 ?>
 
                 <!-- Anchor Navigation Menu -->
-                <nav class="tour-nav" id="hle-tour-nav"
+                <nav class="anchor-nav" id="hle-anchor-nav"
                     aria-label="<?php esc_attr_e('Tour navigation', 'hue-local-experience'); ?>">
-                    <div class="tour-nav__inner">
-                        <ul class="tour-nav__list">
+                    <div class="anchor-nav__inner">
+                        <ul class="anchor-nav__list">
                             <?php foreach ($nav_items as $id => $item):
                                 if (!$item['show'])
                                     continue;
                                 ?>
-                                <li class="tour-nav__item">
-                                    <a href="#<?php echo esc_attr($id); ?>" class="tour-nav__link">
+                                <li class="anchor-nav__item">
+                                    <a href="#<?php echo esc_attr($id); ?>" class="anchor-nav__link">
                                         <?php echo esc_html($item['label']); ?>
                                     </a>
                                 </li>

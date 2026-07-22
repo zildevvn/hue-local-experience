@@ -1,0 +1,110 @@
+/* Anchor Navigation Bar */
+.anchor-nav {
+    position: sticky;
+    top: 105px;
+    /* Right below the fixed main header */
+    z-index: 99;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    margin-bottom: 40px;
+    padding: 4px 16px;
+    transition: top 0.3s ease;
+
+    @include media-breakpoint-down(md) {
+        top: 60px;
+        padding: 4px;
+    }
+
+    body.logged-in & {
+        top: 140px;
+
+        @include media-breakpoint-down(md) {
+            top: 60px;
+        }
+    }
+
+    &__inner {
+        width: 100%;
+    }
+
+    &__list {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 !important;
+        padding: 0;
+        list-style: none;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE 10+ */
+
+        @include media-breakpoint-down(md) {
+            gap: 4px;
+        }
+
+        &::-webkit-scrollbar {
+            display: none;
+            /* Safari and Chrome */
+        }
+    }
+
+    &__item {
+        flex-shrink: 0;
+        padding: 0 !important;
+
+        &::before {
+            content: none !important;
+        }
+    }
+
+    &__link {
+        display: inline-block;
+        padding: 10px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: $color-body;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.25s ease;
+        position: relative;
+        outline: none;
+
+        @include media-breakpoint-down(md) {
+            padding: 8px 6px;
+            font-size: 10px;
+        }
+
+        &:hover {
+            color: $color-primary;
+            background-color: rgba($color-primary, 0.04);
+        }
+
+        &:focus-visible {
+            outline: 2px solid $color-primary;
+            outline-offset: -2px;
+        }
+
+        &.is-active {
+            color: #fff;
+            background-color: $color-primary;
+            box-shadow: 0 4px 12px rgba($color-primary, 0.2);
+        }
+    }
+}
+
+
+// html {
+//     scroll-behavior: smooth;
+// }
+
+// @media (prefers-reduced-motion: reduce) {
+//     html {
+//         scroll-behavior: auto !important;
+//     }
+// }

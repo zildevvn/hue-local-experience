@@ -1077,11 +1077,11 @@ import { CountUp } from 'countup.js';
      * and horizontal mobile auto-scroll.
      */
     function hleInitTourAnchorNav() {
-        const $nav = $('#hle-tour-nav');
+        const $nav = $('#hle-anchor-nav');
         if (!$nav.length) return;
 
-        const $links = $nav.find('.tour-nav__link');
-        const $list = $nav.find('.tour-nav__list');
+        const $links = $nav.find('.anchor-nav__link');
+        const $list = $nav.find('.anchor-nav__list');
 
         // Map IDs to section elements that actually exist in DOM
         const sections = [];
