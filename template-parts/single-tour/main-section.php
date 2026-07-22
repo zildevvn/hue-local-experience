@@ -73,7 +73,7 @@ $price_private = get_field('price_for_private_tour');
                 </nav>
 
                 <div id="tour-overview">
-                    <h2>Overview Tour</h2>
+                    <h2 class="hle-heading hle-heading-animation">Overview Tour</h2>
                     <?php the_content() ?>
                 </div>
 
@@ -149,7 +149,7 @@ $price_private = get_field('price_for_private_tour');
 
                 <?php if (!empty($price_group) || !empty($price_private)): ?>
                     <div id="tour-prices" class="tour-prices">
-                        <h2>Tour Prices</h2>
+                        <h2 class="hle-heading hle-heading-animation">Tour Prices</h2>
 
                         <div class="tour-prices__cards">
                             <?php if (!empty($price_group)): ?>
@@ -227,7 +227,7 @@ $price_private = get_field('price_for_private_tour');
 
                 <div id="tour-itinerary">
                     <?php if (!empty($itinerary_tour)): ?>
-                        <h2>Itinerary</h2>
+                        <h2 class="hle-heading hle-heading-animation">Itinerary</h2>
                         <div class="accordion-list">
                             <?php foreach ($itinerary_tour as $index => $item): ?>
                                 <?php
@@ -279,7 +279,7 @@ $price_private = get_field('price_for_private_tour');
 
             <div class="main-section-right">
                 <div class="booking-form-wrapper">
-                    <h2 id="tour-booking-form" class="h4">Tour Booking Request</h2>
+                    <h2 id="hle-booking-form" class="h4">Tour Booking Request</h2>
                     <?php if ($booking_form)
                         echo do_shortcode($booking_form); ?>
                 </div>

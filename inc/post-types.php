@@ -57,7 +57,7 @@ if (!function_exists('hle_create_custom_post_type')) {
 				'menu_name' => __('Cars'),
 			),
 			'label' => __('Cars', 'hle'),
-			'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'page-attributes'),
+			'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'page-attributes', 'comments'),
 			'menu_icon' => 'dashicons-car',
 			'hierarchical' => false,
 			'public' => true,

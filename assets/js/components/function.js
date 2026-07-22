@@ -1189,7 +1189,7 @@ import { CountUp } from 'countup.js';
 
         if ($(window).width() >= 768) return;
 
-        const headerTop = $('#header-top-bar-tour');
+        const headerTop = $('#header-booking-top');
         if (!headerTop.length) return;
 
         $(window).on('scroll', function () {

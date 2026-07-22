@@ -385,3 +385,34 @@ function hle_car_tour_item($class = '')
         </div>
     </a>
 <?php }
+
+
+function header_booking_top($original_price, $discount_price)
+{ ?>
+    <div id="header-booking-top" class="hle-header-booking-top d-md-none">
+        <div class="d-flex align-items-center justify-content-between">
+            <?php if (!empty($original_price)): ?>
+                <h2 class="h4 mb-0">From:
+                    <?php if ($discount_price): ?>
+                        <span class="car-item__price-discount">
+                            <?= esc_html($discount_price) ?>$
+                        </span>
+                        <?php if ($original_price): ?>
+                            <span class="car-item__price-original">
+                                <?= esc_html($original_price) ?>$
+                            </span>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <span class="car-item__price-discount">
+                            <?= esc_html($original_price) ?>$
+                        </span>
+                    <?php endif; ?>
+                </h2>
+            <?php endif; ?>
+
+            <a href="#hle-booking-form" class="hle-button" label="Book a tour" data-scroll-target="#hle-booking-form">
+                Book Now
+            </a>
+        </div>
+    </div>
+<?php }

@@ -53,6 +53,12 @@ $routes_and_stop_over_car = get_field('routes_and_stop_over_car');
                     'show' => !empty($itinerary_car)
                 ];
 
+                // Reviews
+                $nav_items['car-review'] = [
+                    'label' => __('Reviews', 'hue-local-experience'),
+                    'show' => (comments_open() || get_comments_number() > 0)
+                ];
+
                 ?>
 
                 <!-- Anchor Navigation Menu -->
@@ -381,7 +387,7 @@ $routes_and_stop_over_car = get_field('routes_and_stop_over_car');
 
             <div class="main-section-right">
                 <div class="booking-form-wrapper">
-                    <h2 id="car-booking-form" class="h4">Booking Request</h2>
+                    <h2 id="hle-booking-form" class="h4">Booking Request</h2>
                     <?php if ($booking_form)
                         echo do_shortcode($booking_form); ?>
                 </div>

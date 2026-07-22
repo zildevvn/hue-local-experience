@@ -34,7 +34,7 @@ body.single-cars {
                 align-items: flex-start;
                 gap: 24px;
                 padding: 24px;
-                margin-top: -60px;
+                margin-top: -30%;
             }
 
             .info-item {
@@ -1119,6 +1119,35 @@ body.single-cars {
             }
 
 
+        }
+    }
+
+    .related-cars-section {
+        padding: 90px 0;
+
+        @include media-breakpoint-down(lg) {
+            padding: 60px 0;
+        }
+
+        @include media-breakpoint-down(md) {
+            padding: 40px 0;
+        }
+
+        &__list {
+            margin-top: 48px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+
+            @include media-breakpoint-down(lg) {
+                grid-template-columns: repeat(2, 1fr);
+                margin-top: 32px;
+            }
+
+            @include media-breakpoint-down(md) {
+                grid-template-columns: 1fr;
+                margin-top: 28px;
+            }
         }
     }
 }

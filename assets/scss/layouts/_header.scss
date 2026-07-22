@@ -56,7 +56,7 @@
     z-index: 1000;
     padding: 0;
     position: fixed;
-    top: 0;
+    top: 30px;
     left: 0;
     width: 100%;
     z-index: 1029;
@@ -68,7 +68,7 @@
     }
 
     body.logged-in & {
-        top: 32px;
+        top: 62px;
     }
 
 
@@ -128,26 +128,6 @@
             z-index: 99;
         }
     }
-
-    // &.is-sticky {
-    //     .header-main__logo img {
-    //         max-width: 70px;
-    //     }
-    // }
-
-    // &.fixed-top {
-    //     position: fixed;
-    //     top: 0;
-    //     left: 0;
-    //     width: 100%;
-    //     box-shadow: 0 0 15px rgba(0, 0, 0, 0.17);
-    //     animation: slide-down 0.7s;
-    //     z-index: 1030;
-
-    //     body.logged-in & {
-    //         top: 32px;
-    //     }
-    // }
 
     &__logo {
         img {

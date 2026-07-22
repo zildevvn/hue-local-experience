@@ -8,10 +8,13 @@
 get_header();
 ?>
 
+
+<?php get_template_part('template-parts/single-car/header-bar'); ?>
 <main id="primary" class="site-main">
     <?php get_template_part('template-parts/single-car/hero-section'); ?>
     <?php get_template_part('template-parts/single-car/info-section'); ?>
     <?php get_template_part('template-parts/single-car/main-section'); ?>
+    <?php get_template_part('template-parts/single-car/related-cars'); ?>
     <?php get_template_part('template-parts/shared/team-section'); ?>
 </main>
 

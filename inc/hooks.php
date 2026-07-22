@@ -79,17 +79,17 @@ function hle_post_loop_item_template($post_id, $index)
 }
 
 /**
- * Force comments to be open for standard posts and tours.
+ * Force comments to be open for standard posts, tours, and cars.
  */
 add_filter('comments_open', function ($open, $post_id) {
-	if (in_array(get_post_type($post_id), ['post', 'tours'])) {
+	if (in_array(get_post_type($post_id), ['post', 'tours', 'cars'])) {
 		return true;
 	}
 	return $open;
 }, 20, 2);
 
 /**
- * Save tour review rating as comment meta after a comment is posted.
+ * Save review rating as comment meta after a comment is posted.
  */
 add_action('comment_post', function ($comment_id, $comment_approved) {
 	if (isset($_POST['hle_tour_rating'])) {
@@ -101,11 +101,11 @@ add_action('comment_post', function ($comment_id, $comment_approved) {
 }, 10, 2);
 
 /**
- * Validate that a rating is submitted for tour review comments.
+ * Validate that a rating is submitted for tour or car review comments.
  */
 add_filter('preprocess_comment', function ($commentdata) {
 	$post_id = isset($commentdata['comment_post_ID']) ? intval($commentdata['comment_post_ID']) : 0;
-	if ($post_id && get_post_type($post_id) === 'tours') {
+	if ($post_id && in_array(get_post_type($post_id), ['tours', 'cars'])) {
 		if (empty($_POST['hle_tour_rating']) || intval($_POST['hle_tour_rating']) < 1) {
 			wp_die(__('Please select a star rating before submitting your review.'), __('Missing Rating'), ['back_link' => true, 'response' => 400]);
 		}
@@ -114,10 +114,11 @@ add_filter('preprocess_comment', function ($commentdata) {
 });
 
 /**
- * Handle redirect after tour review submission.
+ * Handle redirect after tour or car review submission.
  */
 add_filter('comment_post_redirect', function ($location, $comment) {
-	if (get_post_type($comment->comment_post_ID) === 'tours') {
+	$post_type = get_post_type($comment->comment_post_ID);
+	if (in_array($post_type, ['tours', 'cars'])) {
 		$location = remove_query_arg(['unapproved', 'approved', 'moderation-hash'], $location);
 		// Strip any hash anchor first
 		$parts = explode('#', $location);
@@ -132,7 +133,8 @@ add_filter('comment_post_redirect', function ($location, $comment) {
 			], $base_url);
 		}
 		
-		$location = $base_url . '#tour-review';
+		$anchor = ($post_type === 'cars') ? 'car-review' : 'tour-review';
+		$location = $base_url . '#' . $anchor;
 	}
 	return $location;
 }, 10, 2);

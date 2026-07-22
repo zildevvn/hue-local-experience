@@ -61,28 +61,7 @@
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
-                "width": "50",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "maxlength": "",
-            "allow_in_bindings": 0,
-            "placeholder": "",
-            "prepend": "",
-            "append": ""
-        },
-        {
-            "key": "field_6a5edc1fc5981",
-            "label": "Scenic Stopovers",
-            "name": "scenic_stopovers_car",
-            "aria-label": "",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "50",
+                "width": "25",
                 "class": "",
                 "id": ""
             },
@@ -103,7 +82,7 @@
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
-                "width": "33.3",
+                "width": "25",
                 "class": "",
                 "id": ""
             },
@@ -124,7 +103,7 @@
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
-                "width": "33.3",
+                "width": "25",
                 "class": "",
                 "id": ""
             },
@@ -145,7 +124,7 @@
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
-                "width": "33.3",
+                "width": "25",
                 "class": "",
                 "id": ""
             },
@@ -751,5 +730,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1784603445
+    "modified": 1784689625
 }
