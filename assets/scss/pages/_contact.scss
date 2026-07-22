@@ -1,4 +1,40 @@
 body.page-template-contact-template {
+    .map-section {
+        background: #fff;
+        padding: 60px 0;
+
+        @include media-breakpoint-down(lg) {
+            padding: 40px 0;
+        }
+
+        &__embed {
+            position: relative;
+            width: 100%;
+            padding-bottom: 45%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+
+            @include media-breakpoint-down(lg) {
+                padding-bottom: 56.25%;
+            }
+
+            @include media-breakpoint-down(md) {
+                padding-bottom: 75%;
+            }
+
+            iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: 0;
+            }
+        }
+    }
+
     .main-section {
         padding: 90px 0;
 

@@ -7419,7 +7419,7 @@ body.logged-in #car-review {
   z-index: 1000;
   padding: 0;
   position: fixed;
-  top: 20px;
+  top: 10px;
   left: 0;
   width: 100%;
   z-index: 1029;
@@ -7432,7 +7432,7 @@ body.logged-in #car-review {
   }
 }
 body.logged-in .header-main {
-  top: 52px;
+  top: 42px;
 }
 .header-main > .container {
   background: #fff;
@@ -10965,6 +10965,42 @@ body.page-template-cars-template .popular-car-section {
   }
 }
 
+body.page-template-contact-template .map-section {
+  background: #fff;
+  padding: 60px 0;
+}
+@media (max-width: 1023.98px) {
+  body.page-template-contact-template .map-section {
+    padding: 40px 0;
+  }
+}
+body.page-template-contact-template .map-section__embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 45%;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+@media (max-width: 1023.98px) {
+  body.page-template-contact-template .map-section__embed {
+    padding-bottom: 56.25%;
+  }
+}
+@media (max-width: 767.98px) {
+  body.page-template-contact-template .map-section__embed {
+    padding-bottom: 75%;
+  }
+}
+body.page-template-contact-template .map-section__embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
 body.page-template-contact-template .main-section {
   padding: 90px 0;
 }

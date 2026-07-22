@@ -55,7 +55,7 @@
     z-index: 1000;
     padding: 0;
     position: fixed;
-    top: 20px;
+    top: 10px;
     left: 0;
     width: 100%;
     z-index: 1029;
@@ -67,9 +67,8 @@
     }
 
     body.logged-in & {
-        top: 52px;
+        top: 42px;
     }
-
 
     >.container {
         background: #fff;
