@@ -6296,7 +6296,7 @@ html {
 }
 
 .hle-sub-heading {
-  margin: 10px 0 0 0;
+  margin: 16px 0 0 0;
 }
 
 .section-heading {
@@ -6311,7 +6311,7 @@ html {
   text-align: center;
 }
 .section-heading .hle-sub-heading {
-  margin: 10px 0 0 0;
+  margin: 16px 0 0 0;
 }
 
 .hle-letter {
@@ -7419,7 +7419,7 @@ body.logged-in #car-review {
   z-index: 1000;
   padding: 0;
   position: fixed;
-  top: 30px;
+  top: 20px;
   left: 0;
   width: 100%;
   z-index: 1029;
@@ -7432,7 +7432,7 @@ body.logged-in #car-review {
   }
 }
 body.logged-in .header-main {
-  top: 62px;
+  top: 52px;
 }
 .header-main > .container {
   background: #fff;
@@ -10962,6 +10962,136 @@ body.page-template-cars-template .popular-car-section {
   body.page-template-cars-template .popular-car-section .popular-car-price__value,
   body.page-template-cars-template .popular-car-section .popular-car-price__route-icon {
     transition: none;
+  }
+}
+
+body.page-template-contact-template .main-section {
+  padding: 90px 0;
+}
+@media (max-width: 1023.98px) {
+  body.page-template-contact-template .main-section {
+    padding: 60px 0;
+  }
+}
+@media (max-width: 767.98px) {
+  body.page-template-contact-template .main-section {
+    padding: 40px 0;
+  }
+}
+body.page-template-contact-template .main-section .section-heading {
+  max-width: 900px;
+}
+body.page-template-contact-template .main-section-warp {
+  margin-top: 48px;
+}
+@media (max-width: 1023.98px) {
+  body.page-template-contact-template .main-section-warp {
+    margin-top: 32px;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+}
+@media (max-width: 767.98px) {
+  body.page-template-contact-template .main-section-warp {
+    margin-top: 28px;
+  }
+}
+body.page-template-contact-template .main-section-warp > div {
+  background: #fff;
+  border-radius: 15px;
+  padding: 20px 30px;
+  box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.05);
+}
+@media (max-width: 767.98px) {
+  body.page-template-contact-template .main-section-warp > div {
+    padding: 20px 10px;
+  }
+}
+body.page-template-contact-template .main-section__left {
+  display: flex;
+  align-items: center;
+  width: 30%;
+  position: relative;
+}
+@media (max-width: 1199.98px) {
+  body.page-template-contact-template .main-section__left {
+    width: 40%;
+  }
+}
+@media (max-width: 1023.98px) {
+  body.page-template-contact-template .main-section__left {
+    width: 100%;
+  }
+}
+body.page-template-contact-template .main-section__left::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 30px;
+  bottom: 30px;
+  width: 3px;
+  background: #9615b5;
+  border-radius: 50px;
+}
+body.page-template-contact-template .main-section__left .contact-info {
+  text-decoration: none;
+  gap: 15px;
+  align-items: center;
+}
+body.page-template-contact-template .main-section__left .contact-info:not(:last-child) {
+  margin-bottom: 32px;
+}
+body.page-template-contact-template .main-section__left .contact-info.address .contact-info__icon svg path {
+  stroke: #fff;
+  fill: transparent;
+}
+body.page-template-contact-template .main-section__left .contact-info__icon {
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+  background: #9615b5;
+  border-radius: 50px;
+  text-align: center;
+  font-size: 22px;
+  box-shadow: -5px 5px 0 rgba(17, 110, 99, 0.09);
+  flex-shrink: 0;
+}
+body.page-template-contact-template .main-section__left .contact-info__icon svg path {
+  fill: #fff;
+}
+body.page-template-contact-template .main-section__left .contact-info__content h5, body.page-template-contact-template .main-section__left .contact-info__content .h5 {
+  margin: 0;
+}
+body.page-template-contact-template .main-section__left .contact-info__content p {
+  color: #19232B;
+  font-weight: 500;
+}
+body.page-template-contact-template .main-section__right {
+  width: calc(70% - 30px);
+}
+@media (max-width: 1199.98px) {
+  body.page-template-contact-template .main-section__right {
+    width: calc(60% - 30px);
+  }
+}
+@media (max-width: 1023.98px) {
+  body.page-template-contact-template .main-section__right {
+    width: 100%;
+  }
+}
+body.page-template-contact-template .main-section__right .nf-form-cont .nf-form-layout .nf-form-content nf-fields-wrap {
+  flex-direction: inherit;
+  flex-wrap: wrap;
+}
+body.page-template-contact-template .main-section__right .nf-form-cont .nf-form-layout .nf-form-content nf-fields-wrap .nf-field-container {
+  margin-bottom: 0;
+}
+body.page-template-contact-template .main-section__right .nf-form-cont .nf-form-layout .nf-form-content nf-fields-wrap nf-field {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  body.page-template-contact-template .main-section__right .nf-form-cont .nf-form-layout .nf-form-content nf-fields-wrap nf-field:first-child, body.page-template-contact-template .main-section__right .nf-form-cont .nf-form-layout .nf-form-content nf-fields-wrap nf-field:nth-child(2) {
+    max-width: calc(50% - 8px);
   }
 }
 
