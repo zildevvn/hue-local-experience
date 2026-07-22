@@ -804,3 +804,386 @@
         }
     }
 }
+
+
+
+.wcu-section {
+    padding-bottom: 90px;
+
+    @include media-breakpoint-down(lg) {
+        padding-bottom: 60px;
+    }
+
+    @include media-breakpoint-down(md) {
+        padding-bottom: 40px;
+    }
+
+    &-warp {
+        width: 100%;
+        gap: 40px;
+
+        @include media-breakpoint-down(md) {
+            gap: 32px;
+        }
+    }
+
+    &__left,
+    &__right {
+        width: 50%;
+
+        @include media-breakpoint-down(lg) {
+            width: 100%;
+        }
+    }
+
+    &__right {
+        &-warp {
+            >div {
+                width: 50%;
+
+                @include media-breakpoint-down(md) {
+                    width: 100%;
+                }
+            }
+        }
+
+        &-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+            &__phone {
+                text-decoration: none;
+
+                .icon {
+                    width: 48px;
+                    height: 48px;
+                    line-height: 48px;
+                    background: $color-primary;
+                    border-radius: 50px;
+                    text-align: center;
+                    font-size: 22px;
+                    box-shadow: -5px 5px 0 rgb(17, 110, 99, 0.09);
+
+                    svg {
+                        path {
+                            fill: #fff;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .features {
+        .feature-item {
+            &:not(:last-child) {
+                margin-bottom: 16px;
+            }
+
+            &__icon {
+                width: 70px;
+                height: 70px;
+                background: $color-primary;
+                border-radius: 50px;
+                box-shadow: -5px 5px 0 rgb(17, 110, 99, 0.09);
+
+                @include media-breakpoint-down(md) {
+                    width: 60px;
+                    height: 60px;
+                }
+
+                img {
+                    width: 100%;
+                    height: auto;
+                    max-width: 25px;
+                    filter: brightness(0) invert(1);
+
+                    @include media-breakpoint-down(md) {
+                        max-width: 20px;
+                    }
+                }
+            }
+
+            &__heading {
+                color: $color-text;
+                font-family: $font-primary;
+                font-weight: 500;
+            }
+        }
+    }
+
+    .quote-box {
+        position: relative;
+        color: $color-text;
+        padding: 20px 22px;
+        background: rgb(17, 110, 99, 0.09);
+        border-radius: 20px;
+        font-weight: 500;
+
+        svg {
+            position: absolute;
+            right: 20px;
+            bottom: -25px;
+            width: 100%;
+            height: auto;
+            max-width: 50px;
+            transform: rotate(180deg);
+
+            path {
+                fill: $color-primary;
+            }
+        }
+    }
+
+    .wcu-images {
+        gap: 20px;
+
+        &__left,
+        &__right {
+            width: 50%;
+
+            @include media-breakpoint-down(md) {
+                width: 100%;
+            }
+        }
+
+        img {
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            height: auto;
+            max-width: 100%;
+
+            &.image_large {
+                border-radius: 80px 80px 0 80px;
+            }
+
+            &.wcu-images__bottom {
+                border-radius: 0 80px 80px 80px;
+                margin-top: 20px;
+            }
+        }
+
+        &__circle {
+            position: relative;
+            overflow: hidden;
+            padding: 15px;
+
+            svg {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                animation: dashed_border_running 20s linear infinite both;
+                // animation-play-state: paused;
+                animation-play-state: running;
+                stroke-width: 1.5;
+                stroke-dasharray: 4, 5;
+                stroke-dashoffset: 8;
+                stroke-linecap: round;
+                fill: none;
+                transition: 0.4s;
+                stroke: $color-primary;
+                z-index: 9;
+
+                rect {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+
+            img {
+                border-radius: 50%;
+                aspect-ratio: 1 / 1;
+            }
+        }
+    }
+
+    .experience-box {
+        background: $color-primary;
+        padding: 15px 20px 15px 15px;
+        color: #fff;
+        border-radius: 50px 50px 50px 0;
+        box-shadow: 0 0 40px 5px rgb(0 0 0 / 10%);
+        margin-top: 20px;
+
+        &__icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #fff;
+            flex-shrink: 0;
+
+            @include media-breakpoint-down(xl) {
+                width: 70px;
+                height: 70px;
+            }
+
+            img {
+                width: 100%;
+                height: auto;
+                max-width: 50px;
+                filter: brightness(0%);
+
+                @include media-breakpoint-down(xl) {
+                    max-width: 30px;
+                }
+            }
+        }
+
+        &__number {
+            font-size: 24px;
+            font-weight: 800;
+            font-family: $font-second;
+            margin-bottom: 10px;
+
+            @include media-breakpoint-only(lg) {
+                font-size: 20px;
+            }
+        }
+    }
+
+    &__desc {
+        margin-top: 16px;
+        margin-bottom: 32px;
+    }
+}
+
+
+.how-to-book-section {
+    z-index: 1;
+    padding: 90px 0;
+    background: $color-bg;
+
+    @include media-breakpoint-down(lg) {
+        padding: 60px 0;
+    }
+
+    @include media-breakpoint-down(md) {
+        padding: 40px 0;
+    }
+
+    .hle-section__bg {
+        border-radius: 80px 80px 0 0;
+        overflow: hidden;
+
+        img[data-parallax="true"] {
+            position: absolute;
+            top: -15%;
+            left: 0;
+            width: 100%;
+            height: 130%;
+            object-fit: cover;
+            will-change: transform;
+        }
+    }
+
+    &:before {
+        content: " ";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        background-color: rgba($color: $color-primary, $alpha: 0.6);
+        background-color: rgba($color: #2D77DC, $alpha: 0.7);
+        border-radius: 80px 80px 0 0;
+    }
+
+    >.container {
+        position: relative;
+        z-index: 2;
+        color: #fff;
+    }
+
+    .hle-heading {
+        color: #fff;
+
+        &::before {
+            background: #fff;
+        }
+    }
+
+    .steps-list {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin-top: 48px;
+
+        @include media-breakpoint-down(lg) {
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+
+        @include media-breakpoint-down(md) {
+            margin-top: 28px;
+        }
+
+        .step-item {
+            position: relative;
+            text-align: center;
+            color: #fff;
+
+            @include media-breakpoint-down(lg) {
+                width: calc(50% - 10px);
+            }
+
+            h3 {
+                color: #fff;
+                margin-top: 24px;
+            }
+
+            &:last-child {
+                .step-item__arrow {
+                    display: none;
+                }
+            }
+
+            &__number {
+                position: relative;
+
+                .bg-image {
+                    animation-name: effectDeformY;
+                    animation-duration: 3s;
+                    animation-timing-function: ease-in-out;
+                    animation-direction: alternate;
+                    animation-iteration-count: infinite;
+                }
+            }
+
+            span {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                color: #fff;
+                -webkit-text-stroke: 2px #fff;
+                -webkit-text-fill-color: transparent;
+            }
+
+            &__arrow {
+                position: absolute;
+                right: -14%;
+                top: 22%;
+
+                @include media-breakpoint-down(lg) {
+                    display: none;
+                }
+
+                img {
+                    @include media-breakpoint-down(xl) {
+                        width: 100%;
+                        height: auto;
+                        max-width: 50px;
+                    }
+                }
+            }
+        }
+
+    }
+}

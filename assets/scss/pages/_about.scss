@@ -1,0 +1,103 @@
+body.page-template-about-section {
+    .intro-section {
+        padding: 90px 0;
+        background: $color-bg;
+
+        @include media-breakpoint-down(lg) {
+            padding: 60px 0;
+        }
+
+        @include media-breakpoint-down(md) {
+            padding: 40px 0;
+        }
+
+        &__inner {
+            gap: 48px;
+
+            @include media-breakpoint-down(lg) {
+                gap: 32px;
+                flex-wrap: wrap;
+            }
+
+
+            >div {
+                width: 50%;
+
+                @include media-breakpoint-down(lg) {
+                    width: 100%;
+                }
+
+            }
+        }
+
+        &__image {
+            position: relative;
+            min-height: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+
+            @include media-breakpoint-down(lg) {
+                padding: 34% 0;
+            }
+
+            img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        &__content {
+            padding: 24px 0;
+
+            .sub-heading {
+                text-transform: uppercase;
+                color: $color-primary;
+                font-weight: 600;
+                font-size: 18px;
+            }
+
+            .intro-section__desc {
+                margin-top: 32px;
+
+                @include media-breakpoint-down(md) {
+                    margin-top: 24px;
+                }
+
+                p {
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+                }
+
+                b {
+                    color: $color-text;
+                }
+
+                a {
+                    color: $color-primary;
+
+                    b {
+                        color: inherit;
+                    }
+                }
+            }
+        }
+    }
+
+    .wcu-section {
+        padding: 90px 0;
+        background: #fff;
+
+        @include media-breakpoint-down(lg) {
+            padding: 60px 0;
+        }
+
+        @include media-breakpoint-down(md) {
+            padding: 40px 0;
+        }
+    }
+}
