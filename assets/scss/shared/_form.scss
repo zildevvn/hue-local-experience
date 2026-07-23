@@ -46,10 +46,11 @@
             border: 1px solid #e0e0e0 !important;
             border-radius: 12px !important;
             font-size: 15px !important;
-            color: $color-body !important;
+            color: $color-text !important;
             transition: all 0.3s ease !important;
             box-sizing: border-box !important;
             font-family: inherit !important;
+
 
             &::placeholder {
                 color: #aaa !important;
