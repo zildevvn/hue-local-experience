@@ -1266,6 +1266,41 @@ import { CountUp } from 'countup.js';
         }
     }
 
+    const hleInitSearchFormInterceptor = () => {
+        $(document).on('submit', 'form[role="search"]', function (e) {
+            e.preventDefault();
+            const $form = $(this);
+            const action = $form.attr('action') || window.location.origin + '/';
+            const keyword = $form.find('input[name="s"]').val() || '';
+            
+            const url = new URL(action, window.location.origin);
+            url.searchParams.set('s', keyword);
+            url.hash = 'search-results';
+            window.location.href = url.toString();
+        });
+    };
+
+    const hleInitSearchScroll = () => {
+        const isSearchPage = document.body.classList.contains('search-results') || document.body.classList.contains('search');
+        if (!isSearchPage || window.location.hash !== '#search-results') return;
+
+        const searchResults = document.getElementById('search-results');
+        if (!searchResults) return;
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const headerOffset = 80;
+        
+        setTimeout(() => {
+            const elementPosition = searchResults.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: prefersReducedMotion ? 'auto' : 'smooth'
+            });
+        }, 100);
+    };
+
     $(document).ready(function () {
         btAnimateText('.hle-heading-animation', 'right');
         initBackToTop()
@@ -1284,5 +1319,7 @@ import { CountUp } from 'countup.js';
         hleInitTourAnchorNav()
         AOS.init();
         hleHeaderTopMobile()
+        hleInitSearchFormInterceptor()
+        hleInitSearchScroll()
     });
 })(jQuery);

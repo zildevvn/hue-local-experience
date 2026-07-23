@@ -57,7 +57,7 @@ $bg_banner = get_field('bg_banner', 'option');
 </section>
 
 <?php if (!empty($search_query)): ?>
-	<div class="search-results">
+	<div class="search-results" id="search-results">
 		<div class="hle-results-search-section">
 			<div class="container">
 				<?php if (have_posts()): ?>
@@ -153,18 +153,64 @@ $bg_banner = get_field('bg_banner', 'option');
 				<?php else: ?>
 					<div class="search-empty-state">
 						<div class="search-empty-state__icon">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-								stroke-linejoin="round">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 								<circle cx="11" cy="11" r="8"></circle>
 								<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                <line x1="9" y1="9" x2="13" y2="13"></line>
+                                <line x1="13" y1="9" x2="9" y2="13"></line>
 							</svg>
 						</div>
-						<h3>No results found</h3>
-						<p>We couldn't find any results for "<?php echo esc_html($search_query); ?>". Please try searching with
-							different keywords.</p>
-						<a href="<?php echo esc_url(home_url('/')); ?>" class="hle-button hle-button--primary back-home">Back to
-							Home</a>
+						<h3 class="search-empty-state__title">No Results Found</h3>
+						<p class="search-empty-state__desc">We couldn't find anything matching "<strong><?php echo esc_html($search_query); ?></strong>".</p>
+                        
+                        <div class="search-empty-state__suggestions">
+                            <p>Here are some helpful suggestions:</p>
+                            <ul>
+                                <li>Make sure all words are spelled correctly.</li>
+                                <li>Try using fewer or more general keywords.</li>
+                            </ul>
+                        </div>
+
+                        <div class="search-empty-state__form">
+                            <form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>" class="modern-search-form">
+                                <div class="input-group">
+                                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <input type="search" name="s" placeholder="Try searching again..." value="<?php echo esc_attr($search_query); ?>" required autofocus />
+                                    <button type="submit" class="hle-button hle-button--primary search-submit">Search</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="search-empty-state__actions">
+                            <a href="<?php echo esc_url(home_url('/tours/')); ?>" class="hle-button hle-button--primary">Explore Tours</a>
+                            <a href="<?php echo esc_url(home_url('/')); ?>" class="hle-button hle-button--outline">Back to Home</a>
+                        </div>
 					</div>
+
+                    <?php
+                    $popular_tours = new WP_Query([
+                        'post_type' => 'tours',
+                        'posts_per_page' => 3,
+                        'post_status' => 'publish',
+                        'orderby' => 'date',
+                        'order' => 'DESC'
+                    ]);
+                    if ($popular_tours->have_posts()):
+                    ?>
+                    <div class="search-recommendations" style="margin-top: 80px;">
+                        <h4 class="search-recommendations__title" style="font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 40px; color: #111827;">You Might Also Like</h4>
+                        <div class="hle-results-search-section__list">
+                            <?php while ($popular_tours->have_posts()): $popular_tours->the_post(); 
+                                if (function_exists('hle_tour_item')) {
+                                    hle_tour_item();
+                                }
+                            endwhile; wp_reset_postdata(); ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 				<?php endif; ?>
 			</div>
 		</div>
