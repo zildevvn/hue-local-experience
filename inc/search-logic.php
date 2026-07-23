@@ -98,7 +98,32 @@ function hle_get_search_tokens($search_query) {
     foreach ($raw_words as $word) {
         $word = trim($word);
         if (!empty($word) && !in_array($word, $stop_words)) {
+            // Keep original exact token
             $words[] = $word;
+            
+            // Generate normalized fallback for plurals/suffixes
+            $len = mb_strlen($word);
+            if ($len > 3) { // Only normalize words long enough to remain meaningful
+                $normalized = $word;
+                if (preg_match('/ies$/', $word)) {
+                    // e.g. activities -> activity, cities -> city
+                    $normalized = mb_substr($word, 0, -3) . 'y';
+                } elseif (preg_match('/(ss|sh|ch|x)es$/', $word)) {
+                    // e.g. boxes -> box, matches -> match
+                    $normalized = mb_substr($word, 0, -2);
+                } elseif (preg_match('/es$/', $word)) {
+                    // e.g. experiences -> experience, hues -> hue
+                    $normalized = mb_substr($word, 0, -1);
+                } elseif (preg_match('/[^s]s$/', $word)) {
+                    // e.g. tours -> tour, cars -> car (ends in s but not ss)
+                    $normalized = mb_substr($word, 0, -1);
+                }
+                
+                // Add normalized token if it changed and remains valid length
+                if ($normalized !== $word && mb_strlen($normalized) >= 3) {
+                    $words[] = $normalized;
+                }
+            }
         }
     }
 
@@ -106,5 +131,6 @@ function hle_get_search_tokens($search_query) {
         $words = array_filter(explode(' ', $raw_query));
     }
     
+    // Remove duplicate tokens (e.g. if a generated fallback matches an existing token)
     return array_unique($words);
 }
