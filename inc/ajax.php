@@ -112,35 +112,7 @@ function hle_ajax_filter_tours()
     $items = ob_get_clean();
 
     ob_start();
-    $total_pages = $the_query->max_num_pages;
-    if ($total_pages > 1) {
-        echo '<div class="tours-pagination">';
-        
-        // Prev button
-        if ($currentpage > 1) {
-            echo '<button class="page-numbers prev" data-page="' . ($currentpage - 1) . '">&laquo; Prev</button>';
-        } else {
-            echo '<button class="page-numbers prev disabled" disabled>&laquo; Prev</button>';
-        }
-
-        // Page numbers
-        for ($i = 1; $i <= $total_pages; $i++) {
-            if ($i == $currentpage) {
-                echo '<span class="page-numbers current">' . $i . '</span>';
-            } else {
-                echo '<button class="page-numbers" data-page="' . $i . '">' . $i . '</button>';
-            }
-        }
-
-        // Next button
-        if ($currentpage < $total_pages) {
-            echo '<button class="page-numbers next" data-page="' . ($currentpage + 1) . '">Next &raquo;</button>';
-        } else {
-            echo '<button class="page-numbers next disabled" disabled>Next &raquo;</button>';
-        }
-        
-        echo '</div>';
-    }
+    hle_pagination($currentpage, $the_query->max_num_pages);
     $pagination = ob_get_clean();
 
     wp_reset_postdata();
@@ -192,35 +164,7 @@ function hle_ajax_filter_posts()
     $items = ob_get_clean();
 
     ob_start();
-    $total_pages = $the_query->max_num_pages;
-    if ($total_pages > 1) {
-        echo '<div class="tours-pagination">';
-        
-        // Prev button
-        if ($currentpage > 1) {
-            echo '<button class="page-numbers prev" data-page="' . ($currentpage - 1) . '">&laquo; Prev</button>';
-        } else {
-            echo '<button class="page-numbers prev disabled" disabled>&laquo; Prev</button>';
-        }
-
-        // Page numbers
-        for ($i = 1; $i <= $total_pages; $i++) {
-            if ($i == $currentpage) {
-                echo '<span class="page-numbers current">' . $i . '</span>';
-            } else {
-                echo '<button class="page-numbers" data-page="' . $i . '">' . $i . '</button>';
-            }
-        }
-
-        // Next button
-        if ($currentpage < $total_pages) {
-            echo '<button class="page-numbers next" data-page="' . ($currentpage + 1) . '">Next &raquo;</button>';
-        } else {
-            echo '<button class="page-numbers next disabled" disabled>Next &raquo;</button>';
-        }
-        
-        echo '</div>';
-    }
+    hle_pagination($currentpage, $the_query->max_num_pages);
     $pagination = ob_get_clean();
 
     wp_reset_postdata();
@@ -254,35 +198,7 @@ function hle_ajax_filter_cars()
     $items = ob_get_clean();
 
     ob_start();
-    $total_pages = $the_query->max_num_pages;
-    if ($total_pages > 1) {
-        echo '<div class="hle-pagination">';
-        
-        // Prev button
-        if ($currentpage > 1) {
-            echo '<button class="page-numbers prev" data-page="' . ($currentpage - 1) . '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span>' . __('Prev', 'hue-local-experience') . '</span></button>';
-        } else {
-            echo '<button class="page-numbers prev disabled" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span>' . __('Prev', 'hue-local-experience') . '</span></button>';
-        }
-
-        // Page numbers
-        for ($i = 1; $i <= $total_pages; $i++) {
-            if ($i == $currentpage) {
-                echo '<span class="page-numbers current">' . $i . '</span>';
-            } else {
-                echo '<button class="page-numbers" data-page="' . $i . '">' . $i . '</button>';
-            }
-        }
-
-        // Next button
-        if ($currentpage < $total_pages) {
-            echo '<button class="page-numbers next" data-page="' . ($currentpage + 1) . '"><span>' . __('Next', 'hue-local-experience') . '</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>';
-        } else {
-            echo '<button class="page-numbers next disabled" disabled><span>' . __('Next', 'hue-local-experience') . '</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>';
-        }
-        
-        echo '</div>';
-    }
+    hle_pagination($currentpage, $the_query->max_num_pages);
     $pagination = ob_get_clean();
 
     wp_reset_postdata();

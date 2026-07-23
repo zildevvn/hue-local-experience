@@ -286,17 +286,6 @@ body.page-template-blog-template {
             }
         }
 
-        #hle-posts-pagination {
-            margin-top: 48px;
-
-            @include media-breakpoint-down(lg) {
-                margin-top: 32px;
-            }
-
-            @include media-breakpoint-down(md) {
-                margin-top: 28px;
-            }
-        }
 
         #hle-posts-empty {
             .empty-state {

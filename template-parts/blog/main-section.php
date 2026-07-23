@@ -93,33 +93,7 @@ $query = new WP_Query($args);
                 </div>
 
                 <div id="hle-posts-pagination">
-                    <?php
-                    $total_pages = $query->max_num_pages;
-                    if ($total_pages > 1) {
-                        echo '<div class="hel-pagination">';
-
-                        // Prev button
-                        echo '<button class="page-numbers prev disabled" disabled>&laquo; Prev</button>';
-
-                        // Page numbers
-                        for ($i = 1; $i <= $total_pages; $i++) {
-                            if ($i == 1) {
-                                echo '<span class="page-numbers current">' . $i . '</span>';
-                            } else {
-                                echo '<button class="page-numbers" data-page="' . $i . '">' . $i . '</button>';
-                            }
-                        }
-
-                        // Next button
-                        if (1 < $total_pages) {
-                            echo '<button class="page-numbers next" data-page="2">Next &raquo;</button>';
-                        } else {
-                            echo '<button class="page-numbers next disabled" disabled>Next &raquo;</button>';
-                        }
-
-                        echo '</div>';
-                    }
-                    ?>
+                    <?php hle_pagination($query->query_vars['paged'] ?: 1, $query->max_num_pages); ?>
                 </div>
 
                 <div id="hle-posts-empty" style="display: none;">

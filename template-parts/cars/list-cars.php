@@ -40,37 +40,7 @@ $query = new WP_Query($args);
                 </div>
 
                 <div id="hle-cars-pagination">
-                    <?php
-                    $total_pages = $query->max_num_pages;
-                    if ($total_pages > 1) {
-                        echo '<div class="hle-pagination">';
-
-                        // Prev button
-                        if ($paged > 1) {
-                            echo '<button class="page-numbers prev" data-page="' . ($paged - 1) . '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span>' . __('Prev', 'hue-local-experience') . '</span></button>';
-                        } else {
-                            echo '<button class="page-numbers prev disabled" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span>' . __('Prev', 'hue-local-experience') . '</span></button>';
-                        }
-
-                        // Page numbers
-                        for ($i = 1; $i <= $total_pages; $i++) {
-                            if ($i == $paged) {
-                                echo '<span class="page-numbers current">' . $i . '</span>';
-                            } else {
-                                echo '<button class="page-numbers" data-page="' . $i . '">' . $i . '</button>';
-                            }
-                        }
-
-                        // Next button
-                        if ($paged < $total_pages) {
-                            echo '<button class="page-numbers next" data-page="' . ($paged + 1) . '"><span>' . __('Next', 'hue-local-experience') . '</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>';
-                        } else {
-                            echo '<button class="page-numbers next disabled" disabled><span>' . __('Next', 'hue-local-experience') . '</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>';
-                        }
-
-                        echo '</div>';
-                    }
-                    ?>
+                    <?php hle_pagination($paged, $query->max_num_pages); ?>
                 </div>
             </div>
 

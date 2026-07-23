@@ -554,56 +554,7 @@
     }
 }
 
-.hel-pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
 
-    .page-numbers {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 40px;
-        height: 40px;
-        padding: 0 12px;
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-        background-color: #fff;
-        color: $color-text;
-        font-size: 15px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
-
-        &:hover:not(.disabled):not(.current) {
-            background-color: #f9f9f9;
-            border-color: #d0d0d0;
-            color: $color-primary;
-        }
-
-        &.current {
-            background-color: $color-primary;
-            border-color: $color-primary;
-            color: #fff;
-            cursor: default;
-        }
-
-        &.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #f5f5f5;
-        }
-
-        &.prev,
-        &.next {
-            font-weight: 600;
-            padding: 0 16px;
-        }
-    }
-}
 
 .car-item {
     display: flex;

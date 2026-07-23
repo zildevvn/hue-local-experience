@@ -32,62 +32,49 @@ if (!function_exists('hle_svg_icon')) {
 	}
 }
 
-if (!function_exists('hle_the_posts_navigation')) {
-	function hle_the_posts_navigation($args = array(), $base = false, $query = false)
+if (!function_exists('hle_pagination')) {
+	function hle_pagination($current_page = null, $total_pages = null, $query_args = [])
 	{
-		$args = wp_parse_args($args, array(
-			'prev_text' => __('Older posts'),
-			'next_text' => __('Newer posts'),
-			'screen_reader_text' => __('Posts navigation'),
-			'aria_label' => __('Posts'),
-			'class' => 'posts-navigation',
-		));
+		global $wp_query, $wp_rewrite;
 
-		$wp_query = $query ? $query : $GLOBALS['wp_query'];
+		$paged = get_query_var('paged') ? get_query_var('paged') : (get_query_var('page') ? get_query_var('page') : 1);
+		$current_page = $current_page ? max(1, intval($current_page)) : max(1, intval($paged));
+		$total_pages = $total_pages ? intval($total_pages) : $wp_query->max_num_pages;
 
-		// Don't print empty markup if there's only one page.
-		if ($wp_query->max_num_pages < 2) {
+		if ($total_pages < 2) {
 			return;
 		}
-		$paged = get_query_var('paged') ? intval(get_query_var('paged')) : 1;
+
 		$pagenum_link = html_entity_decode(get_pagenum_link());
-		if ($base) {
-			$orig_req_uri = $_SERVER['REQUEST_URI'];
-			$_SERVER['REQUEST_URI'] = $base;
-			$pagenum_link = get_pagenum_link($paged - 1);
-			$_SERVER['REQUEST_URI'] = $orig_req_uri;
-		}
-
-		$query_args = array();
-		$url_parts = explode('?', $pagenum_link);
+		$url_parts    = explode('?', $pagenum_link);
+		$existing_args = [];
 		if (isset($url_parts[1])) {
-			wp_parse_str($url_parts[1], $query_args);
+			wp_parse_str($url_parts[1], $existing_args);
 		}
 
-		$pagenum_link = remove_query_arg(array_keys($query_args), $pagenum_link);
+		$merged_args = array_merge($existing_args, $query_args);
+		$pagenum_link = remove_query_arg(array_keys($existing_args), $pagenum_link);
 		$pagenum_link = trailingslashit($pagenum_link) . '%_%';
-		$format = $GLOBALS['wp_rewrite']->using_index_permalinks() && !strpos($pagenum_link, 'index.php') ? 'index.php/' : '';
-		$format .= $GLOBALS['wp_rewrite']->using_permalinks() ? user_trailingslashit('page/%#%', 'paged') : '?paged=%#%';
 
-		// Set up paginated links.
-		$links = paginate_links(array(
-			'base' => $pagenum_link,
-			'format' => $format,
-			'total' => $wp_query->max_num_pages,
-			'current' => $paged,
-			'mid_size' => 1,
-			// 'add_args'  => array_map('urlencode', $query_args),
-			'prev_text' => $args['prev_text'],
-			'next_text' => $args['next_text'],
-		));
+		$format  = $wp_rewrite->using_index_permalinks() && !strpos($pagenum_link, 'index.php') ? 'index.php/' : '';
+		$format .= $wp_rewrite->using_permalinks() ? user_trailingslashit('page/%#%', 'paged') : '?paged=%#%';
 
-		if ($links): ?>
-			<nav class="navigation paging-navigation">
-				<span class="screen-reader-text"><?= $args['screen_reader_text']; ?></span>
-				<?php echo '<div class="pagination loop-pagination">' . $links . '</div><!-- .pagination -->' ?>
-			</nav><!-- .navigation -->
-			<?php
-		endif;
+		$links = paginate_links([
+			'base'      => $pagenum_link,
+			'format'    => $format,
+			'current'   => $current_page,
+			'total'     => $total_pages,
+			'type'      => 'list',
+			'prev_text' => hle_svg_icon('arrow_prev') ? hle_svg_icon('arrow_prev') : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>',
+			'next_text' => hle_svg_icon('arrow_next') ? hle_svg_icon('arrow_next') : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>',
+			'add_args'  => $merged_args,
+		]);
+
+		if ($links) {
+			echo '<nav class="hle-pagination" aria-label="Pagination">';
+			echo $links;
+			echo '</nav>';
+		}
 	}
 }
 
