@@ -1,0 +1,160 @@
+.error-404-section {
+    padding: 120px 0 100px;
+    background-color: $color-bg;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    @include media-breakpoint-down(md) {
+        padding: 80px 0 60px;
+    }
+
+    // Decorative subtle accent background
+    &::before {
+        content: '';
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba($color-primary, 0.05) 0%, transparent 70%);
+        z-index: 0;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: -50px;
+        left: -50px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba($color-secondary, 0.05) 0%, transparent 70%);
+        z-index: 0;
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+        max-width: 600px;
+    }
+
+    &__code {
+        font-size: 140px;
+        font-weight: 800;
+        line-height: 1;
+        color: $color-primary;
+        margin-bottom: 20px;
+        font-family: $font-primary;
+        letter-spacing: -3px;
+        text-shadow: 4px 4px 0 rgba($color-primary, 0.1);
+
+        @include media-breakpoint-down(md) {
+            font-size: 100px;
+        }
+    }
+
+    &__title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 16px;
+
+        @include media-breakpoint-down(md) {
+            font-size: 26px;
+        }
+    }
+
+    &__desc {
+        font-size: 16px;
+        color: $color-body;
+        margin-bottom: 40px;
+        line-height: 1.6;
+    }
+
+    .search-form-wrapper {
+        margin-bottom: 40px;
+
+        .modern-search-form {
+            width: 100%;
+            margin: 0 auto;
+
+            .input-group {
+                display: flex;
+                position: relative;
+                align-items: center;
+                background: #fff;
+                border-radius: 12px;
+                padding: 6px;
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+                border: 1px solid rgba(0, 0, 0, 0.04);
+                transition: box-shadow 0.3s ease, border-color 0.3s ease;
+
+                &:focus-within {
+                    border-color: rgba($color-primary, 0.3);
+                    box-shadow: 0 8px 32px rgba($color-primary, 0.08);
+                }
+
+                .search-icon {
+                    position: absolute;
+                    left: 20px;
+                    color: #9CA3AF;
+                    pointer-events: none;
+                    width: 20px;
+                    height: 20px;
+                }
+
+                input[type="search"] {
+                    flex: 1;
+                    border: none;
+                    padding: 12px 16px 12px 52px;
+                    font-size: 15px;
+                    color: $color-text;
+                    background: transparent;
+                    width: 100%;
+                    outline: none;
+
+                    &::placeholder {
+                        color: #9CA3AF;
+                    }
+                }
+
+                .search-submit {
+                    flex-shrink: 0;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-size: 15px;
+
+                    @include media-breakpoint-down(sm) {
+                        padding: 12px 16px;
+                    }
+                }
+            }
+        }
+    }
+
+    .back-home-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 16px;
+        padding: 14px 32px;
+        border-radius: 10px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        svg {
+            transition: transform 0.2s ease;
+        }
+
+        &:hover,
+        &:focus-visible {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba($color-primary, 0.2);
+
+            svg {
+                transform: translateX(-4px);
+            }
+        }
+    }
+}
