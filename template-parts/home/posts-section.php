@@ -33,7 +33,7 @@ $query = new WP_Query($args);
             </div>
 
             <div class="d-flex justify-content-center hle-button-container">
-                <a href="/blog/" class="hle-button" aria-label="View All Posts"> View All </a>
+                <a href="/hue-travel-guide/" class="hle-button" aria-label="View All Posts"> View All </a>
             </div>
         </div>
     </section>

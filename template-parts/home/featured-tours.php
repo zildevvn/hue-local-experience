@@ -32,7 +32,7 @@ if ($query->have_posts()): ?>
             </div>
 
             <div class="d-flex justify-content-center hle-button-container">
-                <a class="hle-button" href="/tours" role="button"> View All</a>
+                <a class="hle-button" href="/hue-experience-all-tour" role="button"> View All</a>
             </div>
         </div>
     </section>

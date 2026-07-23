@@ -61,7 +61,7 @@ $query = new WP_Query($args);
             </div>
 
             <div class="d-flex justify-content-center hle-button-container">
-                <a class="hle-button" href="/cars" role="button"> View All</a>
+                <a class="hle-button" href="/hue-car-rental/" role="button"> View All</a>
             </div>
         </div>
     </section>
