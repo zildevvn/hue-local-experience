@@ -9384,7 +9384,7 @@ body.home .hero-section-sliders .slider-item__bg::before {
   display: inline-block;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.4);
   position: absolute;
   inset: 0;
   opacity: unset;
