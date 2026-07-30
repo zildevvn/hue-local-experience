@@ -6,6 +6,8 @@ $itinerary_tour = get_field('itinerary_tour');
 $highlights = get_field('highlights_tour');
 $price_group = get_field('price_for_group_tour');
 $price_private = get_field('price_for_private_tour');
+$enable_price_private_tour = get_field('enable_price_for_private_tour');
+$phone = get_field('phone', 'option');
 ?>
 <section class="hle-section main-section">
     <div class="container">
@@ -153,27 +155,51 @@ $price_private = get_field('price_for_private_tour');
 
                         <div class="tour-prices__cards">
                             <?php if (!empty($price_group)): ?>
+                                <?php
+                                $persons_map = [
+                                    '1_2_persons' => '1-2 Persons',
+                                    '3_5_persons' => '3-5 Persons',
+                                    '6_10_persons' => '6-10 Persons',
+                                ];
+
+                                ?>
                                 <div class="price-card group-price-card">
-                                    <div class="price-card__icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="9" cy="7" r="4"></circle>
-                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="price-card__content">
-                                        <h3 class="price-card__title"><?= esc_html($price_group['label']) ?></h3>
-                                        <div class="price-card__amount">
-                                            <span class="price-card__value"><?= esc_html($price_group['price']) ?></span>
-                                            <span class="price-card__unit">USD / Person</span>
+                                    <div class="group-price-card__main">
+                                        <div class="group-price-card__left">
+                                            <h3 class="price-card__title">Price<br><small>(USD / Person)</small></h3>
                                         </div>
+
+                                        <div class="group-price-card__right">
+                                            <?php foreach ($persons_map as $key => $label): ?>
+                                                <?php if (!empty($price_group[$key])): ?>
+                                                    <div class="group-price-card__item">
+                                                        <span class="group-price-card__label"><?= esc_html($label) ?></span>
+                                                        <span class="group-price-card__value">
+                                                            $<?= esc_html($price_group[$key]) ?>
+                                                        </span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+
+                                    <?php
+                                    $phone = preg_replace('/\D+/', '', $phone);
+                                    if (strpos($phone, '0') === 0) {
+                                        $phone = '84' . substr($phone, 1);
+                                    }
+                                    ?>
+
+                                    <div class="group-price-card__footer">
+                                        <p>Above 10 persons? <a href="https://wa.me/<?= esc_attr($phone); ?>" target="_blank"
+                                                rel="noopener noreferrer" aria-label="Chat with us on WhatsApp">
+                                                Contact WhatsApp Now!
+                                            </a>.</p>
                                     </div>
                                 </div>
                             <?php endif; ?>
 
-                            <?php if (!empty($price_private)): ?>
+                            <?php if ($enable_price_private_tour && !empty($price_private)): ?>
                                 <div class="price-card private-price-card">
                                     <div class="price-card__icon">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"

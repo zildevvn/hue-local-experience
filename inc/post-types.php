@@ -101,6 +101,12 @@ if (!function_exists('hle_create_custom_taxonomy')) {
 			'show_in_nav_menus' => true,
 			'show_tagcloud' => true,
 			'show_in_rest' => true,
+			'capabilities' => array(
+				'manage_terms' => 'edit_posts',
+				'edit_terms' => 'edit_posts',
+				'delete_terms' => 'edit_posts',
+				'assign_terms' => 'edit_posts',
+			),
 		));
 
 		register_taxonomy('car_category', array('cars'), array(
@@ -123,6 +129,12 @@ if (!function_exists('hle_create_custom_taxonomy')) {
 			'show_in_nav_menus' => true,
 			'show_tagcloud' => true,
 			'show_in_rest' => true,
+			'capabilities' => array(
+				'manage_terms' => 'edit_posts',
+				'edit_terms' => 'edit_posts',
+				'delete_terms' => 'edit_posts',
+				'assign_terms' => 'edit_posts',
+			),
 		));
 	}
 	add_action('init', 'hle_create_custom_taxonomy', 0);

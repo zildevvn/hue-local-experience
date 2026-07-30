@@ -13044,10 +13044,112 @@ body.single-tours .main-section-inner .main-section-left .tour-prices .price-car
 body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.private-price-card {
   flex-direction: column;
 }
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card {
+  flex-direction: column;
+  padding: 32px;
+  gap: 0;
+}
 @media (max-width: 767.98px) {
-  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .price-card__title {
-    margin-bottom: 8px;
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card {
+    padding: 24px 16px;
   }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__main {
+  display: flex;
+  width: 100%;
+  gap: 32px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding-bottom: 24px;
+  margin-bottom: 20px;
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__main {
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 20px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 150px;
+  flex-shrink: 0;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__left .price-card__title {
+  margin: 0;
+  line-height: 1.3;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__left .price-card__title small, body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__left .price-card__title .small {
+  font-size: 14px;
+  color: #888;
+  font-weight: 500;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__right {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  flex: 1;
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__right {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__item {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 20px 16px;
+  border: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__item:hover {
+  border-color: rgba(150, 21, 181, 0.4);
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #19232B;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #9615b5;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__footer {
+  text-align: center;
+  width: 100%;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__footer p {
+  margin: 0;
+  font-size: 15px;
+  color: #19232B;
+  font-weight: 500;
+}
+@media (max-width: 767.98px) {
+  body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__footer p {
+    font-size: 14px;
+  }
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__footer .group-price-card__link {
+  color: #9615b5;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+body.single-tours .main-section-inner .main-section-left .tour-prices .price-card.group-price-card .group-price-card__footer .group-price-card__link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
 }
 body.single-tours .main-section-inner .main-section-left .tour-prices .price-card:hover {
   transform: translateY(-4px);

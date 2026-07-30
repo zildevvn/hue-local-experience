@@ -123,7 +123,7 @@ add_filter('comment_post_redirect', function ($location, $comment) {
 		// Strip any hash anchor first
 		$parts = explode('#', $location);
 		$base_url = $parts[0];
-		
+
 		if ($comment->comment_approved == '1') {
 			$base_url = add_query_arg('approved', '1', $base_url);
 		} else {
@@ -132,10 +132,17 @@ add_filter('comment_post_redirect', function ($location, $comment) {
 				'moderation-hash' => wp_hash($comment->comment_date_gmt)
 			], $base_url);
 		}
-		
+
 		$anchor = ($post_type === 'cars') ? 'car-review' : 'tour-review';
 		$location = $base_url . '#' . $anchor;
 	}
 	return $location;
 }, 10, 2);
 
+
+
+add_action('init', function () {
+	if ($role = get_role('author')) {
+		$role->add_cap('manage_categories');
+	}
+});
