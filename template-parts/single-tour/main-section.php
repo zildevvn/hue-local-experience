@@ -154,7 +154,11 @@ $phone = get_field('phone', 'option');
                         <h2 class="hle-heading hle-heading-animation">Tour Prices</h2>
 
                         <div class="tour-prices__cards">
-                            <?php if (!empty($price_group)): ?>
+                            <?php if (
+                                !empty($price_group['1_2_persons']) ||
+                                !empty($price_group['3_5_persons']) ||
+                                !empty($price_group['6_10_persons'])
+                            ): ?>
                                 <?php
                                 $persons_map = [
                                     '1_2_persons' => '1-2 Persons',
