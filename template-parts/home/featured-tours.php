@@ -5,7 +5,7 @@ $sub_heading = get_field('sub_hd_feature_tour');
 
 $args = array(
     'post_type' => 'tours',
-    'posts_per_page' => 4,
+    'posts_per_page' => 3,
     'post_status' => 'publish',
 );
 $query = new WP_Query($args);
