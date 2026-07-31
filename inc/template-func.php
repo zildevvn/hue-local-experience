@@ -136,23 +136,22 @@ function hle_tour_item()
             </div>
             <img src="<?= get_the_post_thumbnail_url(); ?>" alt="<?= the_title(); ?>">
 
-            <div class="tour-item__category d-flex align-items-center align-content-center justify-content-center gap-2">
-                <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    color="#000000" stroke-width="1.5">
-                    <path
-                        d="M5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21L13.0815 17.1953C12.4227 16.7717 11.5773 16.7717 10.9185 17.1953L5 21Z"
-                        fill="#000000" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    </path>
-                </svg>
-                <?php
-                $terms = get_the_terms(get_the_ID(), 'tour_cats');
-                if ($terms && !is_wp_error($terms)) {
-                    foreach ($terms as $term) {
-                        echo $term->name;
-                    }
-                }
-                ?>
-            </div>
+            <?php $terms = get_the_terms(get_the_ID(), 'tour_cats'); ?>
+            <?php if (!empty($terms) && !is_wp_error($terms)): ?>
+                <div class="tour-item__category d-flex align-items-center align-content-center justify-content-center gap-2">
+                    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        color="#000000" stroke-width="1.5">
+                        <path
+                            d="M5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21L13.0815 17.1953C12.4227 16.7717 11.5773 16.7717 10.9185 17.1953L5 21Z"
+                            fill="#000000" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        </path>
+                    </svg>
+
+                    <?php
+                    echo $terms[0]->name;
+                    ?>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="tour-item-content">
             <div class="tour-item-meta d-flex align-items-center justify-content-between">
