@@ -8160,7 +8160,7 @@ body.mobile-menu-open {
 }
 @media (min-width: 768px) {
   .main-footer .main-footer-widget:first-child {
-    max-width: 30%;
+    max-width: 33%;
   }
 }
 @media (min-width: 1024px) {
@@ -8200,11 +8200,11 @@ body.mobile-menu-open {
   }
 }
 .main-footer .main-footer-widget .about-ft {
-  font-size: 15px;
+  font-size: 14px;
 }
 @media (max-width: 767.98px) {
   .main-footer .main-footer-widget .about-ft {
-    font-size: 14px;
+    font-size: 13px;
   }
 }
 .main-footer .main-footer-widget .widget-menu ul {

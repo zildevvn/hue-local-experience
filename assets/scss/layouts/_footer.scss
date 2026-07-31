@@ -114,7 +114,7 @@
 
         &:first-child {
             @include media-breakpoint-up(md) {
-                max-width: 30%;
+                max-width: 33%;
             }
         }
 
@@ -156,10 +156,10 @@
         }
 
         .about-ft {
-            font-size: 15px;
+            font-size: 14px;
 
             @include media-breakpoint-down(md) {
-                font-size: 14px;
+                font-size: 13px;
             }
         }
 
