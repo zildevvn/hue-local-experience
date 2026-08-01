@@ -26,7 +26,7 @@ $query = new WP_Query($args);
                 <?php
                 $blog_cats = get_terms(array(
                     'taxonomy' => 'category',
-                    'hide_empty' => false,
+                    'hide_empty' => true,
                 ));
                 ?>
                 <div class="posts-filter-bar__cats">

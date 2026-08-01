@@ -54,7 +54,7 @@ $query = new WP_Query($args);
                     <?php
                     $tour_cats = get_terms(array(
                         'taxonomy' => 'tour_cats',
-                        'hide_empty' => false,
+                        'hide_empty' => true,
                     ));
                     ?>
                     <div class="tours-sidebar__widget tours-sidebar__cats">
