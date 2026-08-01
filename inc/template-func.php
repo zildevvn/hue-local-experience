@@ -148,7 +148,25 @@ function hle_tour_item()
                     </svg>
 
                     <?php
-                    echo $terms[0]->name;
+                    $display_name = $terms[0]->name;
+
+                    $active_slug = '';
+                    if (isset($_POST['tour_cat_slug']) && $_POST['tour_cat_slug'] !== 'all') {
+                        $active_slug = sanitize_text_field($_POST['tour_cat_slug']);
+                    } elseif (isset($_GET['tour_cat']) && $_GET['tour_cat'] !== 'all') {
+                        $active_slug = sanitize_text_field($_GET['tour_cat']);
+                    }
+
+                    if (!empty($active_slug)) {
+                        foreach ($terms as $term) {
+                            if ($term->slug === $active_slug) {
+                                $display_name = $term->name;
+                                break;
+                            }
+                        }
+                    }
+
+                    echo esc_html($display_name);
                     ?>
                 </div>
             <?php endif; ?>
