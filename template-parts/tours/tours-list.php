@@ -63,14 +63,14 @@ $query = new WP_Query($args);
                             Categories</h4>
                         <div class="tours-category-list">
                             <label class="tours-category-item">
-                                <input type="radio" name="tour_cat" value="all" checked>
+                                <input type="radio" name="tour_cat_slug" value="all" checked>
                                 <span class="custom-radio"></span>
                                 <span class="tours-category-name">All Tours</span>
                             </label>
                             <?php if (!empty($tour_cats) && !is_wp_error($tour_cats)): ?>
                                 <?php foreach ($tour_cats as $cat): ?>
                                     <label class="tours-category-item">
-                                        <input type="radio" name="tour_cat" value="<?php echo esc_attr($cat->term_id); ?>">
+                                        <input type="radio" name="tour_cat_slug" value="<?php echo esc_attr($cat->slug); ?>">
                                         <span class="custom-radio"></span>
                                         <span class="tours-category-name">
                                             <?php echo esc_html($cat->name); ?>

@@ -4,7 +4,7 @@ add_action('wp_ajax_nopriv_hle_ajax_filter_tours', 'hle_ajax_filter_tours');
 function hle_ajax_filter_tours()
 {
     $idCate = isset($_POST['idCate']) ? $_POST['idCate'] : [];
-    $tour_cat = isset($_POST['tour_cat']) ? $_POST['tour_cat'] : '';
+    $tour_cat_slug = isset($_POST['tour_cat_slug']) ? sanitize_text_field($_POST['tour_cat_slug']) : '';
     $keySeach = isset($_POST['keySeach']) ? $_POST['keySeach'] : [];
     $query = isset($_POST['query']) ? $_POST['query'] : [];
     $currentpage = isset($_POST['currentpage']) ? $_POST['currentpage'] : 1;
@@ -23,14 +23,14 @@ function hle_ajax_filter_tours()
         $query['cat'] = explode(",", $idCate);
     }
 
-    if (!empty($tour_cat) && $tour_cat != 'all') {
+    if (!empty($tour_cat_slug) && $tour_cat_slug != 'all') {
         if (!isset($query['tax_query'])) {
             $query['tax_query'] = ['relation' => 'AND'];
         }
         $query['tax_query'][] = [
             'taxonomy' => 'tour_cats',
-            'field'    => 'term_id',
-            'terms'    => intval($tour_cat),
+            'field'    => 'slug',
+            'terms'    => $tour_cat_slug,
         ];
     }
 

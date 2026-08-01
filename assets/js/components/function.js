@@ -619,7 +619,7 @@ import { CountUp } from 'countup.js';
         const $priceMinInput = $('#hle-tours-price-min');
         const $priceMaxInput = $('#hle-tours-price-max');
 
-        const $catRadios = $isBlock.find('input[name="tour_cat"]');
+        const $catRadios = $isBlock.find('input[name="tour_cat_slug"]');
 
         const $sortSelect = $('#hle-tours-sort');
         const $clearFiltersBtn = $('#hle-clear-filters');
@@ -643,7 +643,7 @@ import { CountUp } from 'countup.js';
             }
         }
 
-        function triggerSearch(resetPage = true) {
+        function triggerSearch(resetPage = true, initialScroll = false) {
             if (resetPage) {
                 currentPage = 1;
             }
@@ -655,7 +655,7 @@ import { CountUp } from 'countup.js';
                 const paxMaxVal = $paxMaxInput.val();
                 const priceMinVal = $priceMinInput.val();
                 const priceMaxVal = $priceMaxInput.val();
-                const catVal = $isBlock.find('input[name="tour_cat"]:checked').val();
+                const catVal = $isBlock.find('input[name="tour_cat_slug"]:checked').val();
                 const sortVal = $sortSelect.val();
 
                 updateClearFiltersVisibility(searchVal, paxMinVal, paxMaxVal, priceMinVal, priceMaxVal, catVal, sortVal);
@@ -666,15 +666,31 @@ import { CountUp } from 'countup.js';
                     pax_max: paxMaxVal,
                     price_min: priceMinVal,
                     price_max: priceMaxVal,
-                    tour_cat: catVal,
+                    tour_cat_slug: catVal,
                     sort: sortVal,
                     query: query,
-                    currentpage: currentPage
+                    currentpage: currentPage,
+                    initialScroll: initialScroll
                 });
             }, 500);
         }
 
-        $catRadios.on('change', () => triggerSearch(true));
+        // URL Parameter Support for Tour Categories
+        const syncUrlWithCategory = (catVal) => {
+            const newUrl = new URL(window.location.href);
+            if (catVal === 'all') {
+                newUrl.searchParams.delete('tour_cat');
+            } else {
+                newUrl.searchParams.set('tour_cat', catVal);
+            }
+            window.history.pushState({ tour_cat: catVal }, '', newUrl);
+        };
+
+        $catRadios.on('change', function() {
+            syncUrlWithCategory($(this).val());
+            triggerSearch(true);
+        });
+        
         $sortSelect.on('change', () => triggerSearch(true));
 
         $clearFiltersBtn.on('click', function (e) {
@@ -682,7 +698,8 @@ import { CountUp } from 'countup.js';
             fieldSearch.val('');
 
             // Reset categories
-            $isBlock.find('input[name="tour_cat"][value="all"]').prop('checked', true);
+            $isBlock.find('input[name="tour_cat_slug"][value="all"]').prop('checked', true);
+            syncUrlWithCategory('all');
 
             // Reset sort
             $sortSelect.val('default');
@@ -695,6 +712,28 @@ import { CountUp } from 'countup.js';
                 priceSlider.noUiSlider.set([0, 1000]);
             }
 
+            triggerSearch(true);
+        });
+
+        // Handle popstate (Back/Forward browser buttons)
+        $(window).on('popstate', function(e) {
+            const state = e.originalEvent.state;
+            const urlParams = new URLSearchParams(window.location.search);
+            let catVal = 'all';
+            
+            if (state && state.tour_cat) {
+                catVal = state.tour_cat;
+            } else if (urlParams.has('tour_cat')) {
+                catVal = urlParams.get('tour_cat');
+            }
+            
+            const $targetRadio = $isBlock.find(`input[name="tour_cat_slug"][value="${catVal}"]`);
+            if ($targetRadio.length) {
+                $targetRadio.prop('checked', true);
+            } else {
+                $isBlock.find('input[name="tour_cat_slug"][value="all"]').prop('checked', true);
+            }
+            
             triggerSearch(true);
         });
 
@@ -796,8 +835,12 @@ import { CountUp } from 'countup.js';
                             $('#hle-tours-empty').hide();
                         }
 
-                        // Smooth scroll to top of listing section when changing pages
-                        if (val.currentpage > 1 || (val.currentpage === 1 && $(window).scrollTop() > $isBlock.offset().top)) {
+                        // Initial scroll or pagination smooth scroll
+                        if (val.initialScroll) {
+                            $('html, body').animate({
+                                scrollTop: $('#hle-tours-results').offset().top - 80
+                            }, 600);
+                        } else if (val.currentpage > 1 || (val.currentpage === 1 && $(window).scrollTop() > $isBlock.offset().top)) {
                             $('html, body').animate({
                                 scrollTop: $isBlock.offset().top - 80 // Adjust offset for sticky header if needed
                             }, 600);
@@ -816,6 +859,20 @@ import { CountUp } from 'countup.js';
                 $contentWrapper.removeClass('is-loading');
                 $sidebarWrapper.removeClass('is-loading');
             }
+        }
+
+        // Initialize from URL on page load
+        const initUrlParams = new URLSearchParams(window.location.search);
+        if (initUrlParams.has('tour_cat')) {
+            const initialCat = initUrlParams.get('tour_cat');
+            const $targetRadio = $isBlock.find(`input[name="tour_cat_slug"][value="${initialCat}"]`);
+            if ($targetRadio.length) {
+                $targetRadio.prop('checked', true);
+                window.history.replaceState({ tour_cat: initialCat }, '', window.location.href);
+                triggerSearch(true, true);
+            }
+        } else {
+            window.history.replaceState({ tour_cat: 'all' }, '', window.location.href);
         }
 
     }
