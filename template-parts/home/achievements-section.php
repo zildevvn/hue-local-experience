@@ -5,7 +5,7 @@ $achievements = get_field('list_achievements_hp');
 <section class="hle-section achievements-section">
     <?php if (!empty($bg) && isset($bg)): ?>
         <div class="hle-section__bg">
-            <img src="<?= $bg ?>" alt="Hue Local Experience" />
+            <img src="<?= $bg ?>" alt="Hue Local Experiences" />
         </div>
     <?php endif; ?>
 
