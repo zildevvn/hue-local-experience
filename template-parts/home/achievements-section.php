@@ -16,8 +16,7 @@ $achievements = get_field('list_achievements_hp');
                     <div class="achievement-item">
                         <div
                             class="achievement-item__icon d-flex align-items-center align-content-center justify-content-center">
-                            <img src="<?= $achievement['icon'] ?>"
-                                alt="icon-achievement for <?= $achievement['heading'] ?? '' ?>">
+                            <img src="<?= $achievement['icon'] ?>" alt="Hue Local Experience" />
                         </div>
                         <h3 class="achievement-item__number h2 hle-counter">
                             <?= $achievement['number'] ?? '' ?>
