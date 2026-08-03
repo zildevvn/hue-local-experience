@@ -686,11 +686,11 @@ import { CountUp } from 'countup.js';
             window.history.pushState({ tour_cat: catVal }, '', newUrl);
         };
 
-        $catRadios.on('change', function() {
+        $catRadios.on('change', function () {
             syncUrlWithCategory($(this).val());
             triggerSearch(true);
         });
-        
+
         $sortSelect.on('change', () => triggerSearch(true));
 
         $clearFiltersBtn.on('click', function (e) {
@@ -716,24 +716,24 @@ import { CountUp } from 'countup.js';
         });
 
         // Handle popstate (Back/Forward browser buttons)
-        $(window).on('popstate', function(e) {
+        $(window).on('popstate', function (e) {
             const state = e.originalEvent.state;
             const urlParams = new URLSearchParams(window.location.search);
             let catVal = 'all';
-            
+
             if (state && state.tour_cat) {
                 catVal = state.tour_cat;
             } else if (urlParams.has('tour_cat')) {
                 catVal = urlParams.get('tour_cat');
             }
-            
+
             const $targetRadio = $isBlock.find(`input[name="tour_cat_slug"][value="${catVal}"]`);
             if ($targetRadio.length) {
                 $targetRadio.prop('checked', true);
             } else {
                 $isBlock.find('input[name="tour_cat_slug"][value="all"]').prop('checked', true);
             }
-            
+
             triggerSearch(true);
         });
 
@@ -1329,7 +1329,7 @@ import { CountUp } from 'countup.js';
             const $form = $(this);
             const action = $form.attr('action') || window.location.origin + '/';
             const keyword = $form.find('input[name="s"]').val() || '';
-            
+
             const url = new URL(action, window.location.origin);
             url.searchParams.set('s', keyword);
             url.hash = 'search-results';
@@ -1346,7 +1346,7 @@ import { CountUp } from 'countup.js';
 
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const headerOffset = 80;
-        
+
         setTimeout(() => {
             const elementPosition = searchResults.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -1356,6 +1356,81 @@ import { CountUp } from 'countup.js';
                 behavior: prefersReducedMotion ? 'auto' : 'smooth'
             });
         }, 100);
+    };
+
+    const hleInitTeamMobileSlider = () => {
+        const swiperContainer = document.querySelector('.team-section__swiper');
+        const swiperWrapper = document.querySelector('.team-section__list');
+        const swiperSlides = document.querySelectorAll('.team-item');
+
+        if (!swiperContainer || !swiperWrapper || !swiperSlides.length) return;
+
+        let swiperInstance = null;
+
+        const initOrDestroySwiper = () => {
+            const isMobile = window.innerWidth <= 767;
+
+            if (isMobile) {
+                if (!swiperInstance) {
+                    swiperContainer.classList.add('swiper');
+                    swiperWrapper.classList.add('swiper-wrapper');
+                    // Override grid temporarily for mobile Swiper
+                    swiperWrapper.style.display = 'flex';
+                    swiperWrapper.style.gridTemplateColumns = 'none';
+                    swiperWrapper.style.gap = '0';
+
+                    swiperSlides.forEach(slide => {
+                        slide.classList.add('swiper-slide');
+                    });
+
+                    const paginationEl = swiperContainer.querySelector('.swiper-pagination');
+                    if (swiperSlides.length <= 1 && paginationEl) {
+                        paginationEl.style.display = 'none';
+                    }
+
+                    swiperInstance = new Swiper(swiperContainer, {
+                        modules: [Pagination, Autoplay],
+                        slidesPerView: 1,
+                        spaceBetween: 20,
+                        loop: swiperSlides.length > 1,
+                        grabCursor: true,
+                        pagination: {
+                            el: paginationEl,
+                            clickable: true,
+                        },
+                        autoplay: swiperSlides.length > 1 ? {
+                            delay: 3000,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
+                        } : false,
+                    });
+                }
+            } else {
+                if (swiperInstance) {
+                    swiperInstance.destroy(true, true);
+                    swiperInstance = null;
+
+                    swiperContainer.classList.remove('swiper');
+                    swiperWrapper.classList.remove('swiper-wrapper');
+                    // Restore original grid styling
+                    swiperWrapper.style.display = '';
+                    swiperWrapper.style.gridTemplateColumns = '';
+                    swiperWrapper.style.gap = '';
+
+                    swiperSlides.forEach(slide => {
+                        slide.classList.remove('swiper-slide');
+                    });
+                }
+            }
+        };
+
+        initOrDestroySwiper();
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(initOrDestroySwiper, 100);
+        });
     };
 
     $(document).ready(function () {
@@ -1378,5 +1453,6 @@ import { CountUp } from 'countup.js';
         hleHeaderTopMobile()
         hleInitSearchFormInterceptor()
         hleInitSearchScroll()
+        hleInitTeamMobileSlider()
     });
 })(jQuery);
