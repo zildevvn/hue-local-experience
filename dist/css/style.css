@@ -9427,7 +9427,8 @@ body.home .hero-section-sliders .slider-item .container {
   z-index: 2;
   text-align: center;
   text-align: center;
-  max-width: 600px;
+  max-width: 1000px;
+  box-sizing: border-box;
 }
 body.home .hero-section-sliders .slider-item h1, body.home .hero-section-sliders .slider-item .h1,
 body.home .hero-section-sliders .slider-item p {
