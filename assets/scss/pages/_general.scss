@@ -170,34 +170,38 @@
     }
 
     &__swiper {
-        .swiper-pagination {
-            position: relative;
-            margin-top: 30px;
-            bottom: 0 !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            z-index: 10;
+        @extend %shared-mobile-swiper-pagination;
+    }
+}
 
-            .swiper-pagination-bullet {
-                width: 10px;
-                height: 10px;
-                background-color: rgba(0, 0, 0, 0.15);
-                opacity: 1;
-                margin: 0 !important;
-                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                cursor: pointer;
+%shared-mobile-swiper-pagination {
+    .swiper-pagination {
+        position: relative;
+        margin-top: 30px;
+        bottom: 0 !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        z-index: 10;
 
-                &:hover {
-                    background-color: $color-primary;
-                }
+        .swiper-pagination-bullet {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(0, 0, 0, 0.15);
+            opacity: 1;
+            margin: 0 !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
 
-                &-active {
-                    width: 28px;
-                    border-radius: 5px;
-                    background-color: $color-primary;
-                }
+            &:hover {
+                background-color: $color-primary;
+            }
+
+            &-active {
+                width: 28px;
+                border-radius: 5px;
+                background-color: $color-primary;
             }
         }
     }
@@ -478,6 +482,10 @@
             }
         }
     }
+}
+
+.posts-section__swiper {
+    @extend %shared-mobile-swiper-pagination;
 }
 
 .post-grid {

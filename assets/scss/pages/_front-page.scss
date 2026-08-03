@@ -228,7 +228,7 @@ body.home {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            @include media-breakpoint-down(md) {
+            @media (max-width: 389.98px) {
                 grid-template-columns: repeat(1, 1fr);
             }
 
@@ -240,6 +240,10 @@ body.home {
                 box-shadow: 0 0 40px 5px rgb(0 0 0 / 5%);
                 z-index: 1;
                 cursor: pointer;
+
+                @include media-breakpoint-down(md) {
+                    padding: 20px 10px;
+                }
 
                 &__icon {
                     width: 80px;
@@ -253,8 +257,8 @@ body.home {
                     transition: $transition-base;
 
                     @include media-breakpoint-down(md) {
-                        width: 60px;
-                        height: 60px;
+                        width: 42px;
+                        height: 42px;
                     }
 
                     img {
@@ -264,7 +268,7 @@ body.home {
                         filter: brightness(0) invert(1);
 
                         @include media-breakpoint-down(md) {
-                            max-width: 30px;
+                            max-width: 20px;
                         }
                     }
                 }
@@ -273,8 +277,17 @@ body.home {
                     color: $color-text;
                     font-weight: 600;
                     margin-bottom: 10px;
+
+                    @include media-breakpoint-down(md) {
+                        font-size: calc(1rem + 0.3vw);
+                    }
                 }
 
+                &__desc {
+                    @include media-breakpoint-down(md) {
+                        font-size: 14px;
+                    }
+                }
 
                 .count {
                     position: absolute;
@@ -286,7 +299,8 @@ body.home {
                     -webkit-text-fill-color: transparent;
 
                     @include media-breakpoint-down(md) {
-                        font-size: 40px;
+                        font-size: 36px;
+                        top: 10px;
                     }
                 }
 
@@ -430,6 +444,10 @@ body.home {
             text-align: center;
             max-width: 800px;
             margin: 0 auto;
+        }
+
+        &__swiper {
+            @extend %shared-mobile-swiper-pagination;
         }
 
         &__list {

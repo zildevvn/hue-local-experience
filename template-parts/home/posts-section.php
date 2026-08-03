@@ -23,13 +23,17 @@ $query = new WP_Query($args);
                 <?php endif; ?>
             </div>
 
-            <div class="posts-section__list post-grid" data-aos="fade-up">
-                <?php while ($query->have_posts()):
-                    $query->the_post();
-                    ?>
-                    <?php hle_post_item(); ?>
-                <?php endwhile; ?>
-                <?php wp_reset_postdata(); ?>
+            <div class="posts-section__swiper">
+                <div class="posts-section__list post-grid" data-aos="fade-up">
+                    <?php while ($query->have_posts()):
+                        $query->the_post();
+                        ?>
+                        <?php hle_post_item(); ?>
+                    <?php endwhile; ?>
+                    <?php wp_reset_postdata(); ?>
+                </div>
+                <!-- Pagination container for mobile -->
+                <div class="swiper-pagination mt-4 position-relative"></div>
             </div>
 
             <div class="d-flex justify-content-center hle-button-container">

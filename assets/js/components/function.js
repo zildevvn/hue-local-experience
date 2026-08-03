@@ -1433,7 +1433,162 @@ import { CountUp } from 'countup.js';
         });
     };
 
+    const hleInitFeaturedToursMobileSlider = () => {
+        const swiperContainer = document.querySelector('.featured-tours-section__swiper');
+        const swiperWrapper = document.querySelector('.featured-tours-section__list');
+        const swiperSlides = swiperWrapper ? swiperWrapper.querySelectorAll('.tour-item') : [];
+
+        if (!swiperContainer || !swiperWrapper || !swiperSlides.length) return;
+
+        let swiperInstance = null;
+
+        const initOrDestroySwiper = () => {
+            const isMobile = window.innerWidth <= 767;
+
+            if (isMobile) {
+                if (!swiperInstance) {
+                    swiperContainer.classList.add('swiper');
+                    swiperWrapper.classList.add('swiper-wrapper');
+                    // Override grid temporarily for mobile Swiper
+                    swiperWrapper.style.display = 'flex';
+                    swiperWrapper.style.gridTemplateColumns = 'none';
+                    swiperWrapper.style.gap = '0';
+
+                    swiperSlides.forEach(slide => {
+                        slide.classList.add('swiper-slide');
+                    });
+
+                    const paginationEl = swiperContainer.querySelector('.swiper-pagination');
+                    if (swiperSlides.length <= 1 && paginationEl) {
+                        paginationEl.style.display = 'none';
+                    }
+
+                    swiperInstance = new Swiper(swiperContainer, {
+                        modules: [Pagination, Autoplay],
+                        slidesPerView: 1,
+                        spaceBetween: 20,
+                        loop: swiperSlides.length > 1,
+                        grabCursor: true,
+                        pagination: {
+                            el: paginationEl,
+                            clickable: true,
+                        },
+                        autoplay: swiperSlides.length > 1 ? {
+                            delay: 3000,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
+                        } : false,
+                    });
+                }
+            } else {
+                if (swiperInstance) {
+                    swiperInstance.destroy(true, true);
+                    swiperInstance = null;
+
+                    swiperContainer.classList.remove('swiper');
+                    swiperWrapper.classList.remove('swiper-wrapper');
+                    // Restore original grid styling
+                    swiperWrapper.style.display = '';
+                    swiperWrapper.style.gridTemplateColumns = '';
+                    swiperWrapper.style.gap = '';
+
+                    swiperSlides.forEach(slide => {
+                        slide.classList.remove('swiper-slide');
+                    });
+                }
+            }
+        };
+
+        initOrDestroySwiper();
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(initOrDestroySwiper, 100);
+        });
+    };
+
+    const hleInitPostsMobileSlider = () => {
+        const swiperContainer = document.querySelector('.posts-section__swiper');
+        const swiperWrapper = document.querySelector('.posts-section__list');
+        const swiperSlides = swiperWrapper ? swiperWrapper.querySelectorAll('.post-item') : [];
+
+        if (!swiperContainer || !swiperWrapper || !swiperSlides.length) return;
+
+        let swiperInstance = null;
+
+        const initOrDestroySwiper = () => {
+            const isMobile = window.innerWidth <= 767;
+
+            if (isMobile) {
+                if (!swiperInstance) {
+                    swiperContainer.classList.add('swiper');
+                    swiperWrapper.classList.add('swiper-wrapper');
+                    // Override grid temporarily for mobile Swiper
+                    swiperWrapper.style.display = 'flex';
+                    swiperWrapper.style.gridTemplateColumns = 'none';
+                    swiperWrapper.style.gap = '0';
+                    
+                    swiperSlides.forEach(slide => {
+                        slide.classList.add('swiper-slide');
+                    });
+
+                    const paginationEl = swiperContainer.querySelector('.swiper-pagination');
+                    if (swiperSlides.length <= 1 && paginationEl) {
+                        paginationEl.style.display = 'none';
+                    }
+
+                    swiperInstance = new Swiper(swiperContainer, {
+                        modules: [Pagination, Autoplay],
+                        slidesPerView: 1,
+                        spaceBetween: 20,
+                        loop: swiperSlides.length > 1,
+                        grabCursor: true,
+                        pagination: {
+                            el: paginationEl,
+                            clickable: true,
+                        },
+                        autoplay: swiperSlides.length > 1 ? {
+                            delay: 3000,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
+                        } : false,
+                    });
+                }
+            } else {
+                if (swiperInstance) {
+                    swiperInstance.destroy(true, true);
+                    swiperInstance = null;
+
+                    swiperContainer.classList.remove('swiper');
+                    swiperWrapper.classList.remove('swiper-wrapper');
+                    // Restore original grid styling
+                    swiperWrapper.style.display = '';
+                    swiperWrapper.style.gridTemplateColumns = '';
+                    swiperWrapper.style.gap = '';
+
+                    swiperSlides.forEach(slide => {
+                        slide.classList.remove('swiper-slide');
+                    });
+                }
+            }
+        };
+
+        initOrDestroySwiper();
+        
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(initOrDestroySwiper, 100);
+        });
+    };
+
     $(document).ready(function () {
+        AOS.init({
+            duration: 1200,
+            once: true,
+            disable: 'mobile',
+        });
         btAnimateText('.hle-heading-animation', 'right');
         initBackToTop()
         hleHeroSliders()
@@ -1449,10 +1604,11 @@ import { CountUp } from 'countup.js';
         hleFilterCars()
         hleInitStarPicker()
         hleInitTourAnchorNav()
-        AOS.init();
         hleHeaderTopMobile()
         hleInitSearchFormInterceptor()
         hleInitSearchScroll()
         hleInitTeamMobileSlider()
+        hleInitFeaturedToursMobileSlider()
+        hleInitPostsMobileSlider()
     });
 })(jQuery);

@@ -22,13 +22,17 @@ if ($query->have_posts()): ?>
                 </p>
             </div>
 
-            <div class="featured-tours-section__list" data-aos="fade-up">
-                <?php while ($query->have_posts()):
-                    $query->the_post();
-                    hle_tour_item();
-                    ?>
-                <?php endwhile; ?>
-                <?php wp_reset_postdata(); ?>
+            <div class="featured-tours-section__swiper">
+                <div class="featured-tours-section__list" data-aos="fade-up">
+                    <?php while ($query->have_posts()):
+                        $query->the_post();
+                        hle_tour_item();
+                        ?>
+                    <?php endwhile; ?>
+                    <?php wp_reset_postdata(); ?>
+                </div>
+                <!-- Pagination container for mobile -->
+                <div class="swiper-pagination mt-4 position-relative"></div>
             </div>
 
             <div class="d-flex justify-content-center hle-button-container">
