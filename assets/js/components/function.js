@@ -1528,7 +1528,7 @@ import { CountUp } from 'countup.js';
                     swiperWrapper.style.display = 'flex';
                     swiperWrapper.style.gridTemplateColumns = 'none';
                     swiperWrapper.style.gap = '0';
-                    
+
                     swiperSlides.forEach(slide => {
                         slide.classList.add('swiper-slide');
                     });
@@ -1575,11 +1575,49 @@ import { CountUp } from 'countup.js';
         };
 
         initOrDestroySwiper();
-        
+
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(initOrDestroySwiper, 100);
+        });
+    };
+
+    const hleInitTocScroll = () => {
+        const $tocLinks = $('.hle-toc__list a');
+        if (!$tocLinks.length) return;
+
+        $tocLinks.on('click', function (e) {
+            const targetId = $(this).attr('href');
+
+            // Only handle if it's a valid ID anchor
+            if (!targetId || !targetId.startsWith('#') || targetId === '#') return;
+
+            try {
+                const $targetSec = $(targetId);
+                if ($targetSec.length) {
+                    e.preventDefault();
+
+                    const wpAdminBarHeight = $('body').hasClass('logged-in') ? 32 : 0;
+                    const offset = 80 + wpAdminBarHeight;
+                    const targetScrollTop = $targetSec.offset().top - offset;
+
+                    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                    if (prefersReducedMotion) {
+                        window.scrollTo(0, targetScrollTop);
+                        history.pushState(null, null, targetId);
+                    } else {
+                        $('html, body').stop().animate({
+                            scrollTop: targetScrollTop
+                        }, 500, function () {
+                            history.pushState(null, null, targetId);
+                        });
+                    }
+                }
+            } catch (error) {
+                // Ignore invalid selectors gracefully
+            }
         });
     };
 
@@ -1610,5 +1648,6 @@ import { CountUp } from 'countup.js';
         hleInitTeamMobileSlider()
         hleInitFeaturedToursMobileSlider()
         hleInitPostsMobileSlider()
+        hleInitTocScroll()
     });
 })(jQuery);

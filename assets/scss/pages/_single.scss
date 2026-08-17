@@ -8,6 +8,10 @@ body.single-post {
             padding-bottom: 40px;
         }
 
+        p {
+            margin-bottom: 1rem;
+        }
+
         h1,
         h2,
         h3,
@@ -15,8 +19,8 @@ body.single-post {
         h5,
         h6 {
             color: $color-text;
-            margin-top: 36px;
-            margin-bottom: 16px;
+            margin-top: 30px;
+            margin-bottom: 20px;
             font-weight: 700;
             line-height: 1.3;
 
@@ -85,6 +89,8 @@ body.single-post {
         }
 
         figure {
+            display: inline-block;
+            margin-top: 14px;
             max-width: 100%;
         }
 
@@ -178,28 +184,30 @@ body.single-post {
             border-left: 4px solid $color-primary;
             border-radius: 0 16px 16px 0;
             position: relative;
-            
+
             p {
                 font-size: 18px;
                 line-height: 1.8;
                 font-style: italic;
                 color: $color-text;
                 margin-bottom: 0;
-                
+
                 &:not(:last-child) {
                     margin-bottom: 16px;
                 }
             }
-            
-            strong, b {
+
+            strong,
+            b {
                 color: $color-text;
                 font-weight: 700;
             }
-            
-            em, i {
+
+            em,
+            i {
                 color: $color-primary;
             }
-            
+
             cite {
                 display: block;
                 margin-top: 16px;
@@ -207,16 +215,16 @@ body.single-post {
                 font-weight: 600;
                 font-style: normal;
                 color: #6B7280;
-                
+
                 &::before {
                     content: '— ';
                 }
             }
-            
+
             @include media-breakpoint-down(md) {
                 padding: 20px 24px;
                 margin: 24px 0;
-                
+
                 p {
                     font-size: 16px;
                 }
@@ -283,7 +291,7 @@ body.single-post {
                 margin-top: 60px;
                 padding-top: 40px;
                 border-top: 1px solid #E5E7EB;
-                
+
                 .widget-title {
                     font-size: 24px;
                     margin-bottom: 32px;
@@ -291,7 +299,7 @@ body.single-post {
                     color: #111827;
                     position: relative;
                     padding-bottom: 12px;
-                    
+
                     &::after {
                         content: '';
                         position: absolute;
@@ -303,26 +311,26 @@ body.single-post {
                         border-radius: 2px;
                     }
                 }
-                
+
                 .comment-list {
                     list-style: none;
                     margin: 0 0 40px 0;
                     padding: 0;
-                    
+
                     .comment {
                         margin-bottom: 32px;
-                        
+
                         &:last-child {
                             margin-bottom: 0;
                         }
-                        
+
                         .comment-body {
                             background: #F9FAFB;
                             border-radius: 20px;
                             padding: 24px;
                             margin-bottom: 24px;
                             position: relative;
-                            
+
                             .comment-meta {
                                 display: flex;
                                 align-items: center;
@@ -330,71 +338,71 @@ body.single-post {
                                 margin-bottom: 16px;
                                 flex-wrap: wrap;
                                 gap: 12px;
-                                
+
                                 .comment-author {
                                     display: flex;
                                     align-items: center;
                                     gap: 12px;
-                                    
+
                                     .avatar {
                                         width: 48px;
                                         height: 48px;
                                         border-radius: 50%;
                                         object-fit: cover;
                                     }
-                                    
+
                                     .fn {
                                         font-size: 16px;
                                         font-weight: 700;
                                         color: #111827;
                                         font-style: normal;
-                                        
+
                                         a {
                                             color: inherit;
                                             text-decoration: none;
                                             transition: color 0.3s ease;
-                                            
+
                                             &:hover {
                                                 color: $color-primary;
                                             }
                                         }
                                     }
-                                    
+
                                     .says {
                                         display: none;
                                     }
                                 }
-                                
+
                                 .comment-metadata {
                                     font-size: 14px;
                                     color: #6B7280;
-                                    
+
                                     a {
                                         color: inherit;
                                         text-decoration: none;
-                                        
+
                                         &:hover {
                                             color: $color-primary;
                                         }
                                     }
                                 }
                             }
-                            
+
                             .comment-content {
                                 p {
                                     margin-bottom: 16px;
                                     color: #4B5563;
                                     line-height: 1.6;
-                                    
+
                                     &:last-child {
                                         margin-bottom: 0;
                                     }
                                 }
                             }
-                            
+
                             .reply {
                                 margin-top: 16px;
-                                
+
                                 .comment-reply-link {
                                     display: inline-flex;
                                     align-items: center;
@@ -403,19 +411,19 @@ body.single-post {
                                     color: $color-primary;
                                     text-decoration: none;
                                     transition: all 0.3s ease;
-                                    
+
                                     &::before {
                                         content: '↩';
                                         margin-right: 6px;
                                         font-size: 16px;
                                     }
-                                    
+
                                     &:hover {
                                         color: darken($color-primary, 10%);
                                     }
                                 }
                             }
-                            
+
                             .comment-awaiting-moderation {
                                 display: block;
                                 margin-top: 12px;
@@ -424,17 +432,17 @@ body.single-post {
                                 font-style: italic;
                             }
                         }
-                        
+
                         // Nested Comments
                         .children {
                             list-style: none;
                             margin: 0 0 0 40px;
                             padding: 0;
-                            
+
                             @include media-breakpoint-down(md) {
                                 margin-left: 20px;
                             }
-                            
+
                             .comment {
                                 .comment-body {
                                     background: #fff;
@@ -444,10 +452,10 @@ body.single-post {
                         }
                     }
                 }
-                
+
                 .comment-respond {
                     margin-top: 48px;
-                    
+
                     .hle-comment-form {
                         .form-control {
                             width: 100%;
@@ -457,55 +465,55 @@ body.single-post {
                             font-size: 15px;
                             transition: all 0.3s ease;
                             background: #fff;
-                            
+
                             &:focus {
                                 border-color: $color-primary;
                                 box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
                                 outline: none;
                             }
                         }
-                        
+
                         textarea.form-control {
                             min-height: 120px;
                             resize: vertical;
                         }
-                        
+
                         .form-submit {
                             margin-top: 24px;
                             margin-bottom: 0;
                         }
-                        
+
                         .logged-in-as {
                             margin-bottom: 24px;
                             font-size: 15px;
                             color: #4B5563;
-                            
+
                             a {
                                 color: $color-primary;
                                 text-decoration: none;
-                                
+
                                 &:hover {
                                     text-decoration: underline;
                                 }
                             }
                         }
-                        
+
                         p.comment-notes {
                             font-size: 14px;
                             color: #6B7280;
                             margin-bottom: 24px;
                         }
-                        
+
                         .comment-reply-title {
                             small {
                                 margin-left: 12px;
                                 font-size: 14px;
                                 font-weight: 500;
-                                
+
                                 a {
                                     color: #EF4444;
                                     text-decoration: none;
-                                    
+
                                     &:hover {
                                         text-decoration: underline;
                                     }
@@ -533,6 +541,12 @@ body.single-post {
 
                 &:last-child {
                     margin-bottom: 0;
+                }
+
+                &.widget-table-of-contents {
+                    position: sticky;
+                    top: 120px;
+                    left: 0;
                 }
 
                 .widget-title {

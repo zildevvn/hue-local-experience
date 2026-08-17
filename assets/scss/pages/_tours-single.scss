@@ -287,6 +287,9 @@ body.single-tours {
     }
 
     .main-section {
+        p {
+            margin-bottom: 1rem;
+        }
 
         h1,
         h2,
@@ -295,8 +298,8 @@ body.single-tours {
         h5,
         h6 {
             color: $color-text;
-            margin-top: 36px;
-            margin-bottom: 16px;
+            margin-top: 30px;
+            margin-bottom: 20px;
             font-weight: 700;
             line-height: 1.3;
 

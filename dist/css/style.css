@@ -6328,6 +6328,11 @@ html {
   animation: fadeInRight 0.5s ease forwards;
 }
 
+p > b,
+p > strong {
+  color: #19232B;
+}
+
 .hle-button {
   display: inline-flex;
   align-items: center;
@@ -7483,6 +7488,93 @@ body.logged-in #car-review {
 .hle-pagination button.page-numbers.prev:hover:not(:disabled) svg,
 .hle-pagination button.page-numbers.prev:focus-visible:not(:disabled) svg {
   transform: translateX(-3px);
+}
+
+.widget-table-of-contents {
+  background-color: #ffffff;
+  border: 1px solid rgba(117, 127, 149, 0.15);
+  border-radius: 12px;
+  padding: 24px 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+@media (max-width: 991px) {
+  .widget-table-of-contents {
+    padding: 20px 24px;
+  }
+}
+@media (max-width: 767px) {
+  .widget-table-of-contents {
+    padding: 16px;
+    width: 100%;
+  }
+}
+.widget-table-of-contents .widget-title {
+  font-family: "Roboto", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #19232B;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(117, 127, 149, 0.1);
+  padding-bottom: 12px;
+}
+
+.hle-toc__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.hle-toc li {
+  margin-bottom: 10px;
+}
+.hle-toc li:last-child {
+  margin-bottom: 0;
+}
+.hle-toc li.hle-toc__item--sub {
+  padding-left: 20px;
+  margin-top: 8px;
+}
+.hle-toc li.hle-toc__item--sub a {
+  font-size: 12px;
+}
+.hle-toc li.hle-toc__item--sub a::before {
+  width: 4px;
+  height: 4px;
+  top: 9px;
+  background-color: transparent;
+  border: 1px solid rgba(117, 127, 149, 0.4);
+}
+.hle-toc li.hle-toc__item--sub a:hover::before, .hle-toc li.hle-toc__item--sub a.is-active::before {
+  background-color: #9615b5;
+  border-color: #9615b5;
+}
+.hle-toc a {
+  display: block;
+  color: #19232B;
+  font-size: 13px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  padding-left: 16px;
+}
+.hle-toc a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  background-color: rgba(117, 127, 149, 0.3);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+.hle-toc a:hover, .hle-toc a.is-active {
+  color: #9615b5;
+  font-weight: 500;
+}
+.hle-toc a:hover::before, .hle-toc a.is-active::before {
+  background-color: #9615b5;
+  transform: scale(1.2);
 }
 
 .header-top {
@@ -12068,6 +12160,9 @@ body.single-post .main-section {
     padding-bottom: 40px;
   }
 }
+body.single-post .main-section p {
+  margin-bottom: 1rem;
+}
 body.single-post .main-section h1, body.single-post .main-section .h1,
 body.single-post .main-section h2,
 body.single-post .main-section .h2,
@@ -12080,8 +12175,8 @@ body.single-post .main-section .h5,
 body.single-post .main-section h6,
 body.single-post .main-section .h6 {
   color: #19232B;
-  margin-top: 36px;
-  margin-bottom: 16px;
+  margin-top: 30px;
+  margin-bottom: 20px;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -12146,6 +12241,8 @@ body.single-post .main-section img {
   border-radius: 12px;
 }
 body.single-post .main-section figure {
+  display: inline-block;
+  margin-top: 14px;
   max-width: 100%;
 }
 body.single-post .main-section .wp-caption-text {
@@ -12235,11 +12332,13 @@ body.single-post .main-section blockquote p {
 body.single-post .main-section blockquote p:not(:last-child) {
   margin-bottom: 16px;
 }
-body.single-post .main-section blockquote strong, body.single-post .main-section blockquote b {
+body.single-post .main-section blockquote strong,
+body.single-post .main-section blockquote b {
   color: #19232B;
   font-weight: 700;
 }
-body.single-post .main-section blockquote em, body.single-post .main-section blockquote i {
+body.single-post .main-section blockquote em,
+body.single-post .main-section blockquote i {
   color: #9615b5;
 }
 body.single-post .main-section blockquote cite {
@@ -12517,6 +12616,11 @@ body.single-post .main-section .main-section-right .sidebar-widget {
 }
 body.single-post .main-section .main-section-right .sidebar-widget:last-child {
   margin-bottom: 0;
+}
+body.single-post .main-section .main-section-right .sidebar-widget.widget-table-of-contents {
+  position: sticky;
+  top: 120px;
+  left: 0;
 }
 body.single-post .main-section .main-section-right .sidebar-widget .widget-title {
   font-size: 20px;
@@ -12888,6 +12992,9 @@ body.single-tours .hle-tour-info .tour-gallery .btn-view-all:hover {
     font-size: 13px;
   }
 }
+body.single-tours .main-section p {
+  margin-bottom: 1rem;
+}
 body.single-tours .main-section h1, body.single-tours .main-section .h1,
 body.single-tours .main-section h2,
 body.single-tours .main-section .h2,
@@ -12900,8 +13007,8 @@ body.single-tours .main-section .h5,
 body.single-tours .main-section h6,
 body.single-tours .main-section .h6 {
   color: #19232B;
-  margin-top: 36px;
-  margin-bottom: 16px;
+  margin-top: 30px;
+  margin-bottom: 20px;
   font-weight: 700;
   line-height: 1.3;
 }

@@ -46,7 +46,7 @@ if (!function_exists('hle_pagination')) {
 		}
 
 		$pagenum_link = html_entity_decode(get_pagenum_link());
-		$url_parts    = explode('?', $pagenum_link);
+		$url_parts = explode('?', $pagenum_link);
 		$existing_args = [];
 		if (isset($url_parts[1])) {
 			wp_parse_str($url_parts[1], $existing_args);
@@ -56,18 +56,18 @@ if (!function_exists('hle_pagination')) {
 		$pagenum_link = remove_query_arg(array_keys($existing_args), $pagenum_link);
 		$pagenum_link = trailingslashit($pagenum_link) . '%_%';
 
-		$format  = $wp_rewrite->using_index_permalinks() && !strpos($pagenum_link, 'index.php') ? 'index.php/' : '';
+		$format = $wp_rewrite->using_index_permalinks() && !strpos($pagenum_link, 'index.php') ? 'index.php/' : '';
 		$format .= $wp_rewrite->using_permalinks() ? user_trailingslashit('page/%#%', 'paged') : '?paged=%#%';
 
 		$links = paginate_links([
-			'base'      => $pagenum_link,
-			'format'    => $format,
-			'current'   => $current_page,
-			'total'     => $total_pages,
-			'type'      => 'list',
+			'base' => $pagenum_link,
+			'format' => $format,
+			'current' => $current_page,
+			'total' => $total_pages,
+			'type' => 'list',
 			'prev_text' => hle_svg_icon('arrow_prev') ? hle_svg_icon('arrow_prev') : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>',
 			'next_text' => hle_svg_icon('arrow_next') ? hle_svg_icon('arrow_next') : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>',
-			'add_args'  => $merged_args,
+			'add_args' => $merged_args,
 		]);
 
 		if ($links) {
@@ -110,4 +110,72 @@ if (!function_exists('hle_split_words_preserve_html')) {
 		}
 		return $result;
 	}
+}
+
+
+/**
+ * Generate Table of Contents từ nội dung bài viết
+ */
+function hle_generate_toc($content)
+{
+	if (empty($content))
+		return ['toc' => '', 'content' => $content];
+
+	$headings = [];
+	$index = 0;
+
+	$content = preg_replace_callback(
+		'/<(h[23])([^>]*)>(.*?)<\/h[23]>/is',
+		function ($matches) use (&$headings, &$index) {
+			$tag = $matches[1];
+			$attrs = $matches[2];
+			$text = strip_tags($matches[3]);
+			$id = 'toc-' . $index . '-' . sanitize_title($text);
+
+			$headings[] = [
+				'tag' => $tag,
+				'text' => $text,
+				'id' => $id,
+			];
+
+			$index++;
+
+			return "<{$tag}{$attrs} id=\"{$id}\">{$matches[3]}</{$tag}>";
+		},
+		$content
+	);
+
+	if (empty($headings))
+		return ['toc' => '', 'content' => $content];
+
+	$toc = '<nav class="hle-toc" aria-label="Table of Contents">';
+	$toc .= '<ol class="hle-toc__list">';
+
+	foreach ($headings as $heading) {
+		$class = $heading['tag'] === 'h3' ? ' class="hle-toc__item--sub"' : '';
+		$toc .= "<li{$class}>";
+		$toc .= '<a href="#' . esc_attr($heading['id']) . '">' . esc_html($heading['text']) . '</a>';
+		$toc .= '</li>';
+	}
+
+	$toc .= '</ol></nav>';
+
+	return ['toc' => $toc, 'content' => $content];
+}
+
+/**
+ * [WHY] Cache kết quả để không gọi hle_generate_toc 2 lần
+ * Sidebar dùng để lấy TOC, main content dùng để lấy content đã inject id
+ */
+function hle_get_toc_result()
+{
+	static $cached = null;
+
+	if ($cached === null) {
+		$raw = get_the_content();
+		$raw = apply_filters('the_content', $raw);
+		$cached = hle_generate_toc($raw);
+	}
+
+	return $cached;
 }

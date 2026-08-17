@@ -95,3 +95,8 @@ html {
 .hle-in-view .hle-letter {
     animation: fadeInRight 0.5s ease forwards;
 }
+
+p>b,
+p>strong {
+    color: $color-text;
+}

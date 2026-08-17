@@ -55,7 +55,11 @@ $image = get_the_post_thumbnail_url();
 
                 <div class="main-section-left__content">
                     <?php
-                    the_content();
+                    // [WHY] Dùng $result['content'] thay vì the_content()
+                    // vì $result['content'] đã có id inject vào các heading
+                    // the_content() sẽ output content GỐC không có id → TOC links không scroll được
+                    $result = hle_get_toc_result();
+                    echo $result['content'];
                     ?>
                 </div>
 
@@ -132,6 +136,18 @@ $image = get_the_post_thumbnail_url();
                             <p>No recent posts found.</p>
                         <?php endif; ?>
                     </div>
+                </div>
+
+                <div class="sidebar-widget widget-table-of-contents">
+                    <h3 class="widget-title">Table of contents</h3>
+
+                    <?php
+                    $result = hle_get_toc_result();
+                    ?>
+
+                    <?php if (!empty($result['toc'])): ?>
+                        <?php echo $result['toc']; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
