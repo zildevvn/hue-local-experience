@@ -179,3 +179,214 @@ function hle_get_toc_result()
 
 	return $cached;
 }
+
+
+/**
+ * External API request.
+ */
+function vm_external_api_request(
+	$endpoint,
+	$method = 'GET',
+	$body = null
+) {
+	if (
+		!defined('VM_EXTERNAL_API_URL') ||
+		!defined('VM_EXTERNAL_API_KEY')
+	) {
+		return [
+			'ok' => false,
+			'status' => 500,
+			'message' => 'External API configuration is missing.',
+		];
+	}
+
+	$url = rtrim(
+		VM_EXTERNAL_API_URL,
+		'/'
+	) . '/' . ltrim(
+		$endpoint,
+		'/'
+	);
+
+	$args = [
+		'method' => strtoupper($method),
+		'timeout' => 20,
+
+		'headers' => [
+			'Authorization' =>
+				'Bearer ' . VM_EXTERNAL_API_KEY,
+
+			'Accept' =>
+				'application/json',
+		],
+	];
+
+	if ($body !== null) {
+		$args['headers']['Content-Type'] =
+			'application/json';
+
+		$args['body'] =
+			wp_json_encode($body);
+	}
+
+	$response = wp_remote_request(
+		$url,
+		$args
+	);
+
+	if (is_wp_error($response)) {
+		return [
+			'ok' => false,
+			'status' => 500,
+			'message' =>
+				$response->get_error_message(),
+		];
+	}
+
+	$status = wp_remote_retrieve_response_code(
+		$response
+	);
+
+	$responseBody = wp_remote_retrieve_body(
+		$response
+	);
+
+	/*
+	 * 204 No Content
+	 */
+	if ($status === 204) {
+		return [
+			'ok' => true,
+			'status' => 204,
+			'data' => null,
+		];
+	}
+
+	$data = json_decode(
+		$responseBody,
+		true
+	);
+
+	if (
+		!is_array($data) &&
+		!empty($responseBody)
+	) {
+		return [
+			'ok' => false,
+			'status' => $status,
+			'message' => 'Invalid API response.',
+		];
+	}
+
+	/*
+	 * HTTP error
+	 */
+	if ($status < 200 || $status >= 300) {
+		return [
+			'ok' => false,
+			'status' => $status,
+			'message' =>
+				$data['message']
+				?? 'API request failed.',
+			'data' => $data,
+		];
+	}
+
+	return [
+		'ok' => true,
+		'status' => $status,
+		'data' => $data,
+	];
+}
+
+
+/**
+ * AJAX: Get orders.
+ */
+function vm_external_ajax_get_orders()
+{
+	check_ajax_referer(
+		'vm_external_orders',
+		'nonce'
+	);
+
+	$dateFrom = isset($_POST['date_from'])
+		? sanitize_text_field(
+			wp_unslash($_POST['date_from'])
+		)
+		: '';
+
+	$dateTo = isset($_POST['date_to'])
+		? sanitize_text_field(
+			wp_unslash($_POST['date_to'])
+		)
+		: '';
+
+	$page = isset($_POST['page'])
+		? max(
+			1,
+			absint($_POST['page'])
+		)
+		: 1;
+
+	$perPage = isset($_POST['per_page'])
+		? min(
+			100,
+			max(
+				1,
+				absint($_POST['per_page'])
+			)
+		)
+		: 20;
+
+	if (
+		empty($dateFrom) ||
+		empty($dateTo)
+	) {
+		wp_send_json_error([
+			'message' =>
+				'Date range is required.',
+		], 400);
+	}
+
+	$orderId = isset($_POST['order_id'])
+		? absint($_POST['order_id'])
+		: 0;
+
+	$query = [
+		'date_from' => $dateFrom,
+		'date_to' => $dateTo,
+		'page' => $page,
+		'per_page' => $perPage,
+	];
+
+	if ($orderId > 0) {
+		$query['order_id'] = $orderId;
+	}
+
+	$result = vm_external_api_request(
+		'orders?' . http_build_query($query)
+	);
+
+	if (empty($result['ok'])) {
+		wp_send_json_error([
+			'message' =>
+				$result['message']
+				?? 'Unable to load orders.',
+		], $result['status'] ?? 500);
+	}
+
+	/*
+	 * WordPress AJAX wrapper.
+	 *
+	 * Laravel itself does NOT return `success`.
+	 */
+	wp_send_json_success(
+		$result['data']
+	);
+}
+
+add_action(
+	'wp_ajax_vm_external_get_orders',
+	'vm_external_ajax_get_orders'
+);

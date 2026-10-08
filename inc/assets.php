@@ -20,5 +20,17 @@ add_action('wp_enqueue_scripts', function () {
 	wp_localize_script('theme-scripts', 'themeData', [
 		'templateUrl' => get_template_directory_uri()
 	]);
+
+
+	if (is_page_template('external-api.php')) {
+		wp_localize_script(
+			'theme-scripts',
+			'vmExternalAPI',
+			[
+				'ajaxUrl' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('vm_external_orders'),
+			]
+		);
+	}
 });
 

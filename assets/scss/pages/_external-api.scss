@@ -1,0 +1,107 @@
+.vm-external-orders {
+    max-width: 1200px;
+    margin: 40px auto;
+
+    &__filters {
+        display: flex;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 15px;
+
+        padding: 20px;
+        margin-bottom: 20px;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+    }
+}
+
+.vm-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    input,
+    select {
+        min-width: 160px;
+        padding: 9px 12px;
+    }
+}
+
+.vm-filter-actions {
+    button {
+        padding: 10px 20px;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+    }
+}
+
+.vm-api-table-wrapper {
+    overflow-x: auto;
+}
+
+.vm-api-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        font-weight: 600;
+    }
+}
+
+.vm-api-empty {
+    padding: 30px !important;
+    text-align: center !important;
+}
+
+.vm-api-loading {
+    margin-bottom: 15px;
+}
+
+.vm-api-summary {
+    margin-bottom: 15px;
+}
+
+.vm-api-message {
+    padding: 12px;
+    margin-bottom: 15px;
+
+    &--error {
+        background: #fee2e2;
+    }
+
+    &--success {
+        background: #dcfce7;
+    }
+}
+
+.vm-api-pagination {
+    display: flex;
+    gap: 6px;
+    margin-top: 20px;
+
+    button {
+        padding: 7px 12px;
+        cursor: pointer;
+
+        &.is-active {
+            font-weight: 700;
+        }
+    }
+}

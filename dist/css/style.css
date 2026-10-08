@@ -9484,6 +9484,10 @@ body.home .featured-tours-section__swiper .swiper-pagination .swiper-pagination-
   }
 }
 
+body.page-template-external-api main {
+  padding: 40vh 0;
+}
+
 body.home .hero-section-sliders .slider-item {
   position: relative;
   min-height: 100vh;
@@ -15183,4 +15187,98 @@ body.search-no-results .search-recommendations .hle-results-search-section__list
   body.search-no-results .search-recommendations .hle-results-search-section__list {
     grid-template-columns: repeat(1, 1fr);
   }
+}
+
+.vm-external-orders {
+  max-width: 1200px;
+  margin: 40px auto;
+}
+.vm-external-orders__filters {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.vm-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.vm-filter-field label {
+  font-size: 14px;
+  font-weight: 600;
+}
+.vm-filter-field input,
+.vm-filter-field select {
+  min-width: 160px;
+  padding: 9px 12px;
+}
+
+.vm-filter-actions button {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.vm-filter-actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.vm-api-table-wrapper {
+  overflow-x: auto;
+}
+
+.vm-api-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.vm-api-table th,
+.vm-api-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+.vm-api-table th {
+  font-weight: 600;
+}
+
+.vm-api-empty {
+  padding: 30px !important;
+  text-align: center !important;
+}
+
+.vm-api-loading {
+  margin-bottom: 15px;
+}
+
+.vm-api-summary {
+  margin-bottom: 15px;
+}
+
+.vm-api-message {
+  padding: 12px;
+  margin-bottom: 15px;
+}
+.vm-api-message--error {
+  background: #fee2e2;
+}
+.vm-api-message--success {
+  background: #dcfce7;
+}
+
+.vm-api-pagination {
+  display: flex;
+  gap: 6px;
+  margin-top: 20px;
+}
+.vm-api-pagination button {
+  padding: 7px 12px;
+  cursor: pointer;
+}
+.vm-api-pagination button.is-active {
+  font-weight: 700;
 }
