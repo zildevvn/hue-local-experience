@@ -143,8 +143,17 @@
             yearField.hidden = type !== "year";
         }
 
+
         function getDateRange() {
             const type = timeType.value;
+
+            const formatDate = (date) => {
+                return [
+                    date.getFullYear(),
+                    pad(date.getMonth() + 1),
+                    pad(date.getDate()),
+                ].join("-");
+            };
 
             // Day
             if (type === "day") {
@@ -158,39 +167,49 @@
                 };
             }
 
-            // Week
+            // Week: ISO week, Monday to Sunday
             if (type === "week") {
                 if (!weekInput.value) {
                     throw new Error("Please select a week.");
                 }
 
-                const [year, week] =
-                    weekInput.value.split("-W").map(Number);
+                const match = weekInput.value.match(/^(\d{4})-W(\d{2})$/);
 
-                const simple =
-                    new Date(year, 0, 1 + (week - 1) * 7);
+                if (!match) {
+                    throw new Error("Please select a valid week.");
+                }
 
-                const day = simple.getDay();
+                const year = Number(match[1]);
+                const week = Number(match[2]);
 
-                const monday = new Date(simple);
+                if (week < 1 || week > 53) {
+                    throw new Error("Please select a valid week.");
+                }
+
+                // ISO week 1 is the week containing January 4.
+                const jan4 = new Date(year, 0, 4);
+                const monday = new Date(jan4);
+
+                const dayOfWeek = jan4.getDay() || 7;
 
                 monday.setDate(
-                    simple.getDate() -
-                    (day === 0 ? 6 : day - 1)
+                    jan4.getDate() - dayOfWeek + 1 + (week - 1) * 7
                 );
 
                 const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
 
-                sunday.setDate(
-                    monday.getDate() + 6
-                );
+                // Reject week 53 if it falls outside the selected ISO week-year.
+                const thursday = new Date(monday);
+                thursday.setDate(monday.getDate() + 3);
+
+                if (thursday.getFullYear() !== year) {
+                    throw new Error("The selected week is invalid.");
+                }
 
                 return {
-                    date_from:
-                        `${monday.getFullYear()}-${pad(monday.getMonth() + 1)}-${pad(monday.getDate())}`,
-
-                    date_to:
-                        `${sunday.getFullYear()}-${pad(sunday.getMonth() + 1)}-${pad(sunday.getDate())}`,
+                    date_from: formatDate(monday),
+                    date_to: formatDate(sunday),
                 };
             }
 
@@ -200,26 +219,37 @@
                     throw new Error("Please select a month.");
                 }
 
-                const [year, month] =
-                    monthInput.value.split("-").map(Number);
+                const match = monthInput.value.match(/^(\d{4})-(\d{2})$/);
 
-                const lastDay =
-                    new Date(year, month, 0);
+                if (!match) {
+                    throw new Error("Please select a valid month.");
+                }
+
+                const year = Number(match[1]);
+                const month = Number(match[2]);
+
+                if (month < 1 || month > 12) {
+                    throw new Error("Please select a valid month.");
+                }
+
+                const lastDay = new Date(year, month, 0).getDate();
 
                 return {
-                    date_from:
-                        `${year}-${pad(month)}-01`,
-
-                    date_to:
-                        `${year}-${pad(month)}-${pad(lastDay.getDate())}`,
+                    date_from: `${year}-${pad(month)}-01`,
+                    date_to: `${year}-${pad(month)}-${pad(lastDay)}`,
                 };
             }
 
             // Year
             if (type === "year") {
-                const year = Number(yearInput.value);
+                const value = yearInput.value.trim();
+                const year = Number(value);
 
-                if (year < 2000 || year > 2100) {
+                if (
+                    !/^\d{4}$/.test(value) ||
+                    year < 2000 ||
+                    year > 2100
+                ) {
                     throw new Error("Please enter a valid year.");
                 }
 
@@ -231,6 +261,8 @@
 
             throw new Error("Invalid time period.");
         }
+
+
 
         // ---------------------------------------------------------------------
         // API
