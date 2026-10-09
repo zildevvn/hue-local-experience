@@ -105,3 +105,163 @@
         }
     }
 }
+
+
+.vm-order-modal[hidden] {
+    display: none !important;
+}
+
+.vm-order-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.vm-order-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(15 23 42 / 65%);
+    backdrop-filter: blur(3px);
+}
+
+.vm-order-modal__dialog {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 1000px);
+    max-height: 85vh;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 24px 80px rgb(0 0 0 / 25%);
+}
+
+.vm-order-modal__header,
+.vm-order-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+}
+
+.vm-order-modal__header {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.vm-order-modal__header h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+}
+
+.vm-order-modal__header p {
+    margin: 0;
+    color: #64748b;
+}
+
+.vm-order-modal__body {
+    padding: 20px 22px;
+    overflow: auto;
+}
+
+.vm-order-modal__summary {
+    margin-bottom: 14px;
+    font-size: 14px;
+}
+
+.vm-order-modal__table-wrap {
+    max-height: 45vh;
+    overflow: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.vm-order-modal__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.vm-order-modal__table th,
+.vm-order-modal__table td {
+    padding: 11px 12px;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.vm-order-modal__table th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+.vm-order-modal__warning {
+    margin: 16px 0 0;
+    color: #b91c1c;
+    font-size: 13px;
+}
+
+.vm-order-modal__error {
+    padding: 10px 12px;
+    color: #b91c1c;
+    background: #fef2f2;
+    border-radius: 6px;
+}
+
+.vm-order-modal__footer {
+    justify-content: flex-end;
+    border-top: 1px solid #e5e7eb;
+}
+
+.vm-order-modal__footer button {
+    padding: 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.vm-order-modal__footer .vm-order-modal__delete {
+    color: #fff;
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.vm-order-modal__footer .vm-order-modal__delete:hover {
+    background: #b91c1c;
+}
+
+.vm-order-modal__footer button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+body.vm-order-modal-open {
+    overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .vm-order-modal {
+        padding: 10px;
+    }
+
+    .vm-order-modal__dialog {
+        max-height: 92vh;
+    }
+
+    .vm-order-modal__header,
+    .vm-order-modal__footer {
+        padding: 14px;
+    }
+
+    .vm-order-modal__body {
+        padding: 14px;
+    }
+}

@@ -372,3 +372,139 @@ add_action(
 	'wp_ajax_vm_external_get_orders',
 	'vm_external_ajax_get_orders'
 );
+
+/**
+ * Shared permission check for destructive order actions.
+ */
+function vm_external_check_delete_permission()
+{
+	check_ajax_referer('vm_external_orders', 'nonce');
+
+	if (!is_user_logged_in() || !current_user_can('manage_options')) {
+		wp_send_json_error([
+			'message' => 'You do not have permission to delete orders.',
+		], 403);
+	}
+}
+
+/**
+ * AJAX: Delete selected orders.
+ */
+function vm_external_ajax_delete_orders()
+{
+	vm_external_check_delete_permission();
+
+	$rawIds = isset($_POST['ids'])
+		? wp_unslash($_POST['ids'])
+		: [];
+
+	if (!is_array($rawIds)) {
+		wp_send_json_error([
+			'message' => 'Invalid order selection.',
+		], 400);
+	}
+
+	$ids = array_values(array_unique(array_filter(
+		array_map('absint', $rawIds)
+	)));
+
+	if (empty($ids) || count($ids) > 100) {
+		wp_send_json_error([
+			'message' => 'Select between 1 and 100 orders.',
+		], 400);
+	}
+
+	$body = ['ids' => $ids];
+
+	$orderId = isset($_POST['order_id'])
+		? absint($_POST['order_id'])
+		: 0;
+
+	if ($orderId > 0) {
+		$body['order_id'] = $orderId;
+	} else {
+		$dateFrom = isset($_POST['date_from'])
+			? sanitize_text_field(wp_unslash($_POST['date_from']))
+			: '';
+
+		$dateTo = isset($_POST['date_to'])
+			? sanitize_text_field(wp_unslash($_POST['date_to']))
+			: '';
+
+		if (!$dateFrom || !$dateTo) {
+			wp_send_json_error([
+				'message' => 'Date range is required.',
+			], 400);
+		}
+
+		$body['date_from'] = $dateFrom;
+		$body['date_to'] = $dateTo;
+	}
+
+	$result = vm_external_api_request('orders', 'DELETE', $body);
+
+	if (empty($result['ok'])) {
+		wp_send_json_error([
+			'message' => $result['message'] ?? 'Unable to delete orders.',
+		], $result['status'] ?? 500);
+	}
+
+	wp_send_json_success($result['data']);
+}
+
+add_action(
+	'wp_ajax_vm_external_delete_orders',
+	'vm_external_ajax_delete_orders'
+);
+
+/**
+ * AJAX: Delete random 30% of matching orders.
+ */
+function vm_external_ajax_delete_random_orders()
+{
+	vm_external_check_delete_permission();
+
+	$body = [
+		'random_percent' => 30,
+	];
+
+	$orderId = isset($_POST['order_id'])
+		? absint($_POST['order_id'])
+		: 0;
+
+	if ($orderId > 0) {
+		$body['order_id'] = $orderId;
+	} else {
+		$dateFrom = isset($_POST['date_from'])
+			? sanitize_text_field(wp_unslash($_POST['date_from']))
+			: '';
+
+		$dateTo = isset($_POST['date_to'])
+			? sanitize_text_field(wp_unslash($_POST['date_to']))
+			: '';
+
+		if (!$dateFrom || !$dateTo) {
+			wp_send_json_error([
+				'message' => 'Date range is required.',
+			], 400);
+		}
+
+		$body['date_from'] = $dateFrom;
+		$body['date_to'] = $dateTo;
+	}
+
+	$result = vm_external_api_request('orders', 'DELETE', $body);
+
+	if (empty($result['ok'])) {
+		wp_send_json_error([
+			'message' => $result['message'] ?? 'Unable to delete orders.',
+		], $result['status'] ?? 500);
+	}
+
+	wp_send_json_success($result['data']);
+}
+
+add_action(
+	'wp_ajax_vm_external_delete_random_orders',
+	'vm_external_ajax_delete_random_orders'
+);
