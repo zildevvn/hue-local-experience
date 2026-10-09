@@ -25,6 +25,10 @@
         const monthInput = app.querySelector("[data-month]");
         const yearInput = app.querySelector("[data-year]");
 
+        const orderIdInput = app.querySelector("[data-order-id]");
+        const searchOrderButton = app.querySelector("[data-search-order]");
+        const clearOrderButton = app.querySelector("[data-clear-order]");
+
         const callApiButton = app.querySelector("[data-call-api]");
         const tbody = app.querySelector("[data-orders-body]");
         const pagination = app.querySelector("[data-pagination]");
@@ -32,7 +36,6 @@
         const message = app.querySelector("[data-message]");
         const summary = app.querySelector("[data-summary]");
         const totalOrders = app.querySelector("[data-total-orders]");
-
 
         if (
             !timeType ||
@@ -78,6 +81,14 @@
         function showLoading(show) {
             loading.hidden = !show;
             callApiButton.disabled = show;
+
+            if (searchOrderButton) {
+                searchOrderButton.disabled = show;
+            }
+
+            if (clearOrderButton) {
+                clearOrderButton.disabled = show;
+            }
         }
 
         function showMessage(text, type = "error") {
@@ -225,7 +236,7 @@
         // API
         // ---------------------------------------------------------------------
 
-        function buildRequestData(page, range) {
+        function buildRequestData(page, range = null) {
             const formData = new FormData();
 
             formData.append(
@@ -248,15 +259,37 @@
                 20
             );
 
-            formData.append(
-                "date_from",
-                range.date_from
-            );
+            const orderId =
+                orderIdInput
+                    ? orderIdInput.value.trim()
+                    : "";
 
-            formData.append(
-                "date_to",
-                range.date_to
-            );
+            /*
+             * Order ID search takes priority.
+             *
+             * If Order ID exists:
+             * - Send order_id
+             * - Do NOT send date filters
+             *
+             * Otherwise:
+             * - Keep the existing date filter behavior
+             */
+            if (orderId) {
+                formData.append(
+                    "order_id",
+                    orderId
+                );
+            } else if (range) {
+                formData.append(
+                    "date_from",
+                    range.date_from
+                );
+
+                formData.append(
+                    "date_to",
+                    range.date_to
+                );
+            }
 
             return formData;
         }
@@ -310,13 +343,24 @@
                 return;
             }
 
-            let range;
+            const orderId =
+                orderIdInput
+                    ? orderIdInput.value.trim()
+                    : "";
 
-            try {
-                range = getDateRange();
-            } catch (error) {
-                showMessage(error.message);
-                return;
+            let range = null;
+
+            /*
+             * When searching by Order ID,
+             * date validation is completely skipped.
+             */
+            if (!orderId) {
+                try {
+                    range = getDateRange();
+                } catch (error) {
+                    showMessage(error.message);
+                    return;
+                }
             }
 
             isLoading = true;
@@ -330,8 +374,9 @@
             console.log(
                 "External API request:",
                 {
-                    date_from: range.date_from,
-                    date_to: range.date_to,
+                    order_id: orderId || null,
+                    date_from: range?.date_from || null,
+                    date_to: range?.date_to || null,
                     page: page,
                 }
             );
@@ -401,32 +446,32 @@
                             : "-";
 
                     return `
-                        <tr>
-                            <td>#${Number(order.id)}</td>
+                    <tr>
+                        <td>#${Number(order.id)}</td>
 
-                            <td>
-                                ${escapeHtml(tableName)}
-                            </td>
+                        <td>
+                            ${escapeHtml(tableName)}
+                        </td>
 
-                            <td>
-                                ${escapeHtml(
+                        <td>
+                            ${escapeHtml(
                         order.status || "-"
                     )}
-                            </td>
+                        </td>
 
-                            <td>
-                                ${itemsCount}
-                            </td>
+                        <td>
+                            ${itemsCount}
+                        </td>
 
-                            <td>
-                                ${money(order.total_price)}
-                            </td>
+                        <td>
+                            ${money(order.total_price)}
+                        </td>
 
-                            <td>
-                                ${escapeHtml(createdAt)}
-                            </td>
-                        </tr>
-                    `;
+                        <td>
+                            ${escapeHtml(createdAt)}
+                        </td>
+                    </tr>
+                `;
                 })
                 .join("");
 
@@ -434,25 +479,33 @@
         }
 
         function renderEmpty() {
+            const orderId =
+                orderIdInput
+                    ? orderIdInput.value.trim()
+                    : "";
+
             tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="vm-api-empty">
-                        No orders found for this period.
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td colspan="6" class="vm-api-empty">
+                    ${orderId
+                    ? "No order found with this Order ID."
+                    : "No orders found for this period."
+                }
+                </td>
+            </tr>
+        `;
 
             pagination.innerHTML = "";
         }
 
         function renderError(errorMessage) {
             tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="vm-api-empty">
-                        ${escapeHtml(errorMessage)}
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td colspan="6" class="vm-api-empty">
+                    ${escapeHtml(errorMessage)}
+                </td>
+            </tr>
+        `;
 
             pagination.innerHTML = "";
             summary.hidden = true;
@@ -476,13 +529,13 @@
             // Previous
             if (current > 1) {
                 html += `
-                    <button
-                        type="button"
-                        data-page="${current - 1}"
-                    >
-                        Previous
-                    </button>
-                `;
+                <button
+                    type="button"
+                    data-page="${current - 1}"
+                >
+                    Previous
+                </button>
+            `;
             }
 
             // Page numbers
@@ -493,27 +546,27 @@
                     Math.abs(i - current) <= 2
                 ) {
                     html += `
-                        <button
-                            type="button"
-                            class="${i === current ? "is-active" : ""}"
-                            data-page="${i}"
-                        >
-                            ${i}
-                        </button>
-                    `;
+                    <button
+                        type="button"
+                        class="${i === current ? "is-active" : ""}"
+                        data-page="${i}"
+                    >
+                        ${i}
+                    </button>
+                `;
                 }
             }
 
             // Next
             if (current < last) {
                 html += `
-                    <button
-                        type="button"
-                        data-page="${current + 1}"
-                    >
-                        Next
-                    </button>
-                `;
+                <button
+                    type="button"
+                    data-page="${current + 1}"
+                >
+                    Next
+                </button>
+            `;
             }
 
             pagination.innerHTML = html;
@@ -534,6 +587,54 @@
                 () => loadOrders(1)
             );
 
+            /*
+             * Search Order ID
+             */
+            if (searchOrderButton && orderIdInput) {
+                searchOrderButton.addEventListener(
+                    "click",
+                    () => loadOrders(1)
+                );
+            }
+
+            /*
+             * Press Enter in Order ID input
+             */
+            if (orderIdInput) {
+                orderIdInput.addEventListener(
+                    "keydown",
+                    (event) => {
+                        if (event.key !== "Enter") {
+                            return;
+                        }
+
+                        event.preventDefault();
+
+                        loadOrders(1);
+                    }
+                );
+            }
+
+            /*
+             * Clear Order ID
+             *
+             * After clearing, the next request
+             * automatically uses the existing
+             * Day / Week / Month / Year filter.
+             */
+            if (clearOrderButton && orderIdInput) {
+                clearOrderButton.addEventListener(
+                    "click",
+                    () => {
+                        orderIdInput.value = "";
+
+                        clearMessage();
+
+                        loadOrders(1);
+                    }
+                );
+            }
+
             pagination.addEventListener(
                 "click",
                 (event) => {
@@ -547,7 +648,10 @@
                     const page =
                         Number(button.dataset.page);
 
-                    if (!Number.isInteger(page) || page < 1) {
+                    if (
+                        !Number.isInteger(page) ||
+                        page < 1
+                    ) {
                         return;
                     }
 

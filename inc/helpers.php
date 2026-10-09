@@ -267,14 +267,12 @@ function vm_external_api_request(
 		true
 	);
 
-	if (
-		!is_array($data) &&
-		!empty($responseBody)
-	) {
+	if (!is_array($data) && !empty($responseBody)) {
 		return [
 			'ok' => false,
 			'status' => $status,
 			'message' => 'Invalid API response.',
+			'raw_body' => $responseBody,
 		];
 	}
 
@@ -305,63 +303,56 @@ function vm_external_api_request(
  */
 function vm_external_ajax_get_orders()
 {
-	check_ajax_referer(
-		'vm_external_orders',
-		'nonce'
-	);
-
-	$dateFrom = isset($_POST['date_from'])
-		? sanitize_text_field(
-			wp_unslash($_POST['date_from'])
-		)
-		: '';
-
-	$dateTo = isset($_POST['date_to'])
-		? sanitize_text_field(
-			wp_unslash($_POST['date_to'])
-		)
-		: '';
-
-	$page = isset($_POST['page'])
-		? max(
-			1,
-			absint($_POST['page'])
-		)
-		: 1;
-
-	$perPage = isset($_POST['per_page'])
-		? min(
-			100,
-			max(
-				1,
-				absint($_POST['per_page'])
-			)
-		)
-		: 20;
-
-	if (
-		empty($dateFrom) ||
-		empty($dateTo)
-	) {
-		wp_send_json_error([
-			'message' =>
-				'Date range is required.',
-		], 400);
-	}
+	check_ajax_referer('vm_external_orders', 'nonce');
 
 	$orderId = isset($_POST['order_id'])
 		? absint($_POST['order_id'])
 		: 0;
 
-	$query = [
-		'date_from' => $dateFrom,
-		'date_to' => $dateTo,
-		'page' => $page,
-		'per_page' => $perPage,
-	];
+	$dateFrom = isset($_POST['date_from'])
+		? sanitize_text_field(wp_unslash($_POST['date_from']))
+		: '';
 
+	$dateTo = isset($_POST['date_to'])
+		? sanitize_text_field(wp_unslash($_POST['date_to']))
+		: '';
+
+	$page = isset($_POST['page'])
+		? max(1, absint($_POST['page']))
+		: 1;
+
+	$perPage = isset($_POST['per_page'])
+		? min(100, max(1, absint($_POST['per_page'])))
+		: 20;
+
+	/*
+	 * Search by Order ID
+	 */
 	if ($orderId > 0) {
-		$query['order_id'] = $orderId;
+
+		$query = [
+			'order_id' => $orderId,
+			'page' => $page,
+			'per_page' => $perPage,
+		];
+
+		/*
+		 * Filter by date
+		 */
+	} else {
+
+		if (empty($dateFrom) || empty($dateTo)) {
+			wp_send_json_error([
+				'message' => 'Date range is required.',
+			], 400);
+		}
+
+		$query = [
+			'date_from' => $dateFrom,
+			'date_to' => $dateTo,
+			'page' => $page,
+			'per_page' => $perPage,
+		];
 	}
 
 	$result = vm_external_api_request(
@@ -370,20 +361,11 @@ function vm_external_ajax_get_orders()
 
 	if (empty($result['ok'])) {
 		wp_send_json_error([
-			'message' =>
-				$result['message']
-				?? 'Unable to load orders.',
+			'message' => $result['message'] ?? 'Unable to load orders.',
 		], $result['status'] ?? 500);
 	}
 
-	/*
-	 * WordPress AJAX wrapper.
-	 *
-	 * Laravel itself does NOT return `success`.
-	 */
-	wp_send_json_success(
-		$result['data']
-	);
+	wp_send_json_success($result['data']);
 }
 
 add_action(
