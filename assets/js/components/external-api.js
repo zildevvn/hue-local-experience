@@ -1,3 +1,4 @@
+
 (function ($) {
     "use strict";
 
@@ -70,103 +71,38 @@
         let modalIsProcessing = false;
 
         // ---------------------------------------------------------------------
-        // Confirmation Modal
+        // Confirmation Modal - HTML comes from confirm-modal.php
         // ---------------------------------------------------------------------
 
-        function injectConfirmModal() {
-            // Modal được thêm vào document.body nên phải kiểm tra trên document.
-            if (document.querySelector("[data-order-confirm-modal]")) {
+        function getConfirmModal() {
+            return document.querySelector("[data-order-confirm-modal]");
+        }
+
+        function bindConfirmModalEvents() {
+            const modal = getConfirmModal();
+
+            if (!modal) {
+                console.error(
+                    "External API: confirmation modal template was not found."
+                );
                 return;
             }
 
-            const modal = document.createElement("div");
+            // Prevent duplicate event handlers if this initializer runs again.
+            if (modal.dataset.eventsBound === "true") {
+                return;
+            }
 
-            modal.dataset.orderConfirmModal = "";
-            modal.className = "vm-order-modal";
-            modal.hidden = true;
-
-            modal.innerHTML = `
-                <div
-                    class="vm-order-modal__backdrop"
-                    data-modal-close
-                ></div>
-
-                <section
-                    class="vm-order-modal__dialog"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="vm-order-modal-title"
-                >
-                    <header class="vm-order-modal__header">
-                        <div>
-                            <h2 id="vm-order-modal-title">
-                                Confirm deletion
-                            </h2>
-
-                            <p data-modal-description></p>
-                        </div>
-
-                        <button
-                            type="button"
-                            data-modal-close
-                            aria-label="Close dialog"
-                        >&times;</button>
-                    </header>
-
-                    <div class="vm-order-modal__body">
-                        <div class="vm-order-modal__summary">
-                            Orders to delete:
-                            <strong data-modal-count>0</strong>
-                        </div>
-
-                        <div class="vm-order-modal__table-wrap">
-                            <table class="vm-order-modal__table">
-                                <thead>
-                                    <tr>
-                                        <th>Order ID</th>
-                                        <th>Table</th>
-                                        <th>Status</th>
-                                        <th>Total</th>
-                                        <th>Created at</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody data-modal-orders></tbody>
-                            </table>
-                        </div>
-
-                        <p class="vm-order-modal__warning">
-                            This action permanently deletes the listed orders
-                            and cannot be undone.
-                        </p>
-
-                        <p
-                            class="vm-order-modal__error"
-                            data-modal-error
-                            hidden
-                        ></p>
-                    </div>
-
-                    <footer class="vm-order-modal__footer">
-                        <button type="button" data-modal-close>
-                            Cancel
-                        </button>
-
-                        <button
-                            type="button"
-                            data-modal-confirm
-                            class="vm-order-modal__delete"
-                        >
-                            Confirm deletion
-                        </button>
-                    </footer>
-                </section>
-            `;
-
-            document.body.appendChild(modal);
+            modal.dataset.eventsBound = "true";
 
             modal.addEventListener("click", async (event) => {
-                const closeButton = event.target.closest("[data-modal-close]");
+                const target = event.target;
+
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const closeButton = target.closest("[data-modal-close]");
 
                 if (closeButton) {
                     if (!modalIsProcessing) {
@@ -176,9 +112,7 @@
                     return;
                 }
 
-                const confirmButton = event.target.closest(
-                    "[data-modal-confirm]"
-                );
+                const confirmButton = target.closest("[data-modal-confirm]");
 
                 if (
                     !confirmButton ||
@@ -189,7 +123,6 @@
                 }
 
                 modalIsProcessing = true;
-
                 confirmButton.disabled = true;
                 confirmButton.textContent = "Processing...";
 
@@ -200,14 +133,15 @@
                         "[data-modal-error]"
                     );
 
-                    errorElement.textContent =
-                        error.message || "An unexpected error occurred.";
+                    if (errorElement) {
+                        errorElement.textContent =
+                            error.message || "An unexpected error occurred.";
 
-                    errorElement.hidden = false;
+                        errorElement.hidden = false;
+                    }
                 } finally {
                     modalIsProcessing = false;
 
-                    // Luôn reset nút, kể cả modal đã được đóng thành công.
                     confirmButton.disabled = false;
                     confirmButton.textContent = "Confirm deletion";
                 }
@@ -225,63 +159,81 @@
         }
 
         function openConfirmModal(title, description, orders, onConfirm) {
-            const modal = document.querySelector(
-                "[data-order-confirm-modal]"
-            );
+            const modal = getConfirmModal();
 
             if (!modal) {
                 throw new Error(
-                    "Confirmation modal has not been initialized."
+                    "Confirmation modal template was not found."
                 );
             }
 
-            modal.querySelector("#vm-order-modal-title").textContent = title;
+            const titleElement = modal.querySelector(
+                "#vm-order-modal-title"
+            );
 
-            modal.querySelector("[data-modal-description]").textContent =
-                description;
+            const descriptionElement = modal.querySelector(
+                "[data-modal-description]"
+            );
 
-            modal.querySelector("[data-modal-count]").textContent =
-                String(orders.length);
-
+            const countElement = modal.querySelector("[data-modal-count]");
             const errorElement = modal.querySelector("[data-modal-error]");
-            errorElement.textContent = "";
-            errorElement.hidden = true;
-
             const ordersContainer = modal.querySelector(
                 "[data-modal-orders]"
             );
 
-            ordersContainer.innerHTML = orders.map((order) => {
-                const id = Number(order.id);
-                const tableName = order.table?.name || "-";
+            if (
+                !titleElement ||
+                !descriptionElement ||
+                !countElement ||
+                !errorElement ||
+                !ordersContainer
+            ) {
+                throw new Error(
+                    "Confirmation modal template is missing required elements."
+                );
+            }
 
-                const createdAt = order.created_at
-                    ? new Date(order.created_at).toLocaleString()
-                    : "-";
+            titleElement.textContent = title;
+            descriptionElement.textContent = description;
+            countElement.textContent = String(orders.length);
 
-                return `
-                    <tr>
-                        <td>#${id}</td>
-                        <td>${escapeHtml(tableName)}</td>
-                        <td>${escapeHtml(order.status || "-")}</td>
-                        <td>${money(order.total_price)}</td>
-                        <td>${escapeHtml(createdAt)}</td>
-                    </tr>
-                `;
-            }).join("");
+            errorElement.textContent = "";
+            errorElement.hidden = true;
+
+            ordersContainer.replaceChildren();
+
+            orders.forEach((order) => {
+                const row = document.createElement("tr");
+
+                const values = [
+                    `#${Number(order.id)}`,
+                    order.table?.name || "-",
+                    order.status || "-",
+                    money(order.total_price),
+                    order.created_at
+                        ? new Date(order.created_at).toLocaleString()
+                        : "-",
+                ];
+
+                values.forEach((value) => {
+                    const cell = document.createElement("td");
+                    cell.textContent = String(value);
+                    row.appendChild(cell);
+                });
+
+                ordersContainer.appendChild(row);
+            });
 
             modalConfirmCallback = onConfirm;
-
             modal.hidden = false;
+
             document.body.classList.add("vm-order-modal-open");
 
             modal.querySelector('[aria-label="Close dialog"]')?.focus();
         }
 
         function closeConfirmModal(force = false) {
-            const modal = document.querySelector(
-                "[data-order-confirm-modal]"
-            );
+            const modal = getConfirmModal();
 
             if (!modal || (modalIsProcessing && !force)) {
                 return;
@@ -401,7 +353,6 @@
                 ].join("-");
             };
 
-            // Day
             if (type === "day") {
                 if (!dateInput.value) {
                     throw new Error("Please select a date.");
@@ -413,7 +364,6 @@
                 };
             }
 
-            // Week: ISO week, Monday to Sunday
             if (type === "week") {
                 if (!weekInput.value) {
                     throw new Error("Please select a week.");
@@ -432,7 +382,6 @@
                     throw new Error("Please select a valid week.");
                 }
 
-                // ISO week 1 is the week containing January 4.
                 const jan4 = new Date(year, 0, 4);
                 const monday = new Date(jan4);
                 const dayOfWeek = jan4.getDay() || 7;
@@ -444,7 +393,6 @@
                 const sunday = new Date(monday);
                 sunday.setDate(monday.getDate() + 6);
 
-                // Validate the selected ISO week-year.
                 const thursday = new Date(monday);
                 thursday.setDate(monday.getDate() + 3);
 
@@ -458,7 +406,6 @@
                 };
             }
 
-            // Month
             if (type === "month") {
                 if (!monthInput.value) {
                     throw new Error("Please select a month.");
@@ -485,7 +432,6 @@
                 };
             }
 
-            // Year
             if (type === "year") {
                 const value = yearInput.value.trim();
                 const year = Number(value);
@@ -511,7 +457,7 @@
         // API: Load Orders
         // ---------------------------------------------------------------------
 
-        function buildRequestData(page, range = null, perPage = 20) {
+        function buildRequestData(page, range = null, perPage = 100) {
             const formData = new FormData();
 
             formData.append("action", "vm_external_get_orders");
@@ -573,7 +519,6 @@
 
             let range = null;
 
-            // Skip date validation when searching by Order ID.
             if (!orderId) {
                 try {
                     range = getDateRange();
@@ -657,15 +602,10 @@
                         </td>
 
                         <td>#${orderId}</td>
-
                         <td>${escapeHtml(tableName)}</td>
-
                         <td>${escapeHtml(order.status || "-")}</td>
-
                         <td>${itemsCount}</td>
-
                         <td>${money(order.total_price)}</td>
-
                         <td>${escapeHtml(createdAt)}</td>
                     </tr>
                 `;
@@ -720,7 +660,6 @@
 
             let html = "";
 
-            // Previous
             if (current > 1) {
                 html += `
                     <button
@@ -732,7 +671,6 @@
                 `;
             }
 
-            // Page numbers
             for (let i = 1; i <= last; i++) {
                 if (
                     i === 1 ||
@@ -751,7 +689,6 @@
                 }
             }
 
-            // Next
             if (current < last) {
                 html += `
                     <button
@@ -771,6 +708,8 @@
         // ---------------------------------------------------------------------
 
         function injectDeleteControls() {
+            // Toolbar is rendered by toolbar.php.
+            // Keep this fallback for backward compatibility.
             if (!app.querySelector("[data-delete-toolbar]")) {
                 const toolbar = document.createElement("div");
 
@@ -807,6 +746,8 @@
                 ordersTable.parentNode.insertBefore(toolbar, ordersTable);
             }
 
+            // Checkbox column is rendered by orders-table.php.
+            // Keep this fallback for older templates.
             const headerRow = ordersTable.querySelector("thead tr");
 
             if (
@@ -902,7 +843,6 @@
             formData.append("action", action);
             formData.append("nonce", apiConfig.nonce);
 
-            // Keep the same filter priority as the list.
             if (orderId) {
                 formData.append("order_id", orderId);
             } else {
@@ -951,7 +891,6 @@
         }
 
         async function deleteOrdersByIds(ids) {
-            // Laravel endpoint giới hạn tối đa 100 ID mỗi request.
             const chunkSize = 100;
             let deletedCount = 0;
 
@@ -1010,7 +949,6 @@
 
                         selectedOrderIds.clear();
 
-                        // Cho phép đóng modal sau khi xóa thành công.
                         closeConfirmModal(true);
 
                         isDeleting = false;
@@ -1065,7 +1003,6 @@
             clearMessage();
 
             try {
-                // Fetch all matching pages before selecting random orders.
                 const firstPageResponse = await requestOrders(
                     buildRequestData(1, range, 100)
                 );
@@ -1100,7 +1037,6 @@
                     ];
                 }
 
-                // Approximately 30%, at least one if orders exist.
                 const deleteCount = Math.max(
                     1,
                     Math.round(allOrders.length * 0.3)
@@ -1112,7 +1048,6 @@
                     (order) => Number(order.id)
                 );
 
-                // Stop loading before showing the modal.
                 isLoading = false;
                 showLoading(false);
 
@@ -1136,7 +1071,6 @@
 
                             selectedOrderIds.clear();
 
-                            // Cho phép đóng modal sau khi xóa thành công.
                             closeConfirmModal(true);
 
                             isDeleting = false;
@@ -1189,7 +1123,6 @@
                 loadOrders(1);
             });
 
-            // Search Order ID.
             if (searchOrderButton && orderIdInput) {
                 searchOrderButton.addEventListener("click", (event) => {
                     event.preventDefault();
@@ -1198,7 +1131,6 @@
                 });
             }
 
-            // Press Enter in Order ID input.
             if (orderIdInput) {
                 orderIdInput.addEventListener("keydown", (event) => {
                     if (event.key !== "Enter") {
@@ -1211,7 +1143,6 @@
                 });
             }
 
-            // Clear Order ID.
             if (clearOrderButton && orderIdInput) {
                 clearOrderButton.addEventListener("click", (event) => {
                     event.preventDefault();
@@ -1224,11 +1155,14 @@
                 });
             }
 
-            // Select or deselect an individual order.
             tbody.addEventListener("change", (event) => {
-                const checkbox = event.target.closest(
-                    "[data-order-checkbox]"
-                );
+                const target = event.target;
+
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const checkbox = target.closest("[data-order-checkbox]");
 
                 if (!checkbox) {
                     return;
@@ -1249,9 +1183,14 @@
                 updateDeleteControls();
             });
 
-            // Select all orders on the current page.
             app.addEventListener("change", (event) => {
-                const selectAll = event.target.closest("[data-select-all]");
+                const target = event.target;
+
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const selectAll = target.closest("[data-select-all]");
 
                 if (!selectAll) {
                     return;
@@ -1272,23 +1211,33 @@
                 updateDeleteControls();
             });
 
-            // Delete buttons.
             app.addEventListener("click", (event) => {
-                if (event.target.closest("[data-delete-selected]")) {
+                const target = event.target;
+
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                if (target.closest("[data-delete-selected]")) {
                     event.preventDefault();
                     deleteSelectedOrders();
                     return;
                 }
 
-                if (event.target.closest("[data-delete-random]")) {
+                if (target.closest("[data-delete-random]")) {
                     event.preventDefault();
                     deleteRandomOrders();
                 }
             });
 
-            // Pagination.
             pagination.addEventListener("click", (event) => {
-                const button = event.target.closest("[data-page]");
+                const target = event.target;
+
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const button = target.closest("[data-page]");
 
                 if (!button || isLoading || isDeleting) {
                     return;
@@ -1309,7 +1258,7 @@
         // ---------------------------------------------------------------------
 
         injectDeleteControls();
-        injectConfirmModal();
+        bindConfirmModalEvents();
         setDefaultDates();
         updateFilterFields();
         bindEvents();
