@@ -146,3 +146,22 @@ add_action('init', function () {
 		$role->add_cap('manage_categories');
 	}
 });
+
+
+
+/**
+ * Register custom WordPress user role.
+ */
+function vm_register_tour_manager_role()
+{
+	add_role(
+		'accountant', // Role slug
+		'Accountant', // Display name
+		array(
+			'read' => true,
+			'edit_posts' => true,
+			'upload_files' => true,
+		)
+	);
+}
+add_action('init', 'vm_register_tour_manager_role');
