@@ -48,8 +48,7 @@ if (!defined('ABSPATH')) {
             </div>
 
             <p class="vm-order-modal__warning">
-                This action permanently deletes the listed orders
-                and cannot be undone.
+                Hành động này sẽ xóa vĩnh viễn các đơn hàng được liệt kê và không thể khôi phục.
             </p>
 
             <p class="vm-order-modal__error" data-modal-error role="alert" hidden></p>

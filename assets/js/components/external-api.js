@@ -936,8 +936,8 @@
             });
 
             openConfirmModal(
-                "Delete selected orders",
-                "Review the orders below before confirming deletion.",
+                "Xóa đơn hàng đã chọn",
+                "Vui lòng xem lại các đơn hàng dưới đây trước khi xác nhận xóa.",
                 orders,
                 async () => {
                     isDeleting = true;
@@ -956,12 +956,11 @@
                         await loadOrders(1);
 
                         showMessage(
-                            `Successfully deleted ${deletedCount} order(s).`,
-                            "success"
+                            `Đã xóa thành công ${deletedCount} đơn hàng.`
                         );
                     } catch (error) {
                         showMessage(
-                            error.message || "Unable to delete orders."
+                            error.message || "Không thể xóa đơn hàng."
                         );
 
                         throw error;
@@ -1056,8 +1055,8 @@
                     : `${range.date_from} to ${range.date_to}`;
 
                 openConfirmModal(
-                    "Delete random 30% of orders",
-                    `Filter: ${filterDescription}. Review the exact orders selected for deletion.`,
+                    "Xóa ngẫu nhiên 30% đơn hàng",
+                    `Lọc: ${filterDescription}. Vui lòng xem lại các đơn hàng đã chọn để xóa.`,
                     ordersToDelete,
                     async () => {
                         isDeleting = true;
@@ -1078,12 +1077,11 @@
                             await loadOrders(1);
 
                             showMessage(
-                                `Successfully deleted ${deletedCount} order(s).`,
-                                "success"
+                                `Đã xóa thành công ${deletedCount} đơn hàng.`
                             );
                         } catch (error) {
                             showMessage(
-                                error.message || "Unable to delete orders."
+                                error.message || "Không thể xóa đơn hàng."
                             );
 
                             throw error;
