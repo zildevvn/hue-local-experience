@@ -30,7 +30,7 @@ if (!defined('ABSPATH')) {
             <tr>
                 <td colspan="7" class="vm-api-empty">
                     Select a period and click
-                    <strong>Call API</strong>.
+                    <strong>Get Data</strong>.
                 </td>
             </tr>
         </tbody>

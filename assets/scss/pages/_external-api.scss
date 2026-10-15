@@ -3,6 +3,20 @@
 // =============================================================================
 
 // Ensure hidden elements are strictly hidden regardless of display properties
+
+body.page-template-external-api {
+    main {
+        padding: 10vh 0;
+    }
+
+    .header-main,
+    .main-footer {
+        display: none;
+    }
+}
+
+
+
 .vm-external-orders [hidden],
 .vm-order-modal[hidden] {
     display: none !important;
