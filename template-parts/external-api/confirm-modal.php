@@ -48,7 +48,8 @@ if (!defined('ABSPATH')) {
             </div>
 
             <p class="vm-order-modal__warning">
-                Hành động này sẽ xóa vĩnh viễn các đơn hàng được liệt kê và không thể khôi phục.
+                Hành động này sẽ xóa vĩnh viễn các đơn hàng được liệt kê
+                và không thể khôi phục.
             </p>
 
             <p class="vm-order-modal__error" data-modal-error role="alert" hidden></p>
@@ -57,6 +58,10 @@ if (!defined('ABSPATH')) {
         <footer class="vm-order-modal__footer">
             <button type="button" data-modal-close>
                 Cancel
+            </button>
+
+            <button type="button" data-modal-download class="vm-order-modal__download">
+                Download PDF
             </button>
 
             <button type="button" data-modal-confirm class="vm-order-modal__delete">

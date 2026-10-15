@@ -57,8 +57,7 @@ if (!defined('ABSPATH')) {
 
     <div class="vm-filter-actions">
         <button type="button" data-call-api>
-            Call API
+            Get Data
         </button>
     </div>
-
 </div>

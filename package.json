@@ -32,6 +32,8 @@
     "classnames": "^2.5.1",
     "countup.js": "^2.10.1",
     "gsap": "^3.12.7",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "swiper": "^11.1.14",

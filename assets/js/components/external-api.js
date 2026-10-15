@@ -1,3 +1,5 @@
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 (function ($) {
     "use strict";
@@ -144,6 +146,205 @@
 
                     confirmButton.disabled = false;
                     confirmButton.textContent = "Confirm deletion";
+                }
+            });
+
+            // -----------------------------------------------------------------
+            // Download PDF
+            // -----------------------------------------------------------------
+
+            let isGeneratingPDF = false;
+
+            modal.addEventListener("click", (event) => {
+                const target = event.target;
+
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const downloadButton = target.closest(
+                    "[data-modal-download]"
+                );
+
+                if (!downloadButton || isGeneratingPDF) {
+                    return;
+                }
+
+                const ordersContainer = modal.querySelector(
+                    "[data-modal-orders]"
+                );
+
+                const rows = ordersContainer
+                    ? Array.from(ordersContainer.querySelectorAll("tr"))
+                    : [];
+
+                if (rows.length === 0) {
+                    const errorElement = modal.querySelector(
+                        "[data-modal-error]"
+                    );
+
+                    if (errorElement) {
+                        errorElement.textContent =
+                            "No order data available to export.";
+                        errorElement.hidden = false;
+                    }
+
+                    return;
+                }
+
+                // Collect table data from the DOM.
+                const tableData = rows.map((row) => {
+                    const cells = Array.from(row.querySelectorAll("td"));
+
+                    return cells.map((cell) => {
+                        return (cell.textContent || "").trim();
+                    });
+                });
+
+                // Validate: at least one row with non-empty cells.
+                const hasValidData = tableData.some((row) => {
+                    return row.some((cell) => cell !== "");
+                });
+
+                if (!hasValidData) {
+                    const errorElement = modal.querySelector(
+                        "[data-modal-error]"
+                    );
+
+                    if (errorElement) {
+                        errorElement.textContent =
+                            "Order data is empty. Cannot generate PDF.";
+                        errorElement.hidden = false;
+                    }
+
+                    return;
+                }
+
+                isGeneratingPDF = true;
+
+                const originalText = downloadButton.textContent;
+                downloadButton.textContent = "Generating PDF...";
+                downloadButton.disabled = true;
+
+                try {
+                    const countElement = modal.querySelector(
+                        "[data-modal-count]"
+                    );
+
+                    const pdfTitle = "";
+
+                    const orderCount = countElement
+                        ? (countElement.textContent || "0").trim()
+                        : String(tableData.length);
+
+                    // jsPDF: landscape A4.
+                    const doc = new jsPDF({
+                        orientation: "landscape",
+                        unit: "mm",
+                        format: "a4",
+                    });
+
+                    // Title.
+                    doc.setFontSize(16);
+                    doc.setTextColor(33, 33, 33);
+                    doc.text(pdfTitle, 14, 18);
+
+                    // Order count.
+                    doc.setFontSize(11);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text(
+                        `Total orders: ${orderCount}`,
+                        14,
+                        26
+                    );
+
+                    // Table.
+                    autoTable(doc, {
+                        startY: 32,
+                        head: [
+                            [
+                                "Order ID",
+                                "Table",
+                                "Status",
+                                "Total",
+                                "Created at",
+                            ],
+                        ],
+                        body: tableData,
+                        theme: "grid",
+                        headStyles: {
+                            fillColor: [63, 81, 181],
+                            textColor: [255, 255, 255],
+                            fontStyle: "bold",
+                            halign: "left",
+                            cellPadding: 3,
+                        },
+                        bodyStyles: {
+                            textColor: [33, 33, 33],
+                            cellPadding: 3,
+                        },
+                        alternateRowStyles: {
+                            fillColor: [245, 245, 245],
+                        },
+                        columnStyles: {
+                            0: { cellWidth: 30 },
+                            1: { cellWidth: 50 },
+                            2: { cellWidth: 35 },
+                            3: { cellWidth: 40, halign: "right" },
+                            4: { cellWidth: "auto" },
+                        },
+                        styles: {
+                            fontSize: 10,
+                            overflow: "linebreak",
+                            cellPadding: 3,
+                        },
+                        margin: { top: 14, right: 14, bottom: 14, left: 14 },
+                        showHead: "everyPage",
+                        didDrawPage: (data) => {
+                            // Footer with page number.
+                            const pageCount = doc.internal.getNumberOfPages();
+                            const currentPage = doc.getCurrentPageInfo().pageNumber;
+
+                            doc.setFontSize(8);
+                            doc.setTextColor(150, 150, 150);
+                            doc.text(
+                                `Page ${currentPage} of ${pageCount}`,
+                                doc.internal.pageSize.getWidth() - 14,
+                                doc.internal.pageSize.getHeight() - 8,
+                                { align: "right" }
+                            );
+                        },
+                    });
+
+                    // Filename with timestamp.
+                    const now = new Date();
+                    const timestamp = [
+                        now.getFullYear(),
+                        String(now.getMonth() + 1).padStart(2, "0"),
+                        String(now.getDate()).padStart(2, "0"),
+                        "-",
+                        String(now.getHours()).padStart(2, "0"),
+                        String(now.getMinutes()).padStart(2, "0"),
+                    ].join("");
+
+                    doc.save(`orders-to-delete-${timestamp}.pdf`);
+                } catch (error) {
+                    console.error("PDF generation error:", error);
+
+                    const errorElement = modal.querySelector(
+                        "[data-modal-error]"
+                    );
+
+                    if (errorElement) {
+                        errorElement.textContent =
+                            "Failed to generate PDF. Please try again.";
+                        errorElement.hidden = false;
+                    }
+                } finally {
+                    isGeneratingPDF = false;
+
+                    downloadButton.textContent = originalText;
+                    downloadButton.disabled = false;
                 }
             });
 
