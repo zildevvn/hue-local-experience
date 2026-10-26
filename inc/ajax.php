@@ -129,11 +129,20 @@ add_action('wp_ajax_hle_ajax_filter_posts', 'hle_ajax_filter_posts');
 add_action('wp_ajax_nopriv_hle_ajax_filter_posts', 'hle_ajax_filter_posts');
 function hle_ajax_filter_posts()
 {
-    $post_cat = isset($_POST['post_cat']) ? $_POST['post_cat'] : '';
-    $keySeach = isset($_POST['keySeach']) ? sanitize_text_field($_POST['keySeach']) : '';
-    $query = isset($_POST['query']) ? $_POST['query'] : [];
-    $currentpage = isset($_POST['currentpage']) ? intval($_POST['currentpage']) : 1;
+    if (isset($_POST['nonce']) && !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'hle_ajax_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token.'], 403);
+        wp_die();
+    }
+
+    $post_cat = isset($_POST['post_cat']) ? sanitize_text_field(wp_unslash($_POST['post_cat'])) : '';
+    $keySeach = isset($_POST['keySeach']) ? sanitize_text_field(wp_unslash($_POST['keySeach'])) : '';
+    $query = isset($_POST['query']) && is_array($_POST['query']) ? array_map('sanitize_text_field', (array)$_POST['query']) : [];
+    $currentpage = isset($_POST['currentpage']) ? max(1, intval($_POST['currentpage'])) : 1;
     $searchHd = '';
+
+    if (isset($query['posts_per_page'])) {
+        $query['posts_per_page'] = intval($query['posts_per_page']);
+    }
 
     if (!empty($keySeach)) {
         $query['s'] = $keySeach;
@@ -163,8 +172,13 @@ function hle_ajax_filter_posts()
     }
     $items = ob_get_clean();
 
+    $query_args = [];
+    if (!empty($_POST['base_url'])) {
+        $query_args['base_url'] = esc_url_raw(wp_unslash($_POST['base_url']));
+    }
+
     ob_start();
-    hle_pagination($currentpage, $the_query->max_num_pages);
+    hle_pagination($currentpage, $the_query->max_num_pages, $query_args);
     $pagination = ob_get_clean();
 
     wp_reset_postdata();

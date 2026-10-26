@@ -1,7 +1,9 @@
 <?php
+$paged = get_query_var('paged') ? get_query_var('paged') : (get_query_var('page') ? get_query_var('page') : 1);
 $args = array(
     'post_type' => 'post',
     'posts_per_page' => 12,
+    'paged' => $paged,
     'post_status' => 'publish',
 );
 $query = new WP_Query($args);
@@ -83,7 +85,7 @@ $query = new WP_Query($args);
                     </div>
 
                     <div id="hle-posts-results" class="post-grid" data-query='<?= json_encode($args) ?>'
-                        data-currentpage="1">
+                        data-currentpage="<?= esc_attr($paged) ?>">
                         <?php while ($query->have_posts()):
                             $query->the_post();
                             hle_post_item();
@@ -93,7 +95,7 @@ $query = new WP_Query($args);
                 </div>
 
                 <div id="hle-posts-pagination">
-                    <?php hle_pagination($query->query_vars['paged'] ?: 1, $query->max_num_pages); ?>
+                    <?php hle_pagination($paged, $query->max_num_pages); ?>
                 </div>
 
                 <div id="hle-posts-empty" style="display: none;">

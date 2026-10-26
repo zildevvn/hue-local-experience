@@ -15,6 +15,7 @@ add_action('wp_enqueue_scripts', function () {
 		'ajax_url' => admin_url('admin-ajax.php'),
 		'site_url' => site_url(),
 		'rest_url' => get_rest_url(),
+		'nonce' => wp_create_nonce('hle_ajax_nonce'),
 	]);
 
 	wp_localize_script('theme-scripts', 'themeData', [

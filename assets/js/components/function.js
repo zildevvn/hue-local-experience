@@ -789,7 +789,14 @@ import { CountUp } from 'countup.js';
 
         paginationElement.on('click', '.page-numbers:not(.disabled):not(.current)', function (e) {
             e.preventDefault();
-            const selectedPage = parseInt($(this).attr('data-page'));
+            let selectedPage = parseInt($(this).attr('data-page'));
+            if (isNaN(selectedPage)) {
+                const href = $(this).attr('href') || '';
+                const match = href.match(/(?:page\/|paged=)(\d+)/);
+                if (match) {
+                    selectedPage = parseInt(match[1]);
+                }
+            }
             if (!isNaN(selectedPage)) {
                 currentPage = selectedPage;
                 triggerSearch(false);
@@ -898,7 +905,7 @@ import { CountUp } from 'countup.js';
 
         let searchTimeout;
         let currentAjaxRequest = null;
-        let currentPage = 1;
+        let currentPage = parseInt(resultsElement.data('currentpage')) || 1;
 
         function updateClearFiltersVisibility(searchVal, catVal) {
             const isSearchActive = searchVal !== '';
@@ -911,25 +918,58 @@ import { CountUp } from 'countup.js';
             }
         }
 
-        function triggerSearch(resetPage = true) {
+        const syncUrl = (page, catVal, searchVal) => {
+            const newUrl = new URL(window.location.href);
+
+            if (page > 1) {
+                newUrl.searchParams.set('paged', page);
+            } else {
+                newUrl.searchParams.delete('paged');
+            }
+
+            if (catVal && catVal !== 'all') {
+                newUrl.searchParams.set('post_cat', catVal);
+            } else {
+                newUrl.searchParams.delete('post_cat');
+            }
+
+            if (searchVal) {
+                newUrl.searchParams.set('s', searchVal);
+            } else {
+                newUrl.searchParams.delete('s');
+            }
+
+            window.history.pushState({ paged: page, post_cat: catVal, s: searchVal }, '', newUrl.toString());
+        };
+
+        function executeFilter(resetPage = false, updateHistory = true) {
             if (resetPage) {
                 currentPage = 1;
             }
-
             clearTimeout(searchTimeout);
 
+            const searchVal = fieldSearch.val().trim();
+            const catVal = $isBlock.find('input[name="post_cat"]:checked').val() || 'all';
+
+            updateClearFiltersVisibility(searchVal, catVal);
+
+            if (updateHistory) {
+                syncUrl(currentPage, catVal, searchVal);
+            }
+
+            __ajax_filter({
+                keySeach: searchVal,
+                post_cat: catVal,
+                query: query,
+                currentpage: currentPage,
+                base_url: window.location.href.split('?')[0]
+            });
+        }
+
+        function triggerDebouncedSearch() {
+            clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                const searchVal = fieldSearch.val().trim();
-                const catVal = $isBlock.find('input[name="post_cat"]:checked').val();
-
-                updateClearFiltersVisibility(searchVal, catVal);
-
-                __ajax_filter({
-                    keySeach: searchVal,
-                    post_cat: catVal,
-                    query: query,
-                    currentpage: currentPage
-                });
+                executeFilter(true, true);
             }, 500);
         }
 
@@ -979,7 +1019,7 @@ import { CountUp } from 'countup.js';
         $catRadios.on('change', () => {
             updateDropdownLabel();
             closeDropdown();
-            triggerSearch(true);
+            executeFilter(true, true);
         });
 
         $clearFiltersBtn.on('click', function (e) {
@@ -990,18 +1030,58 @@ import { CountUp } from 'countup.js';
             $isBlock.find('input[name="post_cat"][value="all"]').prop('checked', true);
             updateDropdownLabel();
 
-            triggerSearch(true);
+            executeFilter(true, true);
         });
 
-        fieldSearch.on('input', () => triggerSearch(true));
+        fieldSearch.on('input', () => triggerDebouncedSearch());
 
         paginationElement.on('click', '.page-numbers:not(.disabled):not(.current)', function (e) {
             e.preventDefault();
-            const selectedPage = parseInt($(this).attr('data-page'));
-            if (!isNaN(selectedPage)) {
-                currentPage = selectedPage;
-                triggerSearch(false);
+            let selectedPage = parseInt($(this).attr('data-page'));
+            if (isNaN(selectedPage)) {
+                const href = $(this).attr('href') || '';
+                const match = href.match(/(?:page\/|paged=)(\d+)/);
+                if (match) {
+                    selectedPage = parseInt(match[1]);
+                }
             }
+
+            if (!isNaN(selectedPage) && selectedPage !== currentPage) {
+                currentPage = selectedPage;
+                executeFilter(false, true);
+            }
+        });
+
+        // Handle popstate (Back/Forward browser buttons)
+        $(window).on('popstate', function (e) {
+            const state = e.originalEvent.state;
+            const urlParams = new URLSearchParams(window.location.search);
+
+            let page = 1;
+            let catVal = 'all';
+            let searchVal = '';
+
+            if (state) {
+                page = parseInt(state.paged) || 1;
+                catVal = state.post_cat || 'all';
+                searchVal = state.s || '';
+            } else {
+                page = parseInt(urlParams.get('paged')) || 1;
+                catVal = urlParams.get('post_cat') || 'all';
+                searchVal = urlParams.get('s') || '';
+            }
+
+            fieldSearch.val(searchVal);
+            const $targetRadio = $isBlock.find(`input[name="post_cat"][value="${catVal}"]`);
+            if ($targetRadio.length) {
+                $targetRadio.prop('checked', true);
+            } else {
+                $isBlock.find('input[name="post_cat"][value="all"]').prop('checked', true);
+            }
+            updateDropdownLabel();
+
+            currentPage = page;
+            executeFilter(false, false);
         });
 
         function __ajax_filter(val = {}) {
@@ -1020,6 +1100,7 @@ import { CountUp } from 'countup.js';
                     dataType: "json",
                     data: {
                         action: "hle_ajax_filter_posts",
+                        nonce: php_data.nonce || '',
                         ...val
                     },
                     success: function (data) {
@@ -1030,7 +1111,7 @@ import { CountUp } from 'countup.js';
                         resultsElement.html(data.items);
                         paginationElement.html(data.pagination);
 
-                        if (data.items.trim() === '') {
+                        if (!data.items || data.items.trim() === '') {
                             $('#hle-posts-empty').show();
                             $isBlock.find('.posts-main__header').hide();
                         } else {
@@ -1045,10 +1126,11 @@ import { CountUp } from 'countup.js';
                             }, 600);
                         }
                     },
-
-                    complete: function () {
-                        currentAjaxRequest = null;
-                        $contentWrapper.removeClass('is-loading');
+                    complete: function (jqXHR, textStatus) {
+                        if (textStatus !== 'abort') {
+                            currentAjaxRequest = null;
+                            $contentWrapper.removeClass('is-loading');
+                        }
                     }
                 });
 
@@ -1057,6 +1139,27 @@ import { CountUp } from 'countup.js';
                 $contentWrapper.removeClass('is-loading');
             }
         }
+
+        // Initialize state on page load
+        const initUrlParams = new URLSearchParams(window.location.search);
+        let initCat = initUrlParams.get('post_cat');
+        let initSearch = initUrlParams.get('s');
+        if (initCat) {
+            const $targetRadio = $isBlock.find(`input[name="post_cat"][value="${initCat}"]`);
+            if ($targetRadio.length) {
+                $targetRadio.prop('checked', true);
+                updateDropdownLabel();
+            }
+        }
+        if (initSearch) {
+            fieldSearch.val(initSearch);
+        }
+        updateClearFiltersVisibility(fieldSearch.val().trim(), $isBlock.find('input[name="post_cat"]:checked').val() || 'all');
+        window.history.replaceState({
+            paged: currentPage,
+            post_cat: $isBlock.find('input[name="post_cat"]:checked').val() || 'all',
+            s: fieldSearch.val().trim()
+        }, '', window.location.href);
     }
 
     /**
@@ -1271,7 +1374,14 @@ import { CountUp } from 'countup.js';
 
         paginationElement.on('click', '.page-numbers:not(.disabled):not(.current)', function (e) {
             e.preventDefault();
-            const selectedPage = parseInt($(this).attr('data-page'));
+            let selectedPage = parseInt($(this).attr('data-page'));
+            if (isNaN(selectedPage)) {
+                const href = $(this).attr('href') || '';
+                const match = href.match(/(?:page\/|paged=)(\d+)/);
+                if (match) {
+                    selectedPage = parseInt(match[1]);
+                }
+            }
             if (!isNaN(selectedPage)) {
                 currentPage = selectedPage;
                 __ajax_filter({

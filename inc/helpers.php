@@ -39,40 +39,86 @@ if (!function_exists('hle_pagination')) {
 
 		$paged = get_query_var('paged') ? get_query_var('paged') : (get_query_var('page') ? get_query_var('page') : 1);
 		$current_page = $current_page ? max(1, intval($current_page)) : max(1, intval($paged));
-		$total_pages = $total_pages ? intval($total_pages) : $wp_query->max_num_pages;
+		$total_pages = $total_pages ? intval($total_pages) : intval($wp_query->max_num_pages);
 
 		if ($total_pages < 2) {
 			return;
 		}
 
-		$pagenum_link = html_entity_decode(get_pagenum_link());
-		$url_parts = explode('?', $pagenum_link);
+		// Determine base URL (clean referer in AJAX or current pagenum link)
+		$base_url = '';
+		if (!empty($query_args['base_url'])) {
+			$base_url = $query_args['base_url'];
+			unset($query_args['base_url']);
+		} elseif (wp_doing_ajax()) {
+			$referer = wp_get_referer();
+			if ($referer && strpos($referer, 'admin-ajax.php') === false) {
+				// Strip existing /page/X/ and paged query argument from referer
+				$clean_referer = preg_replace('#/page/\d+/?#', '/', $referer);
+				$clean_referer = remove_query_arg('paged', $clean_referer);
+				$base_url = $clean_referer;
+			}
+		}
+
+		if (empty($base_url)) {
+			$base_url = html_entity_decode(get_pagenum_link(1));
+		}
+
+		$url_parts = explode('?', $base_url);
 		$existing_args = [];
 		if (isset($url_parts[1])) {
 			wp_parse_str($url_parts[1], $existing_args);
 		}
 
 		$merged_args = array_merge($existing_args, $query_args);
-		$pagenum_link = remove_query_arg(array_keys($existing_args), $pagenum_link);
+		$pagenum_link = remove_query_arg(array_keys($existing_args), $base_url);
 		$pagenum_link = trailingslashit($pagenum_link) . '%_%';
 
 		$format = $wp_rewrite->using_index_permalinks() && !strpos($pagenum_link, 'index.php') ? 'index.php/' : '';
 		$format .= $wp_rewrite->using_permalinks() ? user_trailingslashit('page/%#%', 'paged') : '?paged=%#%';
 
-		$links = paginate_links([
+		$links_array = paginate_links([
 			'base' => $pagenum_link,
 			'format' => $format,
 			'current' => $current_page,
 			'total' => $total_pages,
-			'type' => 'list',
+			'type' => 'array',
 			'prev_text' => hle_svg_icon('arrow_prev') ? hle_svg_icon('arrow_prev') : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>',
 			'next_text' => hle_svg_icon('arrow_next') ? hle_svg_icon('arrow_next') : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>',
 			'add_args' => $merged_args,
 		]);
 
-		if ($links) {
+		if (!empty($links_array)) {
 			echo '<nav class="hle-pagination" aria-label="Pagination">';
-			echo $links;
+			echo "<ul class='page-numbers'>\n";
+
+			foreach ($links_array as $link) {
+				$page_num = null;
+
+				if (strpos($link, 'prev page-numbers') !== false) {
+					$page_num = max(1, $current_page - 1);
+				} elseif (strpos($link, 'next page-numbers') !== false) {
+					$page_num = min($total_pages, $current_page + 1);
+				} elseif (strpos($link, 'current') !== false) {
+					$page_num = $current_page;
+				} elseif (strpos($link, 'dots') !== false) {
+					$page_num = null;
+				} else {
+					if (preg_match('/>\s*(\d+)\s*</', $link, $matches)) {
+						$page_num = intval($matches[1]);
+					} elseif (preg_match('/(?:page\/|paged=)(\d+)/', $link, $matches)) {
+						$page_num = intval($matches[1]);
+					}
+				}
+
+				if ($page_num !== null) {
+					$link = preg_replace('/<(a|span)\s+/', '<$1 data-page="' . esc_attr($page_num) . '" ', $link, 1);
+				}
+
+				echo "\t<li>" . $link . "</li>\n";
+			}
+
+			echo "</ul>\n";
 			echo '</nav>';
 		}
 	}
