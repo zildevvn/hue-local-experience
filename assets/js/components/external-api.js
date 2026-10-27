@@ -114,6 +114,108 @@
             return null;
         }
 
+        function parseApiDate(dateStr) {
+            if (!dateStr || typeof dateStr !== "string") return null;
+            const trimmed = dateStr.trim();
+            if (!trimmed) return null;
+
+            let normalized = trimmed;
+            if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\.\d+)?$/.test(normalized)) {
+                normalized = normalized.replace(" ", "T") + "Z";
+            }
+
+            const d = new Date(normalized);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function getOrderPaidTime(order) {
+            if (!order) return null;
+
+            // 1. Explicit paid_at / payment_time fields if backend provides them
+            if (order.paid_at) return order.paid_at;
+            if (order.payment_time) return order.payment_time;
+
+            // 2. Actual payment transaction time from payments array
+            if (Array.isArray(order.payments) && order.payments.length > 0) {
+                let latestTimeMs = -1;
+                let latestDateStr = null;
+
+                for (const payment of order.payments) {
+                    const timeStr = payment?.created_at || payment?.updated_at;
+                    if (timeStr) {
+                        const parsed = parseApiDate(timeStr);
+                        if (parsed) {
+                            const ms = parsed.getTime();
+                            if (ms > latestTimeMs) {
+                                latestTimeMs = ms;
+                                latestDateStr = timeStr;
+                            }
+                        }
+                    }
+                }
+
+                if (latestDateStr) {
+                    return latestDateStr;
+                }
+            }
+
+            // 3. Fallback: completed_at (when order was marked completed)
+            if (order.completed_at) {
+                return order.completed_at;
+            }
+
+            return null;
+        }
+
+        function isPaidBeforeOrAt16VN(dateInput) {
+            if (!dateInput) return false;
+            const date = dateInput instanceof Date ? dateInput : parseApiDate(dateInput);
+            if (!date || isNaN(date.getTime())) return false;
+
+            try {
+                const parts = new Intl.DateTimeFormat("en-GB", {
+                    timeZone: "Asia/Ho_Chi_Minh",
+                    hour12: false,
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric",
+                }).formatToParts(date);
+
+                let hour = 0;
+                let minute = 0;
+                let second = 0;
+
+                for (const p of parts) {
+                    if (p.type === "hour") hour = parseInt(p.value, 10);
+                    if (p.type === "minute") minute = parseInt(p.value, 10);
+                    if (p.type === "second") second = parseInt(p.value, 10);
+                }
+
+                if (hour === 24) hour = 0;
+
+                // Paid between 00:00:00 and 16:00:00 inclusive in Asia/Ho_Chi_Minh
+                if (hour < 16) return true;
+                if (hour === 16 && minute === 0 && second === 0) return true;
+                return false;
+            } catch {
+                // Fallback: UTC+7
+                const vnDate = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+                const h = vnDate.getUTCHours();
+                const m = vnDate.getUTCMinutes();
+                const s = vnDate.getUTCSeconds();
+
+                if (h < 16) return true;
+                if (h === 16 && m === 0 && s === 0) return true;
+                return false;
+            }
+        }
+
+        function isOrderPaidBeforeOrAt16(order) {
+            const paidTime = getOrderPaidTime(order);
+            if (!paidTime) return false;
+            return isPaidBeforeOrAt16VN(paidTime);
+        }
+
         // ---------------------------------------------------------------------
         // UI Helpers
         // ---------------------------------------------------------------------
@@ -1071,7 +1173,14 @@
                     `
                     : "";
 
-                const rowClassAttr = isSplit ? ' class="vm-api-table__row--split"' : "";
+                const rowClasses = [];
+                if (isSplit) {
+                    rowClasses.push("vm-api-table__row--split");
+                }
+                if (isOrderPaidBeforeOrAt16(order)) {
+                    rowClasses.push("vm-api-table__row--paid-before-16");
+                }
+                const rowClassAttr = rowClasses.length > 0 ? ` class="${rowClasses.join(" ")}"` : "";
 
                 const orderIdCellContent = isSplit
                     ? `

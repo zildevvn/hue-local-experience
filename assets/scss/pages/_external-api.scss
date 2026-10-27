@@ -558,16 +558,14 @@ body.page-template-external-api {
             background-color: #f8fafc;
         }
 
-        &.vm-api-table__row--split {
-            background-color: #fffdf5;
-
-            &:hover {
-                background-color: #fefcf0;
-            }
-
-            td {
-                cursor: default;
-            }
+        &.vm-api-table__row--split,
+        &.vm-api-table__row--paid-before-16 {
+            position: absolute;
+            left: -100%;
+            top: -100%;
+            opacity: 0;
+            visibility: hidden;
+            z-index: -999;
         }
     }
 
@@ -1223,6 +1221,7 @@ body.vm-order-modal-open {
     }
 
     .vm-items-table {
+
         th,
         td {
             padding: 10px 12px;

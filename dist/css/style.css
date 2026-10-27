@@ -15676,14 +15676,13 @@ body.page-template-external-api .main-footer {
 .vm-api-table tbody tr:hover {
   background-color: #f8fafc;
 }
-.vm-api-table tbody tr.vm-api-table__row--split {
-  background-color: #fffdf5;
-}
-.vm-api-table tbody tr.vm-api-table__row--split:hover {
-  background-color: #fefcf0;
-}
-.vm-api-table tbody tr.vm-api-table__row--split td {
-  cursor: default;
+.vm-api-table tbody tr.vm-api-table__row--split, .vm-api-table tbody tr.vm-api-table__row--paid-before-16 {
+  position: absolute;
+  left: -100%;
+  top: -100%;
+  opacity: 0;
+  visibility: hidden;
+  z-index: -999;
 }
 .vm-api-table tbody td {
   padding: 14px 18px;
