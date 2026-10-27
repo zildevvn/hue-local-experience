@@ -318,21 +318,47 @@ body.page-template-external-api {
 }
 
 .vm-api-summary {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    padding: 12px 18px;
     margin-bottom: 20px;
-    font-size: 14px;
+    font-size: 13px;
     color: #475569;
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
 
-    strong {
-        color: $color-primary;
-        font-weight: 700;
-        font-size: 15px;
+    &__item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        span {
+            color: #64748b;
+        }
+
+        strong {
+            color: $color-primary;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        &--cash strong {
+            color: #059669;
+        }
+
+        &--deleted strong {
+            color: #dc2626;
+        }
+    }
+
+    @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
     }
 }
 
@@ -531,6 +557,18 @@ body.page-template-external-api {
         &:hover {
             background-color: #f8fafc;
         }
+
+        &.vm-api-table__row--split {
+            background-color: #fffdf5;
+
+            &:hover {
+                background-color: #fefcf0;
+            }
+
+            td {
+                cursor: default;
+            }
+        }
     }
 
     tbody td {
@@ -601,6 +639,33 @@ body.page-template-external-api {
             color: $color-primary;
             font-weight: 600;
         }
+    }
+
+    .vm-order-split-info {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        font-size: 12px;
+        font-weight: 400;
+        color: #64748b;
+        flex-wrap: wrap;
+
+        strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+    }
+
+    .vm-badge--split {
+        background-color: #fef3c7;
+        color: #92400e;
+        font-size: 10.5px;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
     }
 
     @media (max-width: 768px) {
@@ -1027,4 +1092,207 @@ body.vm-order-modal-open {
 .vm-order-modal__download:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+// -----------------------------------------------------------------------------
+// Order ID Link & Order Items Modal Styles
+// -----------------------------------------------------------------------------
+
+.vm-order-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background-color: rgba($color-primary, 0.08);
+    border: 1px solid rgba($color-primary, 0.25);
+    border-radius: 6px;
+    color: $color-primary;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.15s ease;
+
+    &:hover {
+        background-color: $color-primary;
+        border-color: $color-primary;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba($color-primary, 0.2);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 2px rgba($color-primary, 0.35);
+    }
+}
+
+.vm-order-id-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: default;
+    user-select: text;
+
+    &--split {
+        background-color: #fef3c7;
+        border-color: #fde68a;
+        color: #92400e;
+        cursor: default;
+
+        &:hover {
+            background-color: #fef3c7;
+            border-color: #fde68a;
+            color: #92400e;
+            transform: none;
+            box-shadow: none;
+        }
+    }
+}
+
+.vm-order-items-modal {
+    .vm-order-modal__dialog {
+        width: min(100%, 1040px);
+    }
+
+    &__summary {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+        padding: 12px 18px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 14px;
+    }
+
+    &__stat {
+        font-size: 13px;
+        color: #475569;
+
+        strong {
+            font-size: 15px;
+            color: #0f172a;
+            margin-left: 4px;
+        }
+
+        &--deleted strong {
+            color: #dc2626;
+        }
+    }
+
+    .vm-items-modal__state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 40px 16px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .vm-items-modal__empty {
+        text-align: center;
+        padding: 36px 16px;
+        color: #64748b;
+        font-size: 14px;
+        font-style: italic;
+        background-color: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        margin-bottom: 14px;
+    }
+
+    .vm-order-modal__notice {
+        padding: 10px 14px;
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1e40af;
+        border-radius: 8px;
+        font-size: 13px;
+        margin: 0 0 14px;
+    }
+
+    .vm-items-table {
+        th,
+        td {
+            padding: 10px 12px;
+            font-size: 13px;
+            vertical-align: middle;
+            color: #334155;
+        }
+
+        td:first-child {
+            color: #64748b;
+            font-family: ui-monospace, SFMono-Regular, monospace;
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .vm-item-name {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .vm-item-note {
+            font-size: 12px;
+            color: #64748b;
+            font-style: italic;
+            max-width: 160px;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .vm-badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+
+            &--food {
+                background-color: #fef3c7;
+                color: #92400e;
+            }
+
+            &--drink {
+                background-color: #e0f2fe;
+                color: #0369a1;
+            }
+
+            &--packaged_drink {
+                background-color: #ede9fe;
+                color: #5b21b6;
+            }
+
+            &--pending {
+                background-color: #fef9c3;
+                color: #854d0e;
+            }
+
+            &--served {
+                background-color: #dcfce7;
+                color: #166534;
+            }
+
+            &--default {
+                background-color: #f1f5f9;
+                color: #475569;
+            }
+        }
+    }
 }

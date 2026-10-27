@@ -422,13 +422,13 @@ add_action(
 /**
  * Shared permission check for destructive order actions.
  */
-function vm_external_check_delete_permission()
+function vm_external_check_delete_permission($message = 'You do not have permission to delete orders.')
 {
 	check_ajax_referer('vm_external_orders', 'nonce');
 
 	if (!is_user_logged_in() || !current_user_can('manage_options')) {
 		wp_send_json_error([
-			'message' => 'You do not have permission to delete orders.',
+			'message' => $message,
 		], 403);
 	}
 }
@@ -553,4 +553,113 @@ function vm_external_ajax_delete_random_orders()
 add_action(
 	'wp_ajax_vm_external_delete_random_orders',
 	'vm_external_ajax_delete_random_orders'
+);
+
+/**
+ * AJAX: Get order items for a specific order.
+ */
+function vm_external_ajax_get_order_items()
+{
+	check_ajax_referer('vm_external_orders', 'nonce');
+
+	if (!is_user_logged_in()) {
+		wp_send_json_error([
+			'message' => 'Authentication required.',
+		], 401);
+	}
+
+	$current_user = wp_get_current_user();
+	$admin_email = (string) get_option('admin_email');
+	$is_accountant = in_array('accountant', (array) $current_user->roles, true);
+	$is_admin_email = ($admin_email !== '' && strcasecmp(trim($current_user->user_email), trim($admin_email)) === 0);
+
+	if (!current_user_can('manage_options') && !$is_accountant && !$is_admin_email) {
+		wp_send_json_error([
+			'message' => 'You do not have permission to view order items.',
+		], 403);
+	}
+
+	$orderId = isset($_POST['order_id'])
+		? absint($_POST['order_id'])
+		: 0;
+
+	if ($orderId <= 0) {
+		wp_send_json_error([
+			'message' => 'Invalid order ID.',
+		], 400);
+	}
+
+	$result = vm_external_api_request("orders/{$orderId}/items", 'GET');
+
+	if (empty($result['ok'])) {
+		wp_send_json_error([
+			'message' => $result['message'] ?? 'Unable to load order items.',
+			'data' => $result['data'] ?? null,
+		], $result['status'] ?? 500);
+	}
+
+	wp_send_json_success($result['data']);
+}
+
+add_action(
+	'wp_ajax_vm_external_get_order_items',
+	'vm_external_ajax_get_order_items'
+);
+
+/**
+ * AJAX: Delete selected items from a specific order.
+ */
+function vm_external_ajax_delete_order_items()
+{
+	vm_external_check_delete_permission('You do not have permission to delete order items.');
+
+	$orderId = isset($_POST['order_id'])
+		? absint($_POST['order_id'])
+		: 0;
+
+	if ($orderId <= 0) {
+		wp_send_json_error([
+			'message' => 'Invalid order ID.',
+		], 400);
+	}
+
+	$rawIds = isset($_POST['item_ids'])
+		? wp_unslash($_POST['item_ids'])
+		: [];
+
+	if (!is_array($rawIds)) {
+		wp_send_json_error([
+			'message' => 'Invalid item selection.',
+		], 400);
+	}
+
+	$itemIds = array_values(array_unique(array_filter(
+		array_map('absint', $rawIds)
+	)));
+
+	if (empty($itemIds) || count($itemIds) > 100) {
+		wp_send_json_error([
+			'message' => 'Select between 1 and 100 items.',
+		], 400);
+	}
+
+	$result = vm_external_api_request(
+		"orders/{$orderId}/items",
+		'DELETE',
+		['item_ids' => $itemIds]
+	);
+
+	if (empty($result['ok'])) {
+		wp_send_json_error([
+			'message' => $result['message'] ?? 'Unable to delete order items.',
+			'data' => $result['data'] ?? null,
+		], $result['status'] ?? 500);
+	}
+
+	wp_send_json_success($result['data']);
+}
+
+add_action(
+	'wp_ajax_vm_external_delete_order_items',
+	'vm_external_ajax_delete_order_items'
 );

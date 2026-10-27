@@ -30,6 +30,7 @@ add_action('wp_enqueue_scripts', function () {
 			[
 				'ajaxUrl' => admin_url('admin-ajax.php'),
 				'nonce' => wp_create_nonce('vm_external_orders'),
+				'canDelete' => current_user_can('manage_options'),
 			]
 		);
 	}

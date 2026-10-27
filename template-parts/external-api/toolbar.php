@@ -38,27 +38,23 @@ if (!defined('ABSPATH')) {
 </div>
 
 <div class="vm-api-summary" data-summary hidden>
-    <strong data-total-orders>0</strong>
-    orders found.
-</div>
+    <div class="vm-api-summary__item">
+        <span>Đơn hàng:</span>
+        <strong data-total-orders>0</strong>
+    </div>
 
-<!-- Delete Toolbar -->
-<div class="vm-api-delete-toolbar" data-delete-toolbar>
-    <label>
-        <input type="checkbox" data-select-all>
-        Select all on this page
-    </label>
+    <!-- <div class="vm-api-summary__item">
+        <span data-total-orders-label>Tổng giá trị hóa đơn:</span>
+        <strong data-total-orders-amount>0 ₫</strong>
+    </div> -->
 
-    <span>
-        Selected:
-        <strong data-selected-count>0</strong>
-    </span>
+    <div class="vm-api-summary__item vm-api-summary__item--cash">
+        <span data-total-cash-label>Tiền mặt thực thu:</span>
+        <strong data-total-cash-amount>0 ₫</strong>
+    </div>
 
-    <button type="button" data-delete-selected disabled>
-        Delete selected
-    </button>
-
-    <button type="button" data-delete-random>
-        Delete random 30%
-    </button>
+    <div class="vm-api-summary__item vm-api-summary__item--deleted">
+        <span>Tổng tiền món đã xóa:</span>
+        <strong data-total-deleted-amount>0 ₫</strong>
+    </div>
 </div>

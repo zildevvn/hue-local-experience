@@ -14,9 +14,6 @@ if (!defined('ABSPATH')) {
 
         <thead>
             <tr>
-                <th data-select-column>
-                    Select
-                </th>
                 <th>Order</th>
                 <th>Table</th>
                 <th>Status</th>
@@ -28,7 +25,7 @@ if (!defined('ABSPATH')) {
 
         <tbody data-orders-body>
             <tr>
-                <td colspan="7" class="vm-api-empty">
+                <td colspan="6" class="vm-api-empty">
                     Select a period and click
                     <strong>Get Data</strong>.
                 </td>

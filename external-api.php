@@ -43,7 +43,7 @@ get_header();
         <?php get_template_part('template-parts/external-api/pagination'); ?>
     </div>
 
-    <?php get_template_part('template-parts/external-api/confirm-modal'); ?>
+    <?php get_template_part('template-parts/external-api/order-items-modal'); ?>
 </main>
 
 <?php get_footer(); ?>

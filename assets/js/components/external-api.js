@@ -1,6 +1,3 @@
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
-
 (function ($) {
     "use strict";
 
@@ -13,7 +10,7 @@ import autoTable from "jspdf-autotable";
         }
 
         // ---------------------------------------------------------------------
-        // DOM
+        // DOM Elements
         // ---------------------------------------------------------------------
 
         const timeType = app.querySelector("[data-time-type]");
@@ -39,6 +36,11 @@ import autoTable from "jspdf-autotable";
         const message = app.querySelector("[data-message]");
         const summary = app.querySelector("[data-summary]");
         const totalOrders = app.querySelector("[data-total-orders]");
+        const totalOrdersLabelEl = app.querySelector("[data-total-orders-label]");
+        const totalOrdersAmountEl = app.querySelector("[data-total-orders-amount]");
+        const totalCashLabelEl = app.querySelector("[data-total-cash-label]");
+        const totalCashAmountEl = app.querySelector("[data-total-cash-amount]");
+        const totalDeletedAmountEl = app.querySelector("[data-total-deleted-amount]");
 
         if (
             !timeType ||
@@ -58,393 +60,22 @@ import autoTable from "jspdf-autotable";
         }
 
         const ordersTable = tbody.closest("table");
-
         if (!ordersTable) {
             return;
         }
 
         let isLoading = false;
-        let isDeleting = false;
-
-        const selectedOrderIds = new Set();
         const orderCache = new Map();
 
-        let modalConfirmCallback = null;
-        let modalIsProcessing = false;
-
-        // ---------------------------------------------------------------------
-        // Confirmation Modal - HTML comes from confirm-modal.php
-        // ---------------------------------------------------------------------
-
-        function getConfirmModal() {
-            return document.querySelector("[data-order-confirm-modal]");
-        }
-
-        function bindConfirmModalEvents() {
-            const modal = getConfirmModal();
-
-            if (!modal) {
-                console.error(
-                    "External API: confirmation modal template was not found."
-                );
-                return;
-            }
-
-            // Prevent duplicate event handlers if this initializer runs again.
-            if (modal.dataset.eventsBound === "true") {
-                return;
-            }
-
-            modal.dataset.eventsBound = "true";
-
-            modal.addEventListener("click", async (event) => {
-                const target = event.target;
-
-                if (!(target instanceof Element)) {
-                    return;
-                }
-
-                const closeButton = target.closest("[data-modal-close]");
-
-                if (closeButton) {
-                    if (!modalIsProcessing) {
-                        closeConfirmModal();
-                    }
-
-                    return;
-                }
-
-                const confirmButton = target.closest("[data-modal-confirm]");
-
-                if (
-                    !confirmButton ||
-                    modalIsProcessing ||
-                    !modalConfirmCallback
-                ) {
-                    return;
-                }
-
-                modalIsProcessing = true;
-                confirmButton.disabled = true;
-                confirmButton.textContent = "Processing...";
-
-                try {
-                    await modalConfirmCallback();
-                } catch (error) {
-                    const errorElement = modal.querySelector(
-                        "[data-modal-error]"
-                    );
-
-                    if (errorElement) {
-                        errorElement.textContent =
-                            error.message || "An unexpected error occurred.";
-
-                        errorElement.hidden = false;
-                    }
-                } finally {
-                    modalIsProcessing = false;
-
-                    confirmButton.disabled = false;
-                    confirmButton.textContent = "Confirm deletion";
-                }
-            });
-
-            // -----------------------------------------------------------------
-            // Download PDF
-            // -----------------------------------------------------------------
-
-            let isGeneratingPDF = false;
-
-            modal.addEventListener("click", (event) => {
-                const target = event.target;
-
-                if (!(target instanceof Element)) {
-                    return;
-                }
-
-                const downloadButton = target.closest(
-                    "[data-modal-download]"
-                );
-
-                if (!downloadButton || isGeneratingPDF) {
-                    return;
-                }
-
-                const ordersContainer = modal.querySelector(
-                    "[data-modal-orders]"
-                );
-
-                const rows = ordersContainer
-                    ? Array.from(ordersContainer.querySelectorAll("tr"))
-                    : [];
-
-                if (rows.length === 0) {
-                    const errorElement = modal.querySelector(
-                        "[data-modal-error]"
-                    );
-
-                    if (errorElement) {
-                        errorElement.textContent =
-                            "No order data available to export.";
-                        errorElement.hidden = false;
-                    }
-
-                    return;
-                }
-
-                // Collect table data from the DOM.
-                const tableData = rows.map((row) => {
-                    const cells = Array.from(row.querySelectorAll("td"));
-
-                    return cells.map((cell) => {
-                        return (cell.textContent || "").trim();
-                    });
-                });
-
-                // Validate: at least one row with non-empty cells.
-                const hasValidData = tableData.some((row) => {
-                    return row.some((cell) => cell !== "");
-                });
-
-                if (!hasValidData) {
-                    const errorElement = modal.querySelector(
-                        "[data-modal-error]"
-                    );
-
-                    if (errorElement) {
-                        errorElement.textContent =
-                            "Order data is empty. Cannot generate PDF.";
-                        errorElement.hidden = false;
-                    }
-
-                    return;
-                }
-
-                isGeneratingPDF = true;
-
-                const originalText = downloadButton.textContent;
-                downloadButton.textContent = "Generating PDF...";
-                downloadButton.disabled = true;
-
-                try {
-                    const countElement = modal.querySelector(
-                        "[data-modal-count]"
-                    );
-
-                    const pdfTitle = "";
-
-                    const orderCount = countElement
-                        ? (countElement.textContent || "0").trim()
-                        : String(tableData.length);
-
-                    // jsPDF: landscape A4.
-                    const doc = new jsPDF({
-                        orientation: "landscape",
-                        unit: "mm",
-                        format: "a4",
-                    });
-
-                    // Title.
-                    doc.setFontSize(16);
-                    doc.setTextColor(33, 33, 33);
-                    doc.text(pdfTitle, 14, 18);
-
-                    // Order count.
-                    doc.setFontSize(11);
-                    doc.setTextColor(100, 100, 100);
-                    doc.text(
-                        `Total orders: ${orderCount}`,
-                        14,
-                        26
-                    );
-
-                    // Table.
-                    autoTable(doc, {
-                        startY: 32,
-                        head: [
-                            [
-                                "Order ID",
-                                "Table",
-                                "Status",
-                                "Total",
-                                "Created at",
-                            ],
-                        ],
-                        body: tableData,
-                        theme: "grid",
-                        headStyles: {
-                            fillColor: [63, 81, 181],
-                            textColor: [255, 255, 255],
-                            fontStyle: "bold",
-                            halign: "left",
-                            cellPadding: 3,
-                        },
-                        bodyStyles: {
-                            textColor: [33, 33, 33],
-                            cellPadding: 3,
-                        },
-                        alternateRowStyles: {
-                            fillColor: [245, 245, 245],
-                        },
-                        columnStyles: {
-                            0: { cellWidth: 30 },
-                            1: { cellWidth: 50 },
-                            2: { cellWidth: 35 },
-                            3: { cellWidth: 40, halign: "right" },
-                            4: { cellWidth: "auto" },
-                        },
-                        styles: {
-                            fontSize: 10,
-                            overflow: "linebreak",
-                            cellPadding: 3,
-                        },
-                        margin: { top: 14, right: 14, bottom: 14, left: 14 },
-                        showHead: "everyPage",
-                        didDrawPage: (data) => {
-                            // Footer with page number.
-                            const pageCount = doc.internal.getNumberOfPages();
-                            const currentPage = doc.getCurrentPageInfo().pageNumber;
-
-                            doc.setFontSize(8);
-                            doc.setTextColor(150, 150, 150);
-                            doc.text(
-                                `Page ${currentPage} of ${pageCount}`,
-                                doc.internal.pageSize.getWidth() - 14,
-                                doc.internal.pageSize.getHeight() - 8,
-                                { align: "right" }
-                            );
-                        },
-                    });
-
-                    // Filename with timestamp.
-                    const now = new Date();
-                    const timestamp = [
-                        now.getFullYear(),
-                        String(now.getMonth() + 1).padStart(2, "0"),
-                        String(now.getDate()).padStart(2, "0"),
-                        "-",
-                        String(now.getHours()).padStart(2, "0"),
-                        String(now.getMinutes()).padStart(2, "0"),
-                    ].join("");
-
-                    doc.save(`orders-to-delete-${timestamp}.pdf`);
-                } catch (error) {
-                    console.error("PDF generation error:", error);
-
-                    const errorElement = modal.querySelector(
-                        "[data-modal-error]"
-                    );
-
-                    if (errorElement) {
-                        errorElement.textContent =
-                            "Failed to generate PDF. Please try again.";
-                        errorElement.hidden = false;
-                    }
-                } finally {
-                    isGeneratingPDF = false;
-
-                    downloadButton.textContent = originalText;
-                    downloadButton.disabled = false;
-                }
-            });
-
-            document.addEventListener("keydown", (event) => {
-                if (
-                    event.key === "Escape" &&
-                    !modal.hidden &&
-                    !modalIsProcessing
-                ) {
-                    closeConfirmModal();
-                }
-            });
-        }
-
-        function openConfirmModal(title, description, orders, onConfirm) {
-            const modal = getConfirmModal();
-
-            if (!modal) {
-                throw new Error(
-                    "Confirmation modal template was not found."
-                );
-            }
-
-            const titleElement = modal.querySelector(
-                "#vm-order-modal-title"
-            );
-
-            const descriptionElement = modal.querySelector(
-                "[data-modal-description]"
-            );
-
-            const countElement = modal.querySelector("[data-modal-count]");
-            const errorElement = modal.querySelector("[data-modal-error]");
-            const ordersContainer = modal.querySelector(
-                "[data-modal-orders]"
-            );
-
-            if (
-                !titleElement ||
-                !descriptionElement ||
-                !countElement ||
-                !errorElement ||
-                !ordersContainer
-            ) {
-                throw new Error(
-                    "Confirmation modal template is missing required elements."
-                );
-            }
-
-            titleElement.textContent = title;
-            descriptionElement.textContent = description;
-            countElement.textContent = String(orders.length);
-
-            errorElement.textContent = "";
-            errorElement.hidden = true;
-
-            ordersContainer.replaceChildren();
-
-            orders.forEach((order) => {
-                const row = document.createElement("tr");
-
-                const values = [
-                    `#${Number(order.id)}`,
-                    order.table?.name || "-",
-                    order.status || "-",
-                    money(order.total_price),
-                    order.created_at
-                        ? new Date(order.created_at).toLocaleString()
-                        : "-",
-                ];
-
-                values.forEach((value) => {
-                    const cell = document.createElement("td");
-                    cell.textContent = String(value);
-                    row.appendChild(cell);
-                });
-
-                ordersContainer.appendChild(row);
-            });
-
-            modalConfirmCallback = onConfirm;
-            modal.hidden = false;
-
-            document.body.classList.add("vm-order-modal-open");
-
-            modal.querySelector('[aria-label="Close dialog"]')?.focus();
-        }
-
-        function closeConfirmModal(force = false) {
-            const modal = getConfirmModal();
-
-            if (!modal || (modalIsProcessing && !force)) {
-                return;
-            }
-
-            modal.hidden = true;
-            modalConfirmCallback = null;
-
-            document.body.classList.remove("vm-order-modal-open");
-        }
+        let activeItemsFetchId = 0;
+        let currentItemsOrderId = null;
+        let currentOrderItems = [];
+        const selectedItemIds = new Set();
+        let isDeletingItems = false;
+        let currentOrdersTotalAmount = 0;
+        let currentCashTotalAmount = 0;
+        let sessionTotalDeletedAmount = 0;
+        const sessionDeletedItemIds = new Set();
 
         // ---------------------------------------------------------------------
         // Utils
@@ -462,24 +93,51 @@ import autoTable from "jspdf-autotable";
             return Number(value || 0).toLocaleString("en-US");
         }
 
+        function formatVnd(value) {
+            return `${money(value)} ₫`;
+        }
+
+        function getOrderCashAmount(order) {
+            if (!order) return null;
+            const method = String(order.payment_method || "").toLowerCase().trim();
+
+            if (order.cash_amount !== undefined && order.cash_amount !== null) {
+                return Number(order.cash_amount);
+            }
+
+            // Backward compatibility fallback for API responses without cash_amount
+            if (method === "cash") {
+                return Number(order.total_price || 0);
+            }
+
+            // For split (or bank/card), do NOT infer cash from total_price
+            return null;
+        }
+
         // ---------------------------------------------------------------------
-        // UI
+        // UI Helpers
         // ---------------------------------------------------------------------
 
         function showLoading(show) {
             loading.hidden = !show;
-
-            callApiButton.disabled = show || isDeleting;
+            callApiButton.disabled = show;
 
             if (searchOrderButton) {
-                searchOrderButton.disabled = show || isDeleting;
+                searchOrderButton.disabled = show;
             }
 
             if (clearOrderButton) {
-                clearOrderButton.disabled = show || isDeleting;
+                clearOrderButton.disabled = show;
             }
 
-            updateDeleteControls();
+            if (show) {
+                if (totalOrdersAmountEl) {
+                    totalOrdersAmountEl.textContent = "Đang tính...";
+                }
+                if (totalCashAmountEl) {
+                    totalCashAmountEl.textContent = "Đang tính...";
+                }
+            }
         }
 
         function showMessage(text, type = "error") {
@@ -494,7 +152,608 @@ import autoTable from "jspdf-autotable";
         }
 
         // ---------------------------------------------------------------------
-        // Date Filter
+        // Order Items Modal
+        // ---------------------------------------------------------------------
+
+        function getOrderItemsModal() {
+            return document.querySelector("[data-order-items-modal]");
+        }
+
+        function canUserDeleteOrderItems() {
+            const modal = getOrderItemsModal();
+            if (modal && modal.dataset.canDelete !== undefined) {
+                return modal.dataset.canDelete === "true";
+            }
+            return Boolean(apiConfig?.canDelete);
+        }
+
+        function bindOrderItemsModalEvents() {
+            const modal = getOrderItemsModal();
+            if (!modal) {
+                return;
+            }
+
+            if (modal.dataset.eventsBound === "true") {
+                return;
+            }
+            modal.dataset.eventsBound = "true";
+
+            modal.addEventListener("click", async (event) => {
+                const target = event.target;
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                if (target.closest("[data-items-modal-close]")) {
+                    if (!isDeletingItems) {
+                        closeOrderItemsModal();
+                    }
+                    return;
+                }
+
+                if (target.closest("[data-items-modal-delete]")) {
+                    deleteSelectedOrderItems();
+                }
+            });
+
+            modal.addEventListener("change", (event) => {
+                const target = event.target;
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const selectAll = target.closest("[data-items-select-all]");
+                if (selectAll) {
+                    const checkboxes = modal.querySelectorAll("[data-item-checkbox]");
+                    checkboxes.forEach((cb) => {
+                        const id = Number(cb.value);
+                        cb.checked = selectAll.checked;
+                        if (selectAll.checked) {
+                            selectedItemIds.add(id);
+                        } else {
+                            selectedItemIds.delete(id);
+                        }
+                    });
+
+                    updateOrderItemsControls();
+                    return;
+                }
+
+                const itemCheckbox = target.closest("[data-item-checkbox]");
+                if (itemCheckbox) {
+                    const id = Number(itemCheckbox.value);
+                    if (itemCheckbox.checked) {
+                        selectedItemIds.add(id);
+                    } else {
+                        selectedItemIds.delete(id);
+                    }
+
+                    updateOrderItemsControls();
+                }
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && !modal.hidden && !isDeletingItems) {
+                    closeOrderItemsModal();
+                }
+            });
+        }
+
+        async function openOrderItemsModal(orderId) {
+            const modal = getOrderItemsModal();
+            if (!modal) {
+                return;
+            }
+
+            const cachedOrder = orderCache.get(orderId);
+            const method = String(cachedOrder?.payment_method || "").toLowerCase().trim();
+            if (method === "split") {
+                return; // Guard: Split orders do not support modal view/delete
+            }
+
+            const thisFetchId = ++activeItemsFetchId;
+            currentItemsOrderId = orderId;
+            currentOrderItems = [];
+            selectedItemIds.clear();
+            updateDeletedAmountPreview();
+
+            const titleEl = modal.querySelector("[data-items-modal-title]");
+            const subtitleEl = modal.querySelector("[data-items-modal-subtitle]");
+            const totalCountEl = modal.querySelector("[data-items-modal-total]");
+            const totalPriceEl = modal.querySelector("[data-items-modal-total-price]");
+            const selectedCountEl = modal.querySelector("[data-items-modal-selected]");
+            const deleteBtn = modal.querySelector("[data-items-modal-delete]");
+            const deleteCountEl = modal.querySelector("[data-items-modal-delete-count]");
+            const selectAllCheckbox = modal.querySelector("[data-items-select-all]");
+            const loadingEl = modal.querySelector("[data-items-modal-loading]");
+            const errorEl = modal.querySelector("[data-items-modal-error]");
+            const noticeEl = modal.querySelector("[data-items-modal-notice]");
+            const emptyEl = modal.querySelector("[data-items-modal-empty]");
+            const tableWrapEl = modal.querySelector("[data-items-modal-table-wrap]");
+            const tbodyEl = modal.querySelector("[data-items-modal-tbody]");
+
+            if (titleEl) {
+                titleEl.textContent = `Chi tiết món ăn - Đơn hàng #${orderId}`;
+            }
+
+            const tableName = cachedOrder?.table?.name || "-";
+            const orderCreated = cachedOrder?.created_at
+                ? new Date(cachedOrder.created_at).toLocaleString()
+                : "-";
+            const initialTotal = cachedOrder?.total_price || 0;
+
+            const isSplit = method === "split";
+            const cashAmount = getOrderCashAmount(cachedOrder);
+            let paymentMethodInfo = "";
+            if (isSplit) {
+                const cashText = cashAmount !== null ? `${money(cashAmount)} ₫` : "—";
+                paymentMethodInfo = ` | PT: Split (Tiền mặt: ${cashText})`;
+            }
+
+            if (subtitleEl) {
+                subtitleEl.textContent = `Bàn: ${tableName}${paymentMethodInfo} | Thời gian: ${orderCreated}`;
+            }
+
+            if (totalCountEl) totalCountEl.textContent = "-";
+            if (totalPriceEl) totalPriceEl.textContent = money(initialTotal);
+            if (selectedCountEl) selectedCountEl.textContent = "0";
+            if (deleteCountEl) deleteCountEl.textContent = "0";
+            if (deleteBtn) {
+                deleteBtn.disabled = true;
+                deleteBtn.innerHTML = 'Xóa món đã chọn (<span data-items-modal-delete-count>0</span>)';
+            }
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.disabled = true;
+            }
+
+            if (errorEl) { errorEl.hidden = true; errorEl.textContent = ""; }
+            if (noticeEl) { noticeEl.hidden = true; noticeEl.textContent = ""; }
+            if (emptyEl) emptyEl.hidden = true;
+            if (tableWrapEl) tableWrapEl.hidden = true;
+            if (tbodyEl) tbodyEl.replaceChildren();
+            if (loadingEl) loadingEl.hidden = false;
+
+            modal.hidden = false;
+            document.body.classList.add("vm-order-modal-open");
+
+            modal.querySelector('[aria-label="Close dialog"]')?.focus();
+
+            const formData = new FormData();
+            formData.append("action", "vm_external_get_order_items");
+            formData.append("nonce", apiConfig.nonce);
+            formData.append("order_id", String(orderId));
+
+            try {
+                const response = await fetch(apiConfig.ajaxUrl, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    body: formData,
+                });
+
+                const rawResponse = await response.text();
+                let ajaxResponse;
+
+                try {
+                    ajaxResponse = JSON.parse(rawResponse);
+                } catch {
+                    throw new Error(`Invalid AJAX response (${response.status}).`);
+                }
+
+                if (thisFetchId !== activeItemsFetchId || modal.hidden) {
+                    return;
+                }
+
+                if (!response.ok || !ajaxResponse.success) {
+                    throw new Error(
+                        ajaxResponse?.data?.message ||
+                        `Request failed with status ${response.status}.`
+                    );
+                }
+
+                const items = ajaxResponse.data?.data || [];
+                currentOrderItems = items;
+
+                renderOrderItemsList(items);
+            } catch (error) {
+                if (thisFetchId !== activeItemsFetchId || modal.hidden) {
+                    return;
+                }
+
+                console.error("Order items load error:", error);
+                if (errorEl) {
+                    errorEl.textContent = error.message || "Không thể tải danh sách món ăn. Vui lòng thử lại.";
+                    errorEl.hidden = false;
+                }
+            } finally {
+                if (thisFetchId === activeItemsFetchId && !modal.hidden) {
+                    if (loadingEl) loadingEl.hidden = true;
+                }
+            }
+        }
+
+        function renderOrderItemsList(items) {
+            const modal = getOrderItemsModal();
+            if (!modal) return;
+
+            const canDelete = canUserDeleteOrderItems();
+            const totalCountEl = modal.querySelector("[data-items-modal-total]");
+            const totalPriceEl = modal.querySelector("[data-items-modal-total-price]");
+            const emptyEl = modal.querySelector("[data-items-modal-empty]");
+            const tableWrapEl = modal.querySelector("[data-items-modal-table-wrap]");
+            const tbodyEl = modal.querySelector("[data-items-modal-tbody]");
+            const selectAllCheckbox = modal.querySelector("[data-items-select-all]");
+
+            if (totalCountEl) totalCountEl.textContent = String(items.length);
+
+            const itemsSum = items.reduce((sum, it) => sum + Number(it.final_price || 0), 0);
+            const cachedOrder = orderCache.get(currentItemsOrderId);
+            const displayTotal = cachedOrder?.total_price !== undefined
+                ? cachedOrder.total_price
+                : itemsSum;
+
+            if (totalPriceEl) totalPriceEl.textContent = money(displayTotal);
+
+            if (items.length === 0) {
+                if (emptyEl) emptyEl.hidden = false;
+                if (tableWrapEl) tableWrapEl.hidden = true;
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.disabled = true;
+                }
+                updateOrderItemsControls();
+                return;
+            }
+
+            if (emptyEl) emptyEl.hidden = true;
+            if (tableWrapEl) tableWrapEl.hidden = false;
+            if (selectAllCheckbox) selectAllCheckbox.disabled = false;
+
+            tbodyEl.innerHTML = items.map((item) => {
+                const itemId = Number(item.id);
+                const displayName = item.product_name_vi || item.name || `Món #${itemId}`;
+                const rawType = (item.type || "").toLowerCase();
+                const typeBadgeClass = rawType === "food"
+                    ? "vm-badge--food"
+                    : rawType === "drink"
+                        ? "vm-badge--drink"
+                        : rawType === "packaged_drink"
+                            ? "vm-badge--packaged_drink"
+                            : "vm-badge--default";
+
+                const rawStatus = (item.status || "").toLowerCase();
+                const statusBadgeClass = rawStatus === "served"
+                    ? "vm-badge--served"
+                    : rawStatus === "pending"
+                        ? "vm-badge--pending"
+                        : "vm-badge--default";
+
+                const discountAmount = Number(item.discount_amount || 0);
+                const discountText = discountAmount > 0
+                    ? `-${money(discountAmount)}`
+                    : "-";
+
+                const finalPrice = item.final_price !== undefined
+                    ? item.final_price
+                    : (Number(item.quantity || 1) * Number(item.price || 0));
+
+                const isChecked = selectedItemIds.has(itemId) ? "checked" : "";
+
+                const checkboxCell = canDelete
+                    ? `
+                        <td style="text-align: center;">
+                            <input
+                                type="checkbox"
+                                data-item-checkbox
+                                value="${itemId}"
+                                aria-label="Select item ${itemId}"
+                                ${isChecked}
+                                ${isDeletingItems ? "disabled" : ""}
+                            >
+                        </td>
+                    `
+                    : "";
+
+                return `
+                    <tr data-item-row="${itemId}">
+                        ${checkboxCell}
+                        <td style="text-align: center; font-weight: 600; color: #64748b; font-family: ui-monospace, SFMono-Regular, monospace;">
+                            #${itemId}
+                        </td>
+                        <td>
+                            <div class="vm-item-name">${escapeHtml(displayName)}</div>
+                        </td>
+                        <td>
+                            <span class="vm-badge ${typeBadgeClass}">${escapeHtml(item.type || "-")}</span>
+                        </td>
+                        <td style="text-align: center; font-weight: 600;">
+                            ${Number(item.quantity || 1)}
+                        </td>
+                        <td style="text-align: right;">
+                            ${money(item.price)}
+                        </td>
+                        <td style="text-align: right; color: ${discountAmount > 0 ? "#dc2626" : "inherit"};">
+                            ${escapeHtml(discountText)}
+                        </td>
+                        <td style="text-align: right; font-weight: 700; color: #0f172a;">
+                            ${money(finalPrice)}
+                        </td>
+                        <td>
+                            <div class="vm-item-note">${escapeHtml(item.note || "-")}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+
+            updateOrderItemsControls();
+        }
+
+        function getItemFinalPrice(item) {
+            if (!item) return 0;
+            if (item.final_price !== undefined && item.final_price !== null) {
+                return Math.max(0, Number(item.final_price) || 0);
+            }
+            const qty = Number(item.quantity || 1) || 1;
+            const unitPrice = Number(item.price || 0) || 0;
+            const discount = Number(item.discount_amount || 0) || 0;
+            return Math.max(0, qty * unitPrice - discount);
+        }
+
+        function updateDeletedAmountPreview() {
+            let selectedItemsAmount = 0;
+            selectedItemIds.forEach((id) => {
+                if (!sessionDeletedItemIds.has(id)) {
+                    const found = currentOrderItems.find((it) => Number(it.id) === id);
+                    if (found) {
+                        selectedItemsAmount += getItemFinalPrice(found);
+                    }
+                }
+            });
+
+            const preview = sessionTotalDeletedAmount + selectedItemsAmount;
+            const formatted = formatVnd(preview);
+
+            if (totalDeletedAmountEl) {
+                totalDeletedAmountEl.textContent = formatted;
+            }
+
+            const modal = getOrderItemsModal();
+            if (modal) {
+                const modalDeletedEl = modal.querySelector("[data-items-modal-deleted-amount]");
+                if (modalDeletedEl) {
+                    modalDeletedEl.textContent = formatted;
+                }
+            }
+        }
+
+        function updateOrderItemsControls() {
+            const modal = getOrderItemsModal();
+            if (!modal) return;
+
+            const selectedCountEl = modal.querySelector("[data-items-modal-selected]");
+            const deleteCountEl = modal.querySelector("[data-items-modal-delete-count]");
+            const deleteBtn = modal.querySelector("[data-items-modal-delete]");
+            const selectAllCheckbox = modal.querySelector("[data-items-select-all]");
+            const checkboxes = Array.from(modal.querySelectorAll("[data-item-checkbox]"));
+
+            const checkedCount = checkboxes.filter(cb => cb.checked).length;
+            const totalCount = checkboxes.length;
+
+            if (selectedCountEl) selectedCountEl.textContent = String(selectedItemIds.size);
+            if (deleteCountEl) deleteCountEl.textContent = String(selectedItemIds.size);
+
+            if (deleteBtn) {
+                deleteBtn.disabled = selectedItemIds.size === 0 || isDeletingItems;
+            }
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = totalCount > 0 && checkedCount === totalCount;
+                selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < totalCount;
+                selectAllCheckbox.disabled = totalCount === 0 || isDeletingItems;
+            }
+
+            checkboxes.forEach((cb) => {
+                cb.disabled = isDeletingItems;
+            });
+
+            updateDeletedAmountPreview();
+        }
+
+        async function deleteSelectedOrderItems() {
+            const modal = getOrderItemsModal();
+            if (!modal || !canUserDeleteOrderItems() || isDeletingItems || selectedItemIds.size === 0 || !currentItemsOrderId) {
+                return;
+            }
+
+            const countToDelete = selectedItemIds.size;
+            const confirmed = window.confirm(
+                `Bạn có chắc chắn muốn xóa ${countToDelete} món đã chọn khỏi đơn hàng #${currentItemsOrderId}?\nThao tác này sẽ xóa vĩnh viễn món ăn và tính lại tổng tiền đơn hàng.`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const errorEl = modal.querySelector("[data-items-modal-error]");
+            const noticeEl = modal.querySelector("[data-items-modal-notice]");
+            const deleteBtn = modal.querySelector("[data-items-modal-delete]");
+
+            if (errorEl) { errorEl.hidden = true; errorEl.textContent = ""; }
+            if (noticeEl) { noticeEl.hidden = true; noticeEl.textContent = ""; }
+
+            isDeletingItems = true;
+            updateOrderItemsControls();
+            if (deleteBtn) deleteBtn.textContent = "Đang xóa...";
+
+            const targetOrderId = currentItemsOrderId;
+            const itemIdsToDelete = Array.from(selectedItemIds);
+
+            const formData = new FormData();
+            formData.append("action", "vm_external_delete_order_items");
+            formData.append("nonce", apiConfig.nonce);
+            formData.append("order_id", String(targetOrderId));
+            itemIdsToDelete.forEach((id) => {
+                formData.append("item_ids[]", String(id));
+            });
+
+            try {
+                const response = await fetch(apiConfig.ajaxUrl, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    body: formData,
+                });
+
+                const rawResponse = await response.text();
+                let ajaxResponse;
+
+                try {
+                    ajaxResponse = JSON.parse(rawResponse);
+                } catch {
+                    throw new Error(`Invalid AJAX response (${response.status}).`);
+                }
+
+                if (currentItemsOrderId !== targetOrderId || modal.hidden) {
+                    return;
+                }
+
+                if (!response.ok || !ajaxResponse.success) {
+                    const serverMsg = ajaxResponse?.data?.message || `Xóa món thất bại (${response.status}).`;
+                    const notFound = ajaxResponse?.data?.data?.not_found_ids;
+                    if (Array.isArray(notFound) && notFound.length > 0) {
+                        throw new Error(`${serverMsg} (Không tìm thấy món ID: #${notFound.join(", #")})`);
+                    }
+                    throw new Error(serverMsg);
+                }
+
+                const resultData = ajaxResponse.data || {};
+                const deletedIds = Array.isArray(resultData.deleted_ids)
+                    ? resultData.deleted_ids.map(Number)
+                    : [];
+                const deletedSet = new Set(deletedIds);
+                const notFoundIds = Array.isArray(resultData.not_found_ids)
+                    ? resultData.not_found_ids.map(Number)
+                    : [];
+
+                let newlyDeletedAmount = 0;
+                deletedIds.forEach(id => {
+                    if (!sessionDeletedItemIds.has(id)) {
+                        sessionDeletedItemIds.add(id);
+                        const foundItem = currentOrderItems.find(it => Number(it.id) === id);
+                        if (foundItem) {
+                            newlyDeletedAmount += getItemFinalPrice(foundItem);
+                        }
+                    }
+                    selectedItemIds.delete(id);
+                    const row = modal.querySelector(`tr[data-item-row="${id}"]`);
+                    if (row) row.remove();
+                });
+
+                sessionTotalDeletedAmount += newlyDeletedAmount;
+                updateDeletedAmountPreview();
+
+                currentOrderItems = currentOrderItems.filter(item => !deletedSet.has(Number(item.id)));
+
+                const orderSummary = resultData.order_summary || {};
+                const remainingItemsCount = orderSummary.remaining_items_count !== undefined
+                    ? Number(orderSummary.remaining_items_count)
+                    : currentOrderItems.length;
+
+                const newTotalPrice = orderSummary.total_price !== undefined
+                    ? Number(orderSummary.total_price)
+                    : currentOrderItems.reduce((sum, it) => sum + Number(it.final_price || 0), 0);
+
+                const totalCountEl = modal.querySelector("[data-items-modal-total]");
+                const totalPriceEl = modal.querySelector("[data-items-modal-total-price]");
+                const emptyEl = modal.querySelector("[data-items-modal-empty]");
+                const tableWrapEl = modal.querySelector("[data-items-modal-table-wrap]");
+
+                if (totalCountEl) totalCountEl.textContent = String(remainingItemsCount);
+                if (totalPriceEl) totalPriceEl.textContent = money(newTotalPrice);
+
+                if (currentOrderItems.length === 0) {
+                    if (emptyEl) emptyEl.hidden = false;
+                    if (tableWrapEl) tableWrapEl.hidden = true;
+                }
+
+                if (noticeEl) {
+                    let msg = `Đã xóa thành công ${resultData.deleted_count || deletedIds.length} món.`;
+                    if (notFoundIds.length > 0) {
+                        msg += ` Lưu ý: Không tìm thấy món ID #${notFoundIds.join(", #")} trong đơn hàng này.`;
+                    }
+                    noticeEl.textContent = msg;
+                    noticeEl.hidden = false;
+                }
+
+                const dashboardRow = tbody.querySelector(`tr[data-order-row="${targetOrderId}"]`);
+                if (dashboardRow) {
+                    const countCell = dashboardRow.querySelector("[data-order-items-count]");
+                    const priceCell = dashboardRow.querySelector("[data-order-total-price]");
+                    if (countCell) countCell.textContent = String(remainingItemsCount);
+                    if (priceCell) priceCell.textContent = money(newTotalPrice);
+                }
+
+                const cached = orderCache.get(targetOrderId);
+                if (cached) {
+                    const oldOrderPrice = Number(cached.total_price || 0);
+                    const priceDiff = oldOrderPrice - newTotalPrice;
+                    if (priceDiff > 0) {
+                        currentOrdersTotalAmount = Math.max(0, currentOrdersTotalAmount - priceDiff);
+                        if (totalOrdersAmountEl) {
+                            totalOrdersAmountEl.textContent = formatVnd(currentOrdersTotalAmount);
+                        }
+
+                        const orderMethod = String(cached.payment_method || "").toLowerCase().trim();
+                        // For cash orders, single cash payment record is synchronized with newTotalPrice on backend
+                        if (orderMethod === "cash") {
+                            currentCashTotalAmount = Math.max(0, currentCashTotalAmount - priceDiff);
+                            if (totalCashAmountEl) {
+                                totalCashAmountEl.textContent = formatVnd(currentCashTotalAmount);
+                            }
+                        }
+                        // For split orders: do not alter cash amount at frontend
+                    }
+
+                    cached.total_price = newTotalPrice;
+                    if (orderSummary.subtotal !== undefined) cached.subtotal = orderSummary.subtotal;
+                    if (orderSummary.discount_amount !== undefined) cached.discount_amount = orderSummary.discount_amount;
+                    if (Array.isArray(cached.items)) {
+                        cached.items = cached.items.filter(item => !deletedSet.has(Number(item.id)));
+                    }
+                }
+            } catch (error) {
+                console.error("Delete order items error:", error);
+                if (errorEl) {
+                    errorEl.textContent = error.message || "Không thể xóa món ăn.";
+                    errorEl.hidden = false;
+                }
+            } finally {
+                isDeletingItems = false;
+                if (deleteBtn) {
+                    deleteBtn.innerHTML = `Xóa món đã chọn (<span data-items-modal-delete-count>${selectedItemIds.size}</span>)`;
+                }
+                updateOrderItemsControls();
+            }
+        }
+
+        function closeOrderItemsModal(force = false) {
+            const modal = getOrderItemsModal();
+            if (!modal || (isDeletingItems && !force)) {
+                return;
+            }
+
+            modal.hidden = true;
+            activeItemsFetchId++;
+            currentItemsOrderId = null;
+            selectedItemIds.clear();
+            currentOrderItems = [];
+            updateDeletedAmountPreview();
+
+            document.body.classList.remove("vm-order-modal-open");
+        }
+
+        // ---------------------------------------------------------------------
+        // Date Filter Helpers
         // ---------------------------------------------------------------------
 
         function setDefaultDates() {
@@ -526,21 +785,10 @@ import autoTable from "jspdf-autotable";
         function updateFilterFields() {
             const type = timeType.value;
 
-            if (dayField) {
-                dayField.hidden = type !== "day";
-            }
-
-            if (weekField) {
-                weekField.hidden = type !== "week";
-            }
-
-            if (monthField) {
-                monthField.hidden = type !== "month";
-            }
-
-            if (yearField) {
-                yearField.hidden = type !== "year";
-            }
+            if (dayField) dayField.hidden = type !== "day";
+            if (weekField) weekField.hidden = type !== "week";
+            if (monthField) monthField.hidden = type !== "month";
+            if (yearField) yearField.hidden = type !== "year";
         }
 
         function getDateRange() {
@@ -571,7 +819,6 @@ import autoTable from "jspdf-autotable";
                 }
 
                 const match = weekInput.value.match(/^(\d{4})-W(\d{2})$/);
-
                 if (!match) {
                     throw new Error("Please select a valid week.");
                 }
@@ -613,7 +860,6 @@ import autoTable from "jspdf-autotable";
                 }
 
                 const match = monthInput.value.match(/^(\d{4})-(\d{2})$/);
-
                 if (!match) {
                     throw new Error("Please select a valid month.");
                 }
@@ -688,15 +934,12 @@ import autoTable from "jspdf-autotable";
             });
 
             const rawResponse = await response.text();
-
             let ajaxResponse;
 
             try {
                 ajaxResponse = JSON.parse(rawResponse);
             } catch {
-                throw new Error(
-                    `Invalid AJAX response (${response.status}).`
-                );
+                throw new Error(`Invalid AJAX response (${response.status}).`);
             }
 
             if (!response.ok || !ajaxResponse.success) {
@@ -710,7 +953,7 @@ import autoTable from "jspdf-autotable";
         }
 
         async function loadOrders(page = 1) {
-            if (isLoading || isDeleting) {
+            if (isLoading) {
                 return;
             }
 
@@ -730,7 +973,6 @@ import autoTable from "jspdf-autotable";
             }
 
             isLoading = true;
-
             showLoading(true);
             clearMessage();
 
@@ -741,7 +983,6 @@ import autoTable from "jspdf-autotable";
                 renderOrders(apiResponse);
             } catch (error) {
                 console.error("External API error:", error);
-
                 renderError(error.message);
                 showMessage(error.message);
             } finally {
@@ -751,7 +992,7 @@ import autoTable from "jspdf-autotable";
         }
 
         // ---------------------------------------------------------------------
-        // Rendering
+        // Orders Rendering
         // ---------------------------------------------------------------------
 
         function renderOrders(apiResponse) {
@@ -761,6 +1002,39 @@ import autoTable from "jspdf-autotable";
             totalOrders.textContent = Number(
                 meta.total ?? orders.length
             ).toLocaleString();
+
+            currentOrdersTotalAmount = orders.reduce((sum, order) => {
+                return sum + Number(order.total_price || 0);
+            }, 0);
+
+            currentCashTotalAmount = orders.reduce((sum, order) => {
+                const cash = getOrderCashAmount(order);
+                return sum + Number(cash || 0);
+            }, 0);
+
+            const currentPage = Number(meta.current_page || 1);
+            const lastPage = Number(meta.last_page || 1);
+            const isMultiPage = lastPage > 1;
+            const pageSuffix = isMultiPage ? ` (Trang ${currentPage}/${lastPage})` : "";
+
+            if (totalOrdersLabelEl) {
+                totalOrdersLabelEl.textContent = `Tổng giá trị hóa đơn${pageSuffix}:`;
+            }
+            if (totalCashLabelEl) {
+                totalCashLabelEl.textContent = `Tiền mặt thực thu${pageSuffix}:`;
+            }
+
+            if (totalOrdersAmountEl) {
+                totalOrdersAmountEl.textContent = formatVnd(currentOrdersTotalAmount);
+            }
+
+            if (totalCashAmountEl) {
+                totalCashAmountEl.textContent = formatVnd(currentCashTotalAmount);
+            }
+
+            if (totalDeletedAmountEl) {
+                totalDeletedAmountEl.textContent = formatVnd(sessionTotalDeletedAmount);
+            }
 
             summary.hidden = false;
 
@@ -776,7 +1050,6 @@ import autoTable from "jspdf-autotable";
             tbody.innerHTML = orders.map((order) => {
                 const orderId = Number(order.id);
                 const tableName = order.table?.name || "-";
-
                 const itemsCount = Array.isArray(order.items)
                     ? order.items.length
                     : 0;
@@ -785,35 +1058,59 @@ import autoTable from "jspdf-autotable";
                     ? new Date(order.created_at).toLocaleString()
                     : "-";
 
-                const checked = selectedOrderIds.has(orderId)
-                    ? "checked"
+                const method = String(order.payment_method || "").toLowerCase().trim();
+                const isSplit = method === "split";
+                const cashAmount = getOrderCashAmount(order);
+
+                const splitInfoHtml = isSplit
+                    ? `
+                        <div class="vm-order-split-info">
+                            <span class="vm-order-cash-val">Tiền mặt: <strong>${cashAmount !== null ? money(cashAmount) + ' ₫' : '—'}</strong></span>
+                            <span class="vm-badge vm-badge--split">Split</span>
+                        </div>
+                    `
                     : "";
 
-                return `
-                    <tr>
-                        <td>
-                            <input
-                                type="checkbox"
-                                data-order-checkbox
-                                value="${orderId}"
-                                aria-label="Select order ${orderId}"
-                                ${checked}
-                                ${isDeleting ? "disabled" : ""}
-                            >
-                        </td>
+                const rowClassAttr = isSplit ? ' class="vm-api-table__row--split"' : "";
 
-                        <td>#${orderId}</td>
+                const orderIdCellContent = isSplit
+                    ? `
+                        <span
+                            class="vm-order-id-label vm-order-id-label--split"
+                            title="Đơn Split (chỉ xem thông tin, không mở modal)"
+                        >
+                            #${orderId}
+                        </span>
+                    `
+                    : `
+                        <button
+                            type="button"
+                            class="vm-order-link"
+                            data-view-items="${orderId}"
+                            title="Xem chi tiết món ăn"
+                        >
+                            #${orderId}
+                        </button>
+                    `;
+
+                return `
+                    <tr data-order-row="${orderId}" data-payment-method="${escapeHtml(method)}"${rowClassAttr}>
+                        <td>
+                            ${orderIdCellContent}
+                        </td>
                         <td>${escapeHtml(tableName)}</td>
                         <td>${escapeHtml(order.status || "-")}</td>
-                        <td>${itemsCount}</td>
-                        <td>${money(order.total_price)}</td>
+                        <td data-order-items-count>${itemsCount}</td>
+                        <td>
+                            <div data-order-total-price>${money(order.total_price)}</div>
+                            ${splitInfoHtml}
+                        </td>
                         <td>${escapeHtml(createdAt)}</td>
                     </tr>
                 `;
             }).join("");
 
             renderPagination(meta);
-            updateDeleteControls();
         }
 
         function renderEmpty() {
@@ -821,9 +1118,27 @@ import autoTable from "jspdf-autotable";
                 ? orderIdInput.value.trim()
                 : "";
 
+            currentOrdersTotalAmount = 0;
+            currentCashTotalAmount = 0;
+            if (totalOrdersLabelEl) {
+                totalOrdersLabelEl.textContent = "Tổng giá trị hóa đơn:";
+            }
+            if (totalCashLabelEl) {
+                totalCashLabelEl.textContent = "Tiền mặt thực thu:";
+            }
+            if (totalOrdersAmountEl) {
+                totalOrdersAmountEl.textContent = "0 ₫";
+            }
+            if (totalCashAmountEl) {
+                totalCashAmountEl.textContent = "0 ₫";
+            }
+            if (totalDeletedAmountEl) {
+                totalDeletedAmountEl.textContent = formatVnd(sessionTotalDeletedAmount);
+            }
+
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="vm-api-empty">
+                    <td colspan="6" class="vm-api-empty">
                         ${orderId
                     ? "No order found with this Order ID."
                     : "No orders found for this period."
@@ -833,13 +1148,31 @@ import autoTable from "jspdf-autotable";
             `;
 
             pagination.innerHTML = "";
-            updateDeleteControls();
         }
 
         function renderError(errorMessage) {
+            totalOrders.textContent = "0";
+            currentOrdersTotalAmount = 0;
+            currentCashTotalAmount = 0;
+            if (totalOrdersLabelEl) {
+                totalOrdersLabelEl.textContent = "Tổng giá trị hóa đơn:";
+            }
+            if (totalCashLabelEl) {
+                totalCashLabelEl.textContent = "Tiền mặt thực thu:";
+            }
+            if (totalOrdersAmountEl) {
+                totalOrdersAmountEl.textContent = "—";
+            }
+            if (totalCashAmountEl) {
+                totalCashAmountEl.textContent = "—";
+            }
+            if (totalDeletedAmountEl) {
+                totalDeletedAmountEl.textContent = formatVnd(sessionTotalDeletedAmount);
+            }
+
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="vm-api-empty">
+                    <td colspan="6" class="vm-api-empty">
                         ${escapeHtml(errorMessage)}
                     </td>
                 </tr>
@@ -847,7 +1180,6 @@ import autoTable from "jspdf-autotable";
 
             pagination.innerHTML = "";
             summary.hidden = true;
-            updateDeleteControls();
         }
 
         function renderPagination(meta) {
@@ -905,427 +1237,23 @@ import autoTable from "jspdf-autotable";
         }
 
         // ---------------------------------------------------------------------
-        // Selection Toolbar
-        // ---------------------------------------------------------------------
-
-        function injectDeleteControls() {
-            // Toolbar is rendered by toolbar.php.
-            // Keep this fallback for backward compatibility.
-            if (!app.querySelector("[data-delete-toolbar]")) {
-                const toolbar = document.createElement("div");
-
-                toolbar.dataset.deleteToolbar = "";
-                toolbar.className = "vm-api-delete-toolbar";
-
-                toolbar.innerHTML = `
-                    <label>
-                        <input type="checkbox" data-select-all>
-                        Select all on this page
-                    </label>
-
-                    <span>
-                        Selected:
-                        <strong data-selected-count>0</strong>
-                    </span>
-
-                    <button
-                        type="button"
-                        data-delete-selected
-                        disabled
-                    >
-                        Delete selected
-                    </button>
-
-                    <button
-                        type="button"
-                        data-delete-random
-                    >
-                        Delete random 30%
-                    </button>
-                `;
-
-                ordersTable.parentNode.insertBefore(toolbar, ordersTable);
-            }
-
-            // Checkbox column is rendered by orders-table.php.
-            // Keep this fallback for older templates.
-            const headerRow = ordersTable.querySelector("thead tr");
-
-            if (
-                headerRow &&
-                !headerRow.querySelector("[data-select-column]")
-            ) {
-                const header = document.createElement("th");
-
-                header.dataset.selectColumn = "";
-                header.textContent = "Select";
-
-                headerRow.insertBefore(
-                    header,
-                    headerRow.firstElementChild
-                );
-            }
-        }
-
-        function getPageCheckboxes() {
-            return Array.from(
-                tbody.querySelectorAll("[data-order-checkbox]")
-            );
-        }
-
-        function updateDeleteControls() {
-            const selectedCount = app.querySelector(
-                "[data-selected-count]"
-            );
-
-            const deleteSelectedButton = app.querySelector(
-                "[data-delete-selected]"
-            );
-
-            const deleteRandomButton = app.querySelector(
-                "[data-delete-random]"
-            );
-
-            const selectAll = app.querySelector("[data-select-all]");
-            const pageCheckboxes = getPageCheckboxes();
-
-            const checkedCount = pageCheckboxes.filter(
-                (checkbox) => checkbox.checked
-            ).length;
-
-            if (selectedCount) {
-                selectedCount.textContent = String(
-                    selectedOrderIds.size
-                );
-            }
-
-            if (deleteSelectedButton) {
-                deleteSelectedButton.disabled =
-                    isLoading ||
-                    isDeleting ||
-                    selectedOrderIds.size === 0;
-            }
-
-            if (deleteRandomButton) {
-                deleteRandomButton.disabled = isLoading || isDeleting;
-            }
-
-            if (selectAll) {
-                selectAll.checked =
-                    pageCheckboxes.length > 0 &&
-                    checkedCount === pageCheckboxes.length;
-
-                selectAll.indeterminate =
-                    checkedCount > 0 &&
-                    checkedCount < pageCheckboxes.length;
-
-                selectAll.disabled =
-                    isLoading ||
-                    isDeleting ||
-                    pageCheckboxes.length === 0;
-            }
-
-            pageCheckboxes.forEach((checkbox) => {
-                checkbox.disabled = isLoading || isDeleting;
-            });
-        }
-
-        // ---------------------------------------------------------------------
-        // API: Delete Orders
-        // ---------------------------------------------------------------------
-
-        async function requestDelete(action, ids = []) {
-            const formData = new FormData();
-
-            const orderId = orderIdInput
-                ? orderIdInput.value.trim()
-                : "";
-
-            formData.append("action", action);
-            formData.append("nonce", apiConfig.nonce);
-
-            if (orderId) {
-                formData.append("order_id", orderId);
-            } else {
-                const range = getDateRange();
-
-                formData.append("date_from", range.date_from);
-                formData.append("date_to", range.date_to);
-            }
-
-            if (action === "vm_external_delete_orders") {
-                ids.forEach((id) => {
-                    formData.append("ids[]", String(id));
-                });
-            }
-
-            if (action === "vm_external_delete_random_orders") {
-                formData.append("random_percent", "30");
-            }
-
-            const response = await fetch(apiConfig.ajaxUrl, {
-                method: "POST",
-                credentials: "same-origin",
-                body: formData,
-            });
-
-            const rawResponse = await response.text();
-
-            let ajaxResponse;
-
-            try {
-                ajaxResponse = JSON.parse(rawResponse);
-            } catch {
-                throw new Error(
-                    `Invalid AJAX response (${response.status}).`
-                );
-            }
-
-            if (!response.ok || !ajaxResponse.success) {
-                throw new Error(
-                    ajaxResponse?.data?.message ||
-                    `Delete request failed with status ${response.status}.`
-                );
-            }
-
-            return ajaxResponse.data;
-        }
-
-        async function deleteOrdersByIds(ids) {
-            const chunkSize = 100;
-            let deletedCount = 0;
-
-            for (let i = 0; i < ids.length; i += chunkSize) {
-                const chunk = ids.slice(i, i + chunkSize);
-
-                const result = await requestDelete(
-                    "vm_external_delete_orders",
-                    chunk
-                );
-
-                deletedCount += Number(
-                    result?.deleted_count ?? chunk.length
-                );
-            }
-
-            return deletedCount;
-        }
-
-        // ---------------------------------------------------------------------
-        // Delete Selected Orders
-        // ---------------------------------------------------------------------
-
-        async function deleteSelectedOrders() {
-            if (
-                isLoading ||
-                isDeleting ||
-                selectedOrderIds.size === 0
-            ) {
-                return;
-            }
-
-            const ids = Array.from(selectedOrderIds);
-
-            const orders = ids.map((id) => {
-                return orderCache.get(id) || {
-                    id,
-                    status: "-",
-                    total_price: 0,
-                    created_at: "",
-                    table: { name: "-" },
-                };
-            });
-
-            openConfirmModal(
-                "Xóa đơn hàng đã chọn",
-                "Vui lòng xem lại các đơn hàng dưới đây trước khi xác nhận xóa.",
-                orders,
-                async () => {
-                    isDeleting = true;
-                    showLoading(true);
-                    clearMessage();
-
-                    try {
-                        const deletedCount = await deleteOrdersByIds(ids);
-
-                        selectedOrderIds.clear();
-
-                        closeConfirmModal(true);
-
-                        isDeleting = false;
-
-                        await loadOrders(1);
-
-                        showMessage(
-                            `Đã xóa thành công ${deletedCount} đơn hàng.`
-                        );
-                    } catch (error) {
-                        showMessage(
-                            error.message || "Không thể xóa đơn hàng."
-                        );
-
-                        throw error;
-                    } finally {
-                        isDeleting = false;
-                        showLoading(false);
-                        updateDeleteControls();
-                    }
-                }
-            );
-        }
-
-        // ---------------------------------------------------------------------
-        // Delete Random 30% of Matching Orders
-        // ---------------------------------------------------------------------
-
-        async function deleteRandomOrders() {
-            if (isLoading || isDeleting) {
-                return;
-            }
-
-            let range = null;
-
-            const orderId = orderIdInput
-                ? orderIdInput.value.trim()
-                : "";
-
-            try {
-                if (!orderId) {
-                    range = getDateRange();
-                }
-            } catch (error) {
-                showMessage(error.message);
-                return;
-            }
-
-            isLoading = true;
-            showLoading(true);
-            clearMessage();
-
-            try {
-                const firstPageResponse = await requestOrders(
-                    buildRequestData(1, range, 100)
-                );
-
-                const meta = firstPageResponse?.meta || {};
-                const allOrders = [
-                    ...(firstPageResponse?.data || []),
-                ];
-
-                const lastPage = Number(meta.last_page || 1);
-
-                for (let page = 2; page <= lastPage; page++) {
-                    const response = await requestOrders(
-                        buildRequestData(page, range, 100)
-                    );
-
-                    allOrders.push(...(response?.data || []));
-                }
-
-                if (allOrders.length === 0) {
-                    showMessage("No matching orders found.", "info");
-                    return;
-                }
-
-                // Fisher-Yates shuffle.
-                for (let i = allOrders.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-
-                    [allOrders[i], allOrders[j]] = [
-                        allOrders[j],
-                        allOrders[i],
-                    ];
-                }
-
-                const deleteCount = Math.max(
-                    1,
-                    Math.round(allOrders.length * 0.3)
-                );
-
-                const ordersToDelete = allOrders.slice(0, deleteCount);
-
-                const idsToDelete = ordersToDelete.map(
-                    (order) => Number(order.id)
-                );
-
-                isLoading = false;
-                showLoading(false);
-
-                const filterDescription = orderId
-                    ? `Order ID #${orderId}`
-                    : `${range.date_from} to ${range.date_to}`;
-
-                openConfirmModal(
-                    "Xóa ngẫu nhiên 30% đơn hàng",
-                    `Lọc: ${filterDescription}. Vui lòng xem lại các đơn hàng đã chọn để xóa.`,
-                    ordersToDelete,
-                    async () => {
-                        isDeleting = true;
-                        showLoading(true);
-                        clearMessage();
-
-                        try {
-                            const deletedCount = await deleteOrdersByIds(
-                                idsToDelete
-                            );
-
-                            selectedOrderIds.clear();
-
-                            closeConfirmModal(true);
-
-                            isDeleting = false;
-
-                            await loadOrders(1);
-
-                            showMessage(
-                                `Đã xóa thành công ${deletedCount} đơn hàng.`
-                            );
-                        } catch (error) {
-                            showMessage(
-                                error.message || "Không thể xóa đơn hàng."
-                            );
-
-                            throw error;
-                        } finally {
-                            isDeleting = false;
-                            showLoading(false);
-                            updateDeleteControls();
-                        }
-                    }
-                );
-            } catch (error) {
-                console.error("Random order preview error:", error);
-
-                showMessage(
-                    error.message || "Unable to preview orders."
-                );
-            } finally {
-                isLoading = false;
-                showLoading(false);
-            }
-        }
-
-        // ---------------------------------------------------------------------
-        // Events
+        // Event Binding
         // ---------------------------------------------------------------------
 
         function bindEvents() {
             timeType.addEventListener("change", () => {
                 updateFilterFields();
-                selectedOrderIds.clear();
                 loadOrders(1);
             });
 
             callApiButton.addEventListener("click", (event) => {
                 event.preventDefault();
-                selectedOrderIds.clear();
                 loadOrders(1);
             });
 
             if (searchOrderButton && orderIdInput) {
                 searchOrderButton.addEventListener("click", (event) => {
                     event.preventDefault();
-                    selectedOrderIds.clear();
                     loadOrders(1);
                 });
             }
@@ -1337,7 +1265,6 @@ import autoTable from "jspdf-autotable";
                     }
 
                     event.preventDefault();
-                    selectedOrderIds.clear();
                     loadOrders(1);
                 });
             }
@@ -1345,105 +1272,54 @@ import autoTable from "jspdf-autotable";
             if (clearOrderButton && orderIdInput) {
                 clearOrderButton.addEventListener("click", (event) => {
                     event.preventDefault();
-
                     orderIdInput.value = "";
-                    selectedOrderIds.clear();
-
                     clearMessage();
                     loadOrders(1);
                 });
             }
 
-            tbody.addEventListener("change", (event) => {
+            tbody.addEventListener("click", (event) => {
                 const target = event.target;
-
                 if (!(target instanceof Element)) {
                     return;
                 }
 
-                const checkbox = target.closest("[data-order-checkbox]");
-
-                if (!checkbox) {
-                    return;
-                }
-
-                const id = Number(checkbox.value);
-
-                if (!Number.isInteger(id) || id <= 0) {
-                    return;
-                }
-
-                if (checkbox.checked) {
-                    selectedOrderIds.add(id);
-                } else {
-                    selectedOrderIds.delete(id);
-                }
-
-                updateDeleteControls();
-            });
-
-            app.addEventListener("change", (event) => {
-                const target = event.target;
-
-                if (!(target instanceof Element)) {
-                    return;
-                }
-
-                const selectAll = target.closest("[data-select-all]");
-
-                if (!selectAll) {
-                    return;
-                }
-
-                getPageCheckboxes().forEach((checkbox) => {
-                    const id = Number(checkbox.value);
-
-                    checkbox.checked = selectAll.checked;
-
-                    if (selectAll.checked) {
-                        selectedOrderIds.add(id);
-                    } else {
-                        selectedOrderIds.delete(id);
+                // Explicitly block any modal action when clicking anywhere on a split row
+                const row = target.closest("tr[data-order-row]");
+                if (row) {
+                    const rowMethod = String(row.dataset.paymentMethod || "").toLowerCase().trim();
+                    if (rowMethod === "split") {
+                        return;
                     }
-                });
-
-                updateDeleteControls();
-            });
-
-            app.addEventListener("click", (event) => {
-                const target = event.target;
-
-                if (!(target instanceof Element)) {
-                    return;
                 }
 
-                if (target.closest("[data-delete-selected]")) {
+                const viewBtn = target.closest("[data-view-items]");
+                if (viewBtn) {
                     event.preventDefault();
-                    deleteSelectedOrders();
-                    return;
-                }
-
-                if (target.closest("[data-delete-random]")) {
-                    event.preventDefault();
-                    deleteRandomOrders();
+                    const orderId = Number(viewBtn.dataset.viewItems);
+                    if (Number.isInteger(orderId) && orderId > 0) {
+                        const cachedOrder = orderCache.get(orderId);
+                        const method = String(cachedOrder?.payment_method || "").toLowerCase().trim();
+                        if (method === "split") {
+                            return; // Double-guard against split orders
+                        }
+                        openOrderItemsModal(orderId);
+                    }
                 }
             });
 
             pagination.addEventListener("click", (event) => {
                 const target = event.target;
-
                 if (!(target instanceof Element)) {
                     return;
                 }
 
                 const button = target.closest("[data-page]");
-
-                if (!button || isLoading || isDeleting) {
+                if (!button || isLoading) {
                     return;
                 }
 
                 const page = Number(button.dataset.page);
-
                 if (!Number.isInteger(page) || page < 1) {
                     return;
                 }
@@ -1456,12 +1332,10 @@ import autoTable from "jspdf-autotable";
         // Init
         // ---------------------------------------------------------------------
 
-        injectDeleteControls();
-        bindConfirmModalEvents();
+        bindOrderItemsModalEvents();
         setDefaultDates();
         updateFilterFields();
         bindEvents();
-        updateDeleteControls();
     };
 
     $(document).ready(function () {

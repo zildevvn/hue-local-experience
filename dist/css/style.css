@@ -15465,21 +15465,44 @@ body.page-template-external-api .main-footer {
 }
 
 .vm-api-summary {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 12px 18px;
   margin-bottom: 20px;
-  font-size: 14px;
+  font-size: 13px;
   color: #475569;
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
 }
-.vm-api-summary strong {
+.vm-api-summary__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.vm-api-summary__item span {
+  color: #64748b;
+}
+.vm-api-summary__item strong {
   color: #9615b5;
   font-weight: 700;
   font-size: 15px;
+}
+.vm-api-summary__item--cash strong {
+  color: #059669;
+}
+.vm-api-summary__item--deleted strong {
+  color: #dc2626;
+}
+@media (max-width: 640px) {
+  .vm-api-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+  }
 }
 
 .vm-api-delete-toolbar {
@@ -15653,6 +15676,15 @@ body.page-template-external-api .main-footer {
 .vm-api-table tbody tr:hover {
   background-color: #f8fafc;
 }
+.vm-api-table tbody tr.vm-api-table__row--split {
+  background-color: #fffdf5;
+}
+.vm-api-table tbody tr.vm-api-table__row--split:hover {
+  background-color: #fefcf0;
+}
+.vm-api-table tbody tr.vm-api-table__row--split td {
+  cursor: default;
+}
 .vm-api-table tbody td {
   padding: 14px 18px;
   color: #1e293b;
@@ -15711,6 +15743,30 @@ body.page-template-external-api .main-footer {
 .vm-api-table .vm-api-empty strong {
   color: #9615b5;
   font-weight: 600;
+}
+.vm-api-table .vm-order-split-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+.vm-api-table .vm-order-split-info strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+.vm-api-table .vm-badge--split {
+  background-color: #fef3c7;
+  color: #92400e;
+  font-size: 10.5px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
 }
 @media (max-width: 768px) {
   .vm-api-table thead th,
@@ -16078,4 +16134,176 @@ body.vm-order-modal-open {
 .vm-order-modal__download:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.vm-order-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background-color: rgba(150, 21, 181, 0.08);
+  border: 1px solid rgba(150, 21, 181, 0.25);
+  border-radius: 6px;
+  color: #9615b5;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.vm-order-link:hover {
+  background-color: #9615b5;
+  border-color: #9615b5;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(150, 21, 181, 0.2);
+}
+.vm-order-link:focus-visible {
+  box-shadow: 0 0 0 2px rgba(150, 21, 181, 0.35);
+}
+
+.vm-order-id-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: default;
+  user-select: text;
+}
+.vm-order-id-label--split {
+  background-color: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+  cursor: default;
+}
+.vm-order-id-label--split:hover {
+  background-color: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+  transform: none;
+  box-shadow: none;
+}
+
+.vm-order-items-modal .vm-order-modal__dialog {
+  width: min(100%, 1040px);
+}
+.vm-order-items-modal__summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.vm-order-items-modal__stat {
+  font-size: 13px;
+  color: #475569;
+}
+.vm-order-items-modal__stat strong {
+  font-size: 15px;
+  color: #0f172a;
+  margin-left: 4px;
+}
+.vm-order-items-modal__stat--deleted strong {
+  color: #dc2626;
+}
+.vm-order-items-modal .vm-items-modal__state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 16px;
+  color: #64748b;
+  font-size: 14px;
+}
+.vm-order-items-modal .vm-items-modal__empty {
+  text-align: center;
+  padding: 36px 16px;
+  color: #64748b;
+  font-size: 14px;
+  font-style: italic;
+  background-color: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.vm-order-items-modal .vm-order-modal__notice {
+  padding: 10px 14px;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+.vm-order-items-modal .vm-items-table th,
+.vm-order-items-modal .vm-items-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+  vertical-align: middle;
+  color: #334155;
+}
+.vm-order-items-modal .vm-items-table td:first-child {
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-weight: 600;
+}
+.vm-order-items-modal .vm-items-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+.vm-order-items-modal .vm-items-table .vm-item-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+.vm-order-items-modal .vm-items-table .vm-item-note {
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+  max-width: 160px;
+  white-space: normal;
+  word-break: break-word;
+}
+.vm-order-items-modal .vm-items-table .vm-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.vm-order-items-modal .vm-items-table .vm-badge--food {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.vm-order-items-modal .vm-items-table .vm-badge--drink {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+.vm-order-items-modal .vm-items-table .vm-badge--packaged_drink {
+  background-color: #ede9fe;
+  color: #5b21b6;
+}
+.vm-order-items-modal .vm-items-table .vm-badge--pending {
+  background-color: #fef9c3;
+  color: #854d0e;
+}
+.vm-order-items-modal .vm-items-table .vm-badge--served {
+  background-color: #dcfce7;
+  color: #166534;
+}
+.vm-order-items-modal .vm-items-table .vm-badge--default {
+  background-color: #f1f5f9;
+  color: #475569;
 }
