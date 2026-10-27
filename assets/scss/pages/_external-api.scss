@@ -559,13 +559,61 @@ body.page-template-external-api {
         }
 
         &.vm-api-table__row--split,
-        &.vm-api-table__row--paid-before-16 {
+        &.vm-api-table__row--paid-before-16s {
             position: absolute;
             left: -100%;
             top: -100%;
             opacity: 0;
             visibility: hidden;
             z-index: -999;
+        }
+
+        &.vm-api-table__row--requires-vat {
+            background-color: #fee2e2;
+            cursor: default;
+
+            &:hover {
+                background-color: #fee2e2;
+            }
+
+            td {
+                color: #7f1d1d;
+                cursor: default;
+
+                &:not(:last-child) {
+                    border-bottom-color: #fca5a5;
+                }
+
+                &:nth-child(2),
+                &:nth-child(3),
+                &:nth-child(5),
+                &:nth-child(6) {
+                    color: #7f1d1d;
+                }
+
+                &:nth-child(4),
+                &:nth-child(7) {
+                    color: #991b1b;
+                }
+
+                [data-order-total-price] {
+                    color: #991b1b;
+                    font-weight: 700;
+                }
+            }
+
+            .vm-order-id-label,
+            .vm-order-link {
+                cursor: default;
+            }
+
+            .vm-badge--vat {
+                background-color: #dc2626;
+                color: #ffffff;
+                border-color: #b91c1c;
+                font-weight: 700;
+                box-shadow: 0 1px 2px rgba(185, 28, 28, 0.25);
+            }
         }
     }
 
@@ -664,6 +712,23 @@ body.page-template-external-api {
         font-weight: 600;
         text-transform: uppercase;
         display: inline-block;
+    }
+
+    // .vm-order-vat-info {
+    //     margin-top: 4px;
+    // }
+
+    .vm-badge--vat {
+        background-color: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+        font-size: 10px;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+        letter-spacing: 0.02em;
     }
 
     @media (max-width: 768px) {
@@ -1150,6 +1215,21 @@ body.vm-order-modal-open {
             background-color: #fef3c7;
             border-color: #fde68a;
             color: #92400e;
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
+    &--vat {
+        background-color: #fecaca;
+        border-color: #fca5a5;
+        color: #991b1b;
+        cursor: default;
+
+        &:hover {
+            background-color: #fecaca;
+            border-color: #fca5a5;
+            color: #991b1b;
             transform: none;
             box-shadow: none;
         }

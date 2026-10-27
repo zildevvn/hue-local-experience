@@ -1163,12 +1163,21 @@
                 const method = String(order.payment_method || "").toLowerCase().trim();
                 const isSplit = method === "split";
                 const cashAmount = getOrderCashAmount(order);
+                const requiresVat = order.requires_vat === true;
 
                 const splitInfoHtml = isSplit
                     ? `
                         <div class="vm-order-split-info">
                             <span class="vm-order-cash-val">Tiền mặt: <strong>${cashAmount !== null ? money(cashAmount) + ' ₫' : '—'}</strong></span>
                             <span class="vm-badge vm-badge--split">Split</span>
+                        </div>
+                    `
+                    : "";
+
+                const vatBadgeHtml = requiresVat
+                    ? `
+                        <div class="vm-order-vat-info">
+                            <span class="vm-badge vm-badge--vat" title="Đơn hàng yêu cầu xuất hóa đơn VAT">VAT</span>
                         </div>
                     `
                     : "";
@@ -1180,18 +1189,32 @@
                 if (isOrderPaidBeforeOrAt16(order)) {
                     rowClasses.push("vm-api-table__row--paid-before-16");
                 }
+                if (requiresVat) {
+                    rowClasses.push("vm-api-table__row--requires-vat");
+                }
                 const rowClassAttr = rowClasses.length > 0 ? ` class="${rowClasses.join(" ")}"` : "";
 
-                const orderIdCellContent = isSplit
-                    ? `
+                let orderIdCellContent = "";
+                if (requiresVat) {
+                    orderIdCellContent = `
+                        <span
+                            class="vm-order-id-label vm-order-id-label--vat"
+                            title="Đơn VAT (chỉ xem thông tin, không mở modal)"
+                        >
+                            #${orderId}
+                        </span>
+                    `;
+                } else if (isSplit) {
+                    orderIdCellContent = `
                         <span
                             class="vm-order-id-label vm-order-id-label--split"
                             title="Đơn Split (chỉ xem thông tin, không mở modal)"
                         >
                             #${orderId}
                         </span>
-                    `
-                    : `
+                    `;
+                } else {
+                    orderIdCellContent = `
                         <button
                             type="button"
                             class="vm-order-link"
@@ -1201,11 +1224,13 @@
                             #${orderId}
                         </button>
                     `;
+                }
 
                 return `
-                    <tr data-order-row="${orderId}" data-payment-method="${escapeHtml(method)}"${rowClassAttr}>
-                        <td>
+                    <tr data-order-row="${orderId}" data-payment-method="${escapeHtml(method)}" data-requires-vat="${requiresVat ? "true" : "false"}"${rowClassAttr}>
+                        <td class="d-flex align-items-center gap-2">
                             ${orderIdCellContent}
+                            ${vatBadgeHtml}
                         </td>
                         <td>${escapeHtml(tableName)}</td>
                         <td>${escapeHtml(order.status || "-")}</td>
@@ -1393,11 +1418,14 @@
                     return;
                 }
 
-                // Explicitly block any modal action when clicking anywhere on a split row
+                // Explicitly block any modal action when clicking anywhere on a split row or a VAT row
                 const row = target.closest("tr[data-order-row]");
                 if (row) {
                     const rowMethod = String(row.dataset.paymentMethod || "").toLowerCase().trim();
                     if (rowMethod === "split") {
+                        return;
+                    }
+                    if (row.dataset.requiresVat === "true") {
                         return;
                     }
                 }
@@ -1411,6 +1439,9 @@
                         const method = String(cachedOrder?.payment_method || "").toLowerCase().trim();
                         if (method === "split") {
                             return; // Double-guard against split orders
+                        }
+                        if (cachedOrder?.requires_vat === true) {
+                            return; // Double-guard against VAT orders
                         }
                         openOrderItemsModal(orderId);
                     }
