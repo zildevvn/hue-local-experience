@@ -165,3 +165,53 @@ function vm_register_tour_manager_role()
 	);
 }
 add_action('init', 'vm_register_tour_manager_role');
+
+
+
+/**
+ * Redirect Accountant users to the Accountant page after login.
+ */
+add_filter('login_redirect', function ($redirect_to, $requested_redirect_to, $user) {
+	if (
+		$user instanceof WP_User &&
+		in_array('accountant', (array) $user->roles, true)
+	) {
+		return home_url('/accountant/');
+	}
+
+	return $redirect_to;
+}, 10, 3);
+
+
+/**
+ * Keep logged-in Accountant users on the Accountant page.
+ */
+add_action('template_redirect', function () {
+	if (!is_user_logged_in() || is_admin()) {
+		return;
+	}
+
+	$user = wp_get_current_user();
+
+	if (!in_array('accountant', (array) $user->roles, true)) {
+		return;
+	}
+
+	// Allow the Accountant page itself.
+	if (is_page('accountant')) {
+		return;
+	}
+
+	// Do not interfere with AJAX, REST API, or cron requests.
+	if (
+		wp_doing_ajax() ||
+		(defined('REST_REQUEST') && REST_REQUEST) ||
+		(defined('DOING_CRON') && DOING_CRON)
+	) {
+		return;
+	}
+
+	wp_safe_redirect(home_url('/accountant/'));
+	exit;
+});
+
