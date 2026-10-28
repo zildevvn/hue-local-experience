@@ -25,7 +25,12 @@ $can_delete = current_user_can('manage_options');
                 <p id="vm-order-items-modal-description" data-items-modal-subtitle></p>
             </div>
 
-            <button type="button" data-items-modal-close aria-label="Close dialog">&times;</button>
+            <button type="button" class="vm-order-modal__close-btn" data-items-modal-close aria-label="Đóng cửa sổ" title="Đóng cửa sổ">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </header>
 
         <div class="vm-order-modal__body">
@@ -48,8 +53,13 @@ $can_delete = current_user_can('manage_options');
                 </div>
 
                 <div class="vm-order-items-modal__stat vm-order-items-modal__stat--deleted">
-                    <span>Tổng tiền món đã xóa:</span>
+                    <span>Tổng tiền món đã xóa (tất cả order):</span>
                     <strong data-items-modal-deleted-amount>0 ₫</strong>
+                </div>
+
+                <div class="vm-order-items-modal__stat vm-order-items-modal__stat--order-deleted">
+                    <span>Số tiền xóa của bàn đang chọn:</span>
+                    <strong data-items-modal-order-deleted-amount>0 ₫</strong>
                 </div>
             </div>
 
@@ -94,6 +104,15 @@ $can_delete = current_user_can('manage_options');
         <footer class="vm-order-modal__footer">
             <button type="button" data-items-modal-close>
                 Đóng
+            </button>
+
+            <button type="button" data-items-modal-download class="vm-order-modal__download" title="Tải file PDF danh sách món ăn của đơn hàng" disabled>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download PDF</span>
             </button>
 
             <?php if ($can_delete): ?>

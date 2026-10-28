@@ -863,31 +863,58 @@ body.vm-order-modal-open {
             line-height: 1.45;
         }
 
-        button[data-modal-close] {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
+        button[data-modal-close],
+        button[data-items-modal-close],
+        .vm-order-modal__close-btn {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: 10px;
             border: 1px solid #e2e8f0;
             background-color: #f8fafc;
             color: #64748b;
-            font-size: 20px;
+            font-size: 22px;
             line-height: 1;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             outline: none;
-            transition: all 0.15s ease;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
+            user-select: none;
+
+            svg {
+                display: block;
+                width: 18px;
+                height: 18px;
+                stroke: currentColor;
+                stroke-width: 2.2;
+                pointer-events: none;
+                transition: transform 0.15s ease;
+            }
 
             &:hover {
                 background-color: #fee2e2;
                 border-color: #fca5a5;
                 color: #dc2626;
+                box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12);
+
+                svg {
+                    transform: scale(1.08);
+                }
+            }
+
+            &:active {
+                background-color: #fecaca;
+                border-color: #f87171;
+                transform: scale(0.94);
+                box-shadow: none;
             }
 
             &:focus-visible {
-                box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+                border-color: #f87171;
+                box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
             }
         }
     }
@@ -1030,6 +1057,29 @@ body.vm-order-modal-open {
 
             &:focus-visible {
                 box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.3);
+            }
+        }
+
+        .vm-order-modal__download {
+            padding: 0 18px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #166534;
+            border-color: #166534;
+            box-shadow: 0 1px 2px rgba(22, 101, 52, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            &:hover:not(:disabled) {
+                background-color: #14532d;
+                border-color: #14532d;
+                color: #ffffff;
+                box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.3);
+            }
+
+            &:focus-visible {
+                box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.3);
             }
         }
 
@@ -1266,6 +1316,10 @@ body.vm-order-modal-open {
         &--deleted strong {
             color: #dc2626;
         }
+
+        &--order-deleted strong {
+            color: #dc2626;
+        }
     }
 
     .vm-items-modal__state {
@@ -1316,8 +1370,20 @@ body.vm-order-modal-open {
             font-weight: 600;
         }
 
-        tbody tr:hover {
-            background-color: #f8fafc;
+        tbody tr {
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: #f8fafc;
+            }
+        }
+
+        tbody tr[data-item-row] {
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            cursor: pointer;
         }
 
         .vm-item-name {
