@@ -80,8 +80,6 @@ applyPlugin(jsPDF);
         let isDeletingItems = false;
         let currentOrdersTotalAmount = 0;
         let currentCashTotalAmount = 0;
-        let sessionTotalDeletedAmount = 0;
-        const sessionDeletedItemIds = new Set();
         const LOCAL_STORAGE_KEY = "accountant_deleted_order_items";
         let ramFallbackDeletedItems = [];
         let ramFallbackDateKey = "";
@@ -647,11 +645,38 @@ applyPlugin(jsPDF);
             return amount;
         }
 
-        function updateAllOrdersDeletedAmountDisplay() {
-            const formatted = formatVnd(sessionTotalDeletedAmount);
+        function getAggregatedDeletedSummary() {
+            const allItems = getAllAggregatedDeletedItems();
+            let totalAmount = 0;
+            let hasUnknownPrice = false;
+
+            allItems.forEach((item) => {
+                if (item && item.final_price !== null && item.final_price !== undefined && !isNaN(Number(item.final_price))) {
+                    totalAmount += Number(item.final_price);
+                } else {
+                    hasUnknownPrice = true;
+                }
+            });
+
+            return {
+                items: allItems,
+                count: allItems.length,
+                totalAmount,
+                hasUnknownPrice
+            };
+        }
+
+        function updateAllOrdersDeletedAmountDisplay(summary = null) {
+            const activeSummary = summary || getAggregatedDeletedSummary();
+            const formatted = formatVnd(activeSummary.totalAmount);
 
             if (totalDeletedAmountEl) {
                 totalDeletedAmountEl.textContent = formatted;
+                if (activeSummary.hasUnknownPrice) {
+                    totalDeletedAmountEl.title = "Lưu ý: Có món chưa đủ thông tin giá thành tiền trong tổng này.";
+                } else {
+                    totalDeletedAmountEl.removeAttribute("title");
+                }
             }
 
             const modal = getOrderItemsModal();
@@ -659,6 +684,11 @@ applyPlugin(jsPDF);
                 const modalDeletedEl = modal.querySelector("[data-items-modal-deleted-amount]");
                 if (modalDeletedEl) {
                     modalDeletedEl.textContent = formatted;
+                    if (activeSummary.hasUnknownPrice) {
+                        modalDeletedEl.title = "Lưu ý: Có món chưa đủ thông tin giá thành tiền trong tổng này.";
+                    } else {
+                        modalDeletedEl.removeAttribute("title");
+                    }
                 }
             }
         }
@@ -831,22 +861,25 @@ applyPlugin(jsPDF);
         function syncDeletedPdfButtonState() {
             const exportBtn = document.querySelector("[data-export-deleted-pdf]");
             const countBadge = document.querySelector("[data-export-deleted-count]");
-            if (!exportBtn) return;
 
-            const allItems = getAllAggregatedDeletedItems();
-            const totalCount = allItems.length;
+            const summary = getAggregatedDeletedSummary();
+            const totalCount = summary.count;
 
             if (countBadge) {
                 countBadge.textContent = String(totalCount);
             }
 
-            if (totalCount === 0) {
-                exportBtn.disabled = true;
-                exportBtn.title = "Chưa có món nào bị xóa trong ngày hôm nay";
-            } else {
-                exportBtn.disabled = isExportingPdf;
-                exportBtn.title = `Tải PDF tổng hợp ${totalCount} món đã xóa trong ngày hôm nay (Giờ VN)`;
+            if (exportBtn) {
+                if (totalCount === 0) {
+                    exportBtn.disabled = true;
+                    exportBtn.title = "Chưa có món nào bị xóa trong ngày hôm nay";
+                } else {
+                    exportBtn.disabled = isExportingPdf;
+                    exportBtn.title = `Tải PDF tổng hợp ${totalCount} món đã xóa trong ngày hôm nay (Giờ VN)`;
+                }
             }
+
+            updateAllOrdersDeletedAmountDisplay(summary);
         }
 
         function updateSelectedItemsAmountDisplay() {
@@ -999,23 +1032,13 @@ applyPlugin(jsPDF);
                     : [];
 
                 // --- 1. CORE DELETION FLOW (UI, row removal, dashboard) ---
-                let newlyDeletedAmount = 0;
                 deletedIds.forEach(id => {
-                    const foundItem = currentOrderItems.find(it => Number(it.id) === id);
-                    const itemAmount = foundItem ? getItemFinalPrice(foundItem) : 0;
-
-                    if (!sessionDeletedItemIds.has(id)) {
-                        sessionDeletedItemIds.add(id);
-                        newlyDeletedAmount += itemAmount;
-                    }
-
                     selectedItemIds.delete(id);
                     const row = modal.querySelector(`tr[data-item-row="${id}"]`);
                     if (row) row.remove();
                 });
 
-                sessionTotalDeletedAmount += newlyDeletedAmount;
-                updateDeletedAmountPreview();
+                updateSelectedItemsAmountDisplay();
 
                 currentOrderItems = currentOrderItems.filter(item => !deletedSet.has(Number(item.id)));
 
@@ -1683,9 +1706,7 @@ applyPlugin(jsPDF);
                 totalCashAmountEl.textContent = formatVnd(currentCashTotalAmount);
             }
 
-            if (totalDeletedAmountEl) {
-                totalDeletedAmountEl.textContent = formatVnd(sessionTotalDeletedAmount);
-            }
+            updateAllOrdersDeletedAmountDisplay();
 
             summary.hidden = false;
 
@@ -1815,9 +1836,7 @@ applyPlugin(jsPDF);
             if (totalCashAmountEl) {
                 totalCashAmountEl.textContent = "0 ₫";
             }
-            if (totalDeletedAmountEl) {
-                totalDeletedAmountEl.textContent = formatVnd(sessionTotalDeletedAmount);
-            }
+            updateAllOrdersDeletedAmountDisplay();
 
             tbody.innerHTML = `
                 <tr>
@@ -1849,9 +1868,7 @@ applyPlugin(jsPDF);
             if (totalCashAmountEl) {
                 totalCashAmountEl.textContent = "—";
             }
-            if (totalDeletedAmountEl) {
-                totalDeletedAmountEl.textContent = formatVnd(sessionTotalDeletedAmount);
-            }
+            updateAllOrdersDeletedAmountDisplay();
 
             tbody.innerHTML = `
                 <tr>
