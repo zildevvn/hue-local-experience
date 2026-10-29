@@ -82,9 +82,11 @@ applyPlugin(jsPDF);
         let currentCashTotalAmount = 0;
         let sessionTotalDeletedAmount = 0;
         const sessionDeletedItemIds = new Set();
-        const SESSION_STORAGE_KEY = "accountant_deleted_order_items";
-        const ramFallbackDeletedItems = [];
+        const LOCAL_STORAGE_KEY = "accountant_deleted_order_items";
+        let ramFallbackDeletedItems = [];
+        let ramFallbackDateKey = "";
         const processedActionTokens = new Set();
+        let midnightTimerId = null;
 
         // ---------------------------------------------------------------------
         // Utils
@@ -661,30 +663,112 @@ applyPlugin(jsPDF);
             }
         }
 
-        function isSessionStorageAvailable() {
+        function getVietnamDateKey(date = new Date()) {
+            try {
+                const formatter = new Intl.DateTimeFormat("en-CA", {
+                    timeZone: "Asia/Ho_Chi_Minh",
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit"
+                });
+                return formatter.format(date);
+            } catch {
+                const vnDate = new Date(date.getTime() + (7 * 60 + date.getTimezoneOffset()) * 60000);
+                const y = vnDate.getFullYear();
+                const m = String(vnDate.getMonth() + 1).padStart(2, "0");
+                const d = String(vnDate.getDate()).padStart(2, "0");
+                return `${y}-${m}-${d}`;
+            }
+        }
+
+        function getMsUntilNextVnMidnight() {
+            const now = Date.now();
+            const vnDate = new Date(now + 7 * 3600 * 1000);
+            const nextMidnightVn = new Date(Date.UTC(
+                vnDate.getUTCFullYear(),
+                vnDate.getUTCMonth(),
+                vnDate.getUTCDate() + 1,
+                0, 0, 0, 0
+            ));
+            const nextMidnightUtc = nextMidnightVn.getTime() - 7 * 3600 * 1000;
+            return Math.max(1000, nextMidnightUtc - now);
+        }
+
+        function isLocalStorageAvailable() {
             try {
                 const testKey = "__vm_test_storage__";
-                sessionStorage.setItem(testKey, "1");
-                sessionStorage.removeItem(testKey);
+                localStorage.setItem(testKey, "1");
+                localStorage.removeItem(testKey);
                 return true;
             } catch {
                 return false;
             }
         }
 
-        function getAllAggregatedDeletedItems() {
-            let storageItems = [];
-            if (isSessionStorageAvailable()) {
+        function checkAndPurgeExpiredDailyCycle() {
+            const todayVnKey = getVietnamDateKey();
+            let hasPurged = false;
+
+            if (ramFallbackDateKey && ramFallbackDateKey !== todayVnKey) {
+                ramFallbackDeletedItems = [];
+                ramFallbackDateKey = todayVnKey;
+                hasPurged = true;
+            } else if (!ramFallbackDateKey) {
+                ramFallbackDateKey = todayVnKey;
+            }
+
+            if (isLocalStorageAvailable()) {
                 try {
-                    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+                    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
                     if (raw) {
                         const parsed = JSON.parse(raw);
-                        if (Array.isArray(parsed)) {
-                            storageItems = parsed;
+                        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+                            if (parsed.date !== todayVnKey) {
+                                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                                hasPurged = true;
+                            }
+                        } else if (Array.isArray(parsed)) {
+                            localStorage.removeItem(LOCAL_STORAGE_KEY);
+                            hasPurged = true;
                         }
                     }
                 } catch (e) {
-                    console.error("[ExternalAPI] Lỗi đọc sessionStorage:", e);
+                    console.error("[ExternalAPI] Lỗi khi kiểm tra chu kỳ ngày localStorage:", e);
+                }
+            }
+
+            if (hasPurged) {
+                syncDeletedPdfButtonState();
+            }
+
+            return todayVnKey;
+        }
+
+        function scheduleMidnightCycleCheck() {
+            if (midnightTimerId) {
+                clearTimeout(midnightTimerId);
+            }
+            const msUntilMidnight = getMsUntilNextVnMidnight() + 1000;
+            midnightTimerId = setTimeout(() => {
+                checkAndPurgeExpiredDailyCycle();
+                scheduleMidnightCycleCheck();
+            }, msUntilMidnight);
+        }
+
+        function getAllAggregatedDeletedItems() {
+            const todayVnKey = checkAndPurgeExpiredDailyCycle();
+            let storageItems = [];
+            if (isLocalStorageAvailable()) {
+                try {
+                    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && typeof parsed === "object" && parsed.date === todayVnKey && Array.isArray(parsed.items)) {
+                            storageItems = parsed.items;
+                        }
+                    }
+                } catch (e) {
+                    console.error("[ExternalAPI] Lỗi đọc localStorage:", e);
                 }
             }
 
@@ -703,28 +787,40 @@ applyPlugin(jsPDF);
             return merged;
         }
 
-        function saveDeletedItemsToSessionOrRam(newRecords, modalNoticeEl) {
+        function saveDeletedItemsToStorageOrRam(newRecords, modalNoticeEl) {
             if (!newRecords || newRecords.length === 0) return true;
 
+            const todayVnKey = checkAndPurgeExpiredDailyCycle();
             let storageSuccess = false;
-            if (isSessionStorageAvailable()) {
+
+            if (isLocalStorageAvailable()) {
                 try {
-                    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
-                    const currentList = raw ? JSON.parse(raw) : [];
-                    const safeCurrent = Array.isArray(currentList) ? currentList : [];
-                    const updated = [...safeCurrent, ...newRecords];
-                    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updated));
+                    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    let currentItems = [];
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && typeof parsed === "object" && parsed.date === todayVnKey && Array.isArray(parsed.items)) {
+                            currentItems = parsed.items;
+                        }
+                    }
+                    const updatedItems = [...currentItems, ...newRecords];
+                    const payload = {
+                        date: todayVnKey,
+                        items: updatedItems
+                    };
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
                     storageSuccess = true;
                 } catch (storageErr) {
-                    console.warn("[ExternalAPI] Không thể lưu vào sessionStorage (quota hoặc bị tắt):", storageErr);
+                    console.warn("[ExternalAPI] Không thể lưu vào localStorage (quota hoặc bị tắt):", storageErr);
                     storageSuccess = false;
                 }
             }
 
             if (!storageSuccess) {
+                ramFallbackDateKey = todayVnKey;
                 ramFallbackDeletedItems.push(...newRecords);
                 if (modalNoticeEl) {
-                    const warnText = " (Cảnh báo: Bộ nhớ sessionStorage không khả dụng. Dữ liệu chỉ lưu tạm trên RAM và sẽ bị mất khi tải lại trang)";
+                    const warnText = " (Cảnh báo: Bộ nhớ localStorage không khả dụng. Dữ liệu chỉ lưu tạm trên RAM và sẽ bị mất khi tải lại trang)";
                     modalNoticeEl.textContent += warnText;
                 }
                 return false;
@@ -746,10 +842,10 @@ applyPlugin(jsPDF);
 
             if (totalCount === 0) {
                 exportBtn.disabled = true;
-                exportBtn.title = "Chưa có món nào bị xóa trong phiên này";
+                exportBtn.title = "Chưa có món nào bị xóa trong ngày hôm nay";
             } else {
                 exportBtn.disabled = isExportingPdf;
-                exportBtn.title = `Tải PDF tổng hợp ${totalCount} món đã xóa trong phiên làm việc`;
+                exportBtn.title = `Tải PDF tổng hợp ${totalCount} món đã xóa trong ngày hôm nay (Giờ VN)`;
             }
         }
 
@@ -805,6 +901,7 @@ applyPlugin(jsPDF);
         }
 
         async function deleteSelectedOrderItems() {
+            checkAndPurgeExpiredDailyCycle();
             const modal = getOrderItemsModal();
             if (!modal || !canUserDeleteOrderItems() || isDeletingItems || selectedItemIds.size === 0 || !currentItemsOrderId) {
                 return;
@@ -1025,7 +1122,7 @@ applyPlugin(jsPDF);
                         });
 
                         if (newRecords.length > 0) {
-                            saveDeletedItemsToSessionOrRam(newRecords, noticeEl);
+                            saveDeletedItemsToStorageOrRam(newRecords, noticeEl);
                             processedActionTokens.add(actionToken);
                         }
                     }
@@ -1076,6 +1173,7 @@ applyPlugin(jsPDF);
                 return;
             }
 
+            const todayVnKey = checkAndPurgeExpiredDailyCycle();
             const allItems = getAllAggregatedDeletedItems();
             if (allItems.length === 0) {
                 return;
@@ -1124,8 +1222,8 @@ applyPlugin(jsPDF);
                 doc.setFont("Roboto", "normal");
                 doc.setFontSize(9);
                 doc.setTextColor(100, 116, 139);
-                const printedAt = new Date().toLocaleString("vi-VN");
-                doc.text(`Phiên làm việc (Session) | Thời điểm xuất file: ${printedAt}`, 14, currentY);
+                const printedAt = new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
+                doc.text(`Chu kỳ ngày: ${todayVnKey} (Giờ VN) | Thời điểm xuất file: ${printedAt}`, 14, currentY);
 
                 currentY += 6;
 
@@ -1287,7 +1385,7 @@ applyPlugin(jsPDF);
 
                 const now = new Date();
                 const padStr = (n) => String(n).padStart(2, "0");
-                const datePart = `${now.getFullYear()}-${padStr(now.getMonth() + 1)}-${padStr(now.getDate())}_${padStr(now.getHours())}${padStr(now.getMinutes())}`;
+                const datePart = `${todayVnKey}_${padStr(now.getHours())}${padStr(now.getMinutes())}`;
                 const fileName = `tong-hop-mon-da-xoa-${datePart}.pdf`;
 
                 doc.save(fileName);
@@ -1505,6 +1603,7 @@ applyPlugin(jsPDF);
         }
 
         async function loadOrders(page = 1) {
+            checkAndPurgeExpiredDailyCycle();
             if (isLoading) {
                 return;
             }
@@ -1934,11 +2033,23 @@ applyPlugin(jsPDF);
         // Init
         // ---------------------------------------------------------------------
 
+        checkAndPurgeExpiredDailyCycle();
         bindOrderItemsModalEvents();
         setDefaultDates();
         updateFilterFields();
         bindEvents();
         syncDeletedPdfButtonState();
+        scheduleMidnightCycleCheck();
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                checkAndPurgeExpiredDailyCycle();
+            }
+        });
+
+        setInterval(() => {
+            checkAndPurgeExpiredDailyCycle();
+        }, 60000);
     };
 
     $(document).ready(function () {

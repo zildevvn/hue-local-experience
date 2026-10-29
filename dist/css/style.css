@@ -15676,7 +15676,7 @@ body.page-template-external-api .main-footer {
 .vm-api-table tbody tr:hover {
   background-color: #f8fafc;
 }
-.vm-api-table tbody tr.vm-api-table__row--split, .vm-api-table tbody tr.vm-api-table__row--paid-before-16 {
+.vm-api-table tbody tr.vm-api-table__row--split, .vm-api-table tbody tr.vm-api-table__row--paid-before-16s {
   position: absolute;
   left: -100%;
   top: -100%;
