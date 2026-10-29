@@ -106,15 +106,6 @@ $can_delete = current_user_can('manage_options');
                 Đóng
             </button>
 
-            <button type="button" data-items-modal-download class="vm-order-modal__download" title="Tải file PDF danh sách món ăn của đơn hàng" disabled>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <span>Download PDF</span>
-            </button>
-
             <?php if ($can_delete): ?>
                 <button type="button" data-items-modal-delete class="vm-order-modal__delete" disabled>
                     Xóa món đã chọn (<span data-items-modal-delete-count>0</span>)

@@ -82,6 +82,9 @@ applyPlugin(jsPDF);
         let currentCashTotalAmount = 0;
         let sessionTotalDeletedAmount = 0;
         const sessionDeletedItemIds = new Set();
+        const SESSION_STORAGE_KEY = "accountant_deleted_order_items";
+        const ramFallbackDeletedItems = [];
+        const processedActionTokens = new Set();
 
         // ---------------------------------------------------------------------
         // Utils
@@ -304,12 +307,7 @@ applyPlugin(jsPDF);
                     return;
                 }
 
-                if (target.closest("[data-items-modal-download]")) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    downloadCurrentOrderItemsPdf();
-                    return;
-                }
+
 
                 // Row click delegation to toggle order item selection
                 const itemRow = target.closest("tr[data-item-row]");
@@ -434,10 +432,6 @@ applyPlugin(jsPDF);
             if (totalPriceEl) totalPriceEl.textContent = money(initialTotal);
             if (selectedCountEl) selectedCountEl.textContent = "0";
             if (deleteCountEl) deleteCountEl.textContent = "0";
-            const downloadBtn = modal.querySelector("[data-items-modal-download]");
-            if (downloadBtn) {
-                downloadBtn.disabled = true;
-            }
             if (deleteBtn) {
                 deleteBtn.disabled = true;
                 deleteBtn.innerHTML = 'Xóa món đã chọn (<span data-items-modal-delete-count>0</span>)';
@@ -526,11 +520,6 @@ applyPlugin(jsPDF);
             const selectAllCheckbox = modal.querySelector("[data-items-select-all]");
 
             if (totalCountEl) totalCountEl.textContent = String(items.length);
-
-            const downloadBtn = modal.querySelector("[data-items-modal-download]");
-            if (downloadBtn) {
-                downloadBtn.disabled = items.length === 0;
-            }
 
             const itemsSum = items.reduce((sum, it) => sum + Number(it.final_price || 0), 0);
             const cachedOrder = orderCache.get(currentItemsOrderId);
@@ -672,6 +661,98 @@ applyPlugin(jsPDF);
             }
         }
 
+        function isSessionStorageAvailable() {
+            try {
+                const testKey = "__vm_test_storage__";
+                sessionStorage.setItem(testKey, "1");
+                sessionStorage.removeItem(testKey);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        function getAllAggregatedDeletedItems() {
+            let storageItems = [];
+            if (isSessionStorageAvailable()) {
+                try {
+                    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed)) {
+                            storageItems = parsed;
+                        }
+                    }
+                } catch (e) {
+                    console.error("[ExternalAPI] Lỗi đọc sessionStorage:", e);
+                }
+            }
+
+            const seenKeys = new Set();
+            const merged = [];
+
+            [...storageItems, ...ramFallbackDeletedItems].forEach((item) => {
+                if (!item) return;
+                const key = item.record_id || `${item.order_id}_${item.item_id}_${item.deleted_at}`;
+                if (!seenKeys.has(key)) {
+                    seenKeys.add(key);
+                    merged.push(item);
+                }
+            });
+
+            return merged;
+        }
+
+        function saveDeletedItemsToSessionOrRam(newRecords, modalNoticeEl) {
+            if (!newRecords || newRecords.length === 0) return true;
+
+            let storageSuccess = false;
+            if (isSessionStorageAvailable()) {
+                try {
+                    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+                    const currentList = raw ? JSON.parse(raw) : [];
+                    const safeCurrent = Array.isArray(currentList) ? currentList : [];
+                    const updated = [...safeCurrent, ...newRecords];
+                    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updated));
+                    storageSuccess = true;
+                } catch (storageErr) {
+                    console.warn("[ExternalAPI] Không thể lưu vào sessionStorage (quota hoặc bị tắt):", storageErr);
+                    storageSuccess = false;
+                }
+            }
+
+            if (!storageSuccess) {
+                ramFallbackDeletedItems.push(...newRecords);
+                if (modalNoticeEl) {
+                    const warnText = " (Cảnh báo: Bộ nhớ sessionStorage không khả dụng. Dữ liệu chỉ lưu tạm trên RAM và sẽ bị mất khi tải lại trang)";
+                    modalNoticeEl.textContent += warnText;
+                }
+                return false;
+            }
+            return true;
+        }
+
+        function syncDeletedPdfButtonState() {
+            const exportBtn = document.querySelector("[data-export-deleted-pdf]");
+            const countBadge = document.querySelector("[data-export-deleted-count]");
+            if (!exportBtn) return;
+
+            const allItems = getAllAggregatedDeletedItems();
+            const totalCount = allItems.length;
+
+            if (countBadge) {
+                countBadge.textContent = String(totalCount);
+            }
+
+            if (totalCount === 0) {
+                exportBtn.disabled = true;
+                exportBtn.title = "Chưa có món nào bị xóa trong phiên này";
+            } else {
+                exportBtn.disabled = isExportingPdf;
+                exportBtn.title = `Tải PDF tổng hợp ${totalCount} món đã xóa trong phiên làm việc`;
+            }
+        }
+
         function updateSelectedItemsAmountDisplay() {
             const modal = getOrderItemsModal();
             if (!modal) return;
@@ -746,11 +827,23 @@ applyPlugin(jsPDF);
             if (noticeEl) { noticeEl.hidden = true; noticeEl.textContent = ""; }
 
             isDeletingItems = true;
+            const actionToken = `act_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
             updateOrderItemsControls();
             if (deleteBtn) deleteBtn.textContent = "Đang xóa...";
 
             const targetOrderId = currentItemsOrderId;
             const itemIdsToDelete = Array.from(selectedItemIds);
+            const cachedOrder = orderCache.get(targetOrderId);
+
+            // Snapshot selected items before delete request
+            const selectedSnapshot = new Map();
+            currentOrderItems.forEach(item => {
+                const numId = Number(item.id);
+                if (selectedItemIds.has(numId)) {
+                    selectedSnapshot.set(numId, { ...item });
+                }
+            });
 
             const formData = new FormData();
             formData.append("action", "vm_external_delete_order_items");
@@ -780,7 +873,7 @@ applyPlugin(jsPDF);
                     return;
                 }
 
-                if (!response.ok || !ajaxResponse.success) {
+                if (!response.ok || !ajaxResponse || typeof ajaxResponse !== "object" || !ajaxResponse.success) {
                     const serverMsg = ajaxResponse?.data?.message || `Xóa món thất bại (${response.status}).`;
                     const notFound = ajaxResponse?.data?.data?.not_found_ids;
                     if (Array.isArray(notFound) && notFound.length > 0) {
@@ -789,15 +882,26 @@ applyPlugin(jsPDF);
                     throw new Error(serverMsg);
                 }
 
-                const resultData = ajaxResponse.data || {};
-                const deletedIds = Array.isArray(resultData.deleted_ids)
-                    ? resultData.deleted_ids.map(Number)
+                // Verify exact structure of deleted_ids from WordPress AJAX / Laravel
+                const resultData = ajaxResponse.data;
+                let rawDeletedIds = null;
+                if (resultData && typeof resultData === "object") {
+                    if (Array.isArray(resultData.deleted_ids)) {
+                        rawDeletedIds = resultData.deleted_ids;
+                    } else if (resultData.data && Array.isArray(resultData.data.deleted_ids)) {
+                        rawDeletedIds = resultData.data.deleted_ids;
+                    }
+                }
+
+                const deletedIds = Array.isArray(rawDeletedIds)
+                    ? rawDeletedIds.map(Number).filter(id => Number.isInteger(id) && id > 0)
                     : [];
                 const deletedSet = new Set(deletedIds);
-                const notFoundIds = Array.isArray(resultData.not_found_ids)
+                const notFoundIds = Array.isArray(resultData?.not_found_ids)
                     ? resultData.not_found_ids.map(Number)
                     : [];
 
+                // --- 1. CORE DELETION FLOW (UI, row removal, dashboard) ---
                 let newlyDeletedAmount = 0;
                 deletedIds.forEach(id => {
                     const foundItem = currentOrderItems.find(it => Number(it.id) === id);
@@ -818,7 +922,7 @@ applyPlugin(jsPDF);
 
                 currentOrderItems = currentOrderItems.filter(item => !deletedSet.has(Number(item.id)));
 
-                const orderSummary = resultData.order_summary || {};
+                const orderSummary = resultData?.order_summary || {};
                 const remainingItemsCount = orderSummary.remaining_items_count !== undefined
                     ? Number(orderSummary.remaining_items_count)
                     : currentOrderItems.length;
@@ -841,7 +945,7 @@ applyPlugin(jsPDF);
                 }
 
                 if (noticeEl) {
-                    let msg = `Đã xóa thành công ${resultData.deleted_count || deletedIds.length} món.`;
+                    let msg = `Đã xóa thành công ${resultData?.deleted_count || deletedIds.length} món.`;
                     if (notFoundIds.length > 0) {
                         msg += ` Lưu ý: Không tìm thấy món ID #${notFoundIds.join(", #")} trong đơn hàng này.`;
                     }
@@ -857,9 +961,8 @@ applyPlugin(jsPDF);
                     if (priceCell) priceCell.textContent = money(newTotalPrice);
                 }
 
-                const cached = orderCache.get(targetOrderId);
-                if (cached) {
-                    const oldOrderPrice = Number(cached.total_price || 0);
+                if (cachedOrder) {
+                    const oldOrderPrice = Number(cachedOrder.total_price || 0);
                     const priceDiff = oldOrderPrice - newTotalPrice;
                     if (priceDiff > 0) {
                         currentOrdersTotalAmount = Math.max(0, currentOrdersTotalAmount - priceDiff);
@@ -867,24 +970,70 @@ applyPlugin(jsPDF);
                             totalOrdersAmountEl.textContent = formatVnd(currentOrdersTotalAmount);
                         }
 
-                        const orderMethod = String(cached.payment_method || "").toLowerCase().trim();
-                        // For cash orders, single cash payment record is synchronized with newTotalPrice on backend
+                        const orderMethod = String(cachedOrder.payment_method || "").toLowerCase().trim();
                         if (orderMethod === "cash") {
                             currentCashTotalAmount = Math.max(0, currentCashTotalAmount - priceDiff);
                             if (totalCashAmountEl) {
                                 totalCashAmountEl.textContent = formatVnd(currentCashTotalAmount);
                             }
                         }
-                        // For split orders: do not alter cash amount at frontend
                     }
 
-                    cached.total_price = newTotalPrice;
-                    if (orderSummary.subtotal !== undefined) cached.subtotal = orderSummary.subtotal;
-                    if (orderSummary.discount_amount !== undefined) cached.discount_amount = orderSummary.discount_amount;
-                    if (Array.isArray(cached.items)) {
-                        cached.items = cached.items.filter(item => !deletedSet.has(Number(item.id)));
+                    cachedOrder.total_price = newTotalPrice;
+                    if (orderSummary.subtotal !== undefined) cachedOrder.subtotal = orderSummary.subtotal;
+                    if (orderSummary.discount_amount !== undefined) cachedOrder.discount_amount = orderSummary.discount_amount;
+                    if (Array.isArray(cachedOrder.items)) {
+                        cachedOrder.items = cachedOrder.items.filter(item => !deletedSet.has(Number(item.id)));
                     }
                 }
+
+                // --- 2. SEPARATED REPORTING & STORAGE FLOW ---
+                try {
+                    if (!processedActionTokens.has(actionToken) && deletedIds.length > 0) {
+                        const newRecords = [];
+                        deletedIds.forEach(id => {
+                            const itemSnapshot = selectedSnapshot.get(id);
+                            if (!itemSnapshot) {
+                                console.warn(`[ExternalAPI] Món ID #${id} được backend xác nhận xóa nhưng không có trong snapshot trước khi xóa. Bỏ qua để tránh suy đoán số liệu.`);
+                                return;
+                            }
+
+                            const rawQty = itemSnapshot.quantity;
+                            const rawPrice = itemSnapshot.price;
+                            const rawDiscount = itemSnapshot.discount_amount;
+
+                            let finalPrice = null;
+                            if (itemSnapshot.final_price !== undefined && itemSnapshot.final_price !== null && !isNaN(Number(itemSnapshot.final_price))) {
+                                finalPrice = Number(itemSnapshot.final_price);
+                            } else if (rawQty !== undefined && rawQty !== null && !isNaN(Number(rawQty)) && rawPrice !== undefined && rawPrice !== null && !isNaN(Number(rawPrice))) {
+                                finalPrice = getItemFinalPrice(itemSnapshot);
+                            }
+
+                            newRecords.push({
+                                record_id: `${targetOrderId}_${id}_${actionToken}`,
+                                action_token: actionToken,
+                                order_id: targetOrderId,
+                                table_name: cachedOrder?.table?.name || "—",
+                                item_id: id,
+                                product_name: itemSnapshot.product_name_vi || itemSnapshot.product_name || "—",
+                                quantity: (rawQty !== undefined && rawQty !== null && !isNaN(Number(rawQty))) ? Number(rawQty) : null,
+                                unit_price: (rawPrice !== undefined && rawPrice !== null && !isNaN(Number(rawPrice))) ? Number(rawPrice) : null,
+                                discount_amount: (rawDiscount !== undefined && rawDiscount !== null && !isNaN(Number(rawDiscount))) ? Number(rawDiscount) : 0,
+                                final_price: finalPrice,
+                                deleted_at: new Date().toISOString()
+                            });
+                        });
+
+                        if (newRecords.length > 0) {
+                            saveDeletedItemsToSessionOrRam(newRecords, noticeEl);
+                            processedActionTokens.add(actionToken);
+                        }
+                    }
+                } catch (reportErr) {
+                    console.error("[ExternalAPI] Lỗi khi ghi nhận dữ liệu xóa vào báo cáo:", reportErr);
+                }
+
+                syncDeletedPdfButtonState();
             } catch (error) {
                 console.error("Delete order items error:", error);
                 if (errorEl) {
@@ -917,356 +1066,243 @@ applyPlugin(jsPDF);
         }
 
         // ---------------------------------------------------------------------
-        // Order Items PDF Export
+        // Aggregated Deleted Order Items PDF Export
         // ---------------------------------------------------------------------
 
         let isExportingPdf = false;
 
-        async function downloadCurrentOrderItemsPdf() {
+        async function exportAllDeletedItemsToPdf() {
             if (isExportingPdf) {
                 return;
             }
 
-            const modal = getOrderItemsModal();
-            if (!modal) {
+            const allItems = getAllAggregatedDeletedItems();
+            if (allItems.length === 0) {
                 return;
             }
 
-            const downloadBtn = modal.querySelector("[data-items-modal-download]");
-            const errorEl = modal.querySelector("[data-items-modal-error]");
-
-            if (!currentItemsOrderId) {
-                return;
-            }
-
-            const cachedOrder = orderCache.get(currentItemsOrderId);
-            if (!cachedOrder) {
-                if (errorEl) {
-                    errorEl.textContent = "Không tìm thấy dữ liệu đơn hàng trong bộ nhớ.";
-                    errorEl.hidden = false;
-                }
-                return;
-            }
-
-            if (!currentOrderItems || currentOrderItems.length === 0) {
-                if (errorEl) {
-                    errorEl.textContent = "Đơn hàng này không có món nào để xuất PDF.";
-                    errorEl.hidden = false;
-                }
-                return;
-            }
+            const exportBtn = document.querySelector("[data-export-deleted-pdf]");
+            const originalBtnHtml = exportBtn ? exportBtn.innerHTML : "";
 
             isExportingPdf = true;
-            const originalBtnHtml = downloadBtn ? downloadBtn.innerHTML : "";
-            if (downloadBtn) {
-                downloadBtn.disabled = true;
-                downloadBtn.innerHTML = `
+            if (exportBtn) {
+                exportBtn.disabled = true;
+                exportBtn.innerHTML = `
                     <div class="vm-api-spinner" style="width: 14px; height: 14px; border-width: 2px;"></div>
                     <span>Đang tạo PDF...</span>
                 `;
             }
 
-            if (errorEl) {
-                errorEl.hidden = true;
-                errorEl.textContent = "";
-            }
-
             try {
-                // Yield to event loop to allow UI to render spinner
+                // Yield to allow UI spinner to render
                 await new Promise((resolve) => setTimeout(resolve, 60));
 
-                exportOrderItemsToPdf({
-                    order: cachedOrder,
-                    items: currentOrderItems
+                const doc = new jsPDF({
+                    orientation: "landscape",
+                    unit: "mm",
+                    format: "a4"
                 });
-            } catch (err) {
-                console.error("PDF generation failed:", err);
-                if (errorEl) {
-                    errorEl.textContent = `Tạo PDF thất bại: ${err.message || "Lỗi không xác định."}`;
-                    errorEl.hidden = false;
+
+                doc.addFileToVFS("Roboto-Regular.ttf", ROBOTO_REGULAR_BASE64);
+                doc.addFileToVFS("Roboto-Bold.ttf", ROBOTO_BOLD_BASE64);
+                doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+                doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
+                doc.setFont("Roboto", "normal");
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                let currentY = 16;
+
+                // Title
+                doc.setFont("Roboto", "bold");
+                doc.setFontSize(16);
+                doc.setTextColor(30, 41, 59);
+                doc.text("BÁO CÁO TỔNG HỢP CÁC MÓN ĐÃ XÓA", 14, currentY);
+
+                currentY += 7;
+
+                // Subtitle / printed time
+                doc.setFont("Roboto", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(100, 116, 139);
+                const printedAt = new Date().toLocaleString("vi-VN");
+                doc.text(`Phiên làm việc (Session) | Thời điểm xuất file: ${printedAt}`, 14, currentY);
+
+                currentY += 6;
+
+                // Table columns
+                const tableHeaders = [
+                    [
+                        "STT",
+                        "Order ID",
+                        "Bàn",
+                        "Tên món",
+                        "SL",
+                        "Đơn giá",
+                        "Giảm giá",
+                        "Thành tiền",
+                        "Thời điểm xóa"
+                    ]
+                ];
+
+                let hasUnknownPrice = false;
+                let calculatedTotalAmount = 0;
+                let totalQuantity = 0;
+
+                const tableBody = allItems.map((item, index) => {
+                    const stt = String(index + 1);
+                    const orderIdStr = `#${item.order_id || "-"}`;
+                    const tableName = item.table_name || "—";
+                    const productName = item.product_name || "—";
+                    const qtyStr = item.quantity !== null && item.quantity !== undefined
+                        ? String(item.quantity)
+                        : "—";
+
+                    if (item.quantity !== null && item.quantity !== undefined) {
+                        totalQuantity += Number(item.quantity) || 0;
+                    }
+
+                    const unitPriceStr = item.unit_price !== null && item.unit_price !== undefined
+                        ? `${money(item.unit_price)} ₫`
+                        : "—";
+
+                    const discountStr = item.discount_amount
+                        ? `${money(item.discount_amount)} ₫`
+                        : "0 ₫";
+
+                    let finalPriceStr = "—";
+                    if (item.final_price !== null && item.final_price !== undefined) {
+                        finalPriceStr = `${money(item.final_price)} ₫`;
+                        calculatedTotalAmount += Number(item.final_price) || 0;
+                    } else {
+                        hasUnknownPrice = true;
+                    }
+
+                    let deletedAtStr = "—";
+                    if (item.deleted_at) {
+                        const d = new Date(item.deleted_at);
+                        if (!isNaN(d.getTime())) {
+                            deletedAtStr = d.toLocaleString("vi-VN");
+                        }
+                    }
+
+                    return [
+                        stt,
+                        orderIdStr,
+                        tableName,
+                        productName,
+                        qtyStr,
+                        unitPriceStr,
+                        discountStr,
+                        finalPriceStr,
+                        deletedAtStr
+                    ];
+                });
+
+                doc.autoTable({
+                    head: tableHeaders,
+                    body: tableBody,
+                    startY: currentY,
+                    theme: "grid",
+                    styles: {
+                        font: "Roboto",
+                        fontSize: 8.5,
+                        textColor: [30, 41, 59],
+                        lineColor: [226, 232, 240],
+                        lineWidth: 0.2,
+                        cellPadding: 2.5
+                    },
+                    headStyles: {
+                        fillColor: [241, 245, 249],
+                        textColor: [15, 23, 42],
+                        fontStyle: "bold",
+                        lineWidth: 0.2,
+                        lineColor: [203, 213, 225]
+                    },
+                    columnStyles: {
+                        0: { halign: "center", cellWidth: 12 },
+                        1: { halign: "center", cellWidth: 20 },
+                        2: { halign: "left", cellWidth: 26 },
+                        3: { halign: "left", cellWidth: "auto" },
+                        4: { halign: "center", cellWidth: 14 },
+                        5: { halign: "right", cellWidth: 28 },
+                        6: { halign: "right", cellWidth: 24 },
+                        7: { halign: "right", cellWidth: 30 },
+                        8: { halign: "center", cellWidth: 38 }
+                    },
+                    alternateRowStyles: {
+                        fillColor: [248, 250, 252]
+                    },
+                    margin: { left: 14, right: 14, top: 14, bottom: 18 },
+                    didDrawPage: (data) => {
+                        const str = `Trang ${data.pageNumber} / ${doc.internal.getNumberOfPages()}`;
+                        doc.setFontSize(8);
+                        doc.setFont("Roboto", "normal");
+                        doc.setTextColor(148, 163, 184);
+                        doc.text(
+                            str,
+                            pageWidth - 14,
+                            doc.internal.pageSize.getHeight() - 8,
+                            { align: "right" }
+                        );
+                    }
+                });
+
+                let finalY = doc.lastAutoTable.finalY + 8;
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const summaryHeight = hasUnknownPrice ? 36 : 30;
+
+                if (finalY + summaryHeight > pageHeight - 16) {
+                    doc.addPage();
+                    finalY = 16;
                 }
+
+                const summaryWidth = 110;
+                const summaryX = pageWidth - 14 - summaryWidth;
+
+                doc.setFillColor(248, 250, 252);
+                doc.setDrawColor(203, 213, 225);
+                doc.setLineWidth(0.3);
+                doc.roundedRect(summaryX, finalY, summaryWidth, summaryHeight, 2, 2, "FD");
+
+                const uniqueOrderCount = new Set(allItems.map((it) => it.order_id)).size;
+
+                doc.setFontSize(8.5);
+                doc.setFont("Roboto", "normal");
+                doc.setTextColor(71, 85, 105);
+                doc.text("Tổng số đơn liên quan:", summaryX + 6, finalY + 6);
+                doc.text("Tổng số dòng món đã xóa:", summaryX + 6, finalY + 12);
+                doc.text("Tổng số lượng món đã xóa:", summaryX + 6, finalY + 18);
+
+                doc.setFont("Roboto", "bold");
+                doc.setTextColor(185, 28, 28);
+                doc.text("TỔNG TIỀN MÓN ĐÃ XÓA:", summaryX + 6, finalY + 24);
+                doc.text(`${money(calculatedTotalAmount)} ₫`, summaryX + summaryWidth - 6, finalY + 24, { align: "right" });
+
+                if (hasUnknownPrice) {
+                    doc.setFont("Roboto", "normal");
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(148, 163, 184);
+                    doc.text("* Một số món không đủ dữ liệu giá nên không cộng vào tổng tiền", summaryX + 6, finalY + 31);
+                }
+
+                const now = new Date();
+                const padStr = (n) => String(n).padStart(2, "0");
+                const datePart = `${now.getFullYear()}-${padStr(now.getMonth() + 1)}-${padStr(now.getDate())}_${padStr(now.getHours())}${padStr(now.getMinutes())}`;
+                const fileName = `tong-hop-mon-da-xoa-${datePart}.pdf`;
+
+                doc.save(fileName);
+            } catch (err) {
+                console.error("[ExternalAPI] Xuất PDF tổng hợp thất bại:", err);
+                alert(`Tạo PDF tổng hợp thất bại: ${err.message || "Lỗi không xác định"}. Vui lòng thử lại.`);
             } finally {
                 isExportingPdf = false;
-                if (downloadBtn) {
-                    downloadBtn.disabled = false;
-                    downloadBtn.innerHTML = originalBtnHtml;
+                if (exportBtn) {
+                    exportBtn.innerHTML = originalBtnHtml;
                 }
+                syncDeletedPdfButtonState();
             }
         }
 
-        function exportOrderItemsToPdf({ order, items }) {
-            const doc = new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: "a4"
-            });
-
-            // Register UTF-8 Roboto fonts supporting Vietnamese
-            doc.addFileToVFS("Roboto-Regular.ttf", ROBOTO_REGULAR_BASE64);
-            doc.addFileToVFS("Roboto-Bold.ttf", ROBOTO_BOLD_BASE64);
-            doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-            doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
-            doc.setFont("Roboto", "normal");
-
-            const orderId = order.id || "-";
-            const tableName = order.table?.name || "-";
-            const orderDate = order.created_at
-                ? new Date(order.created_at).toLocaleString("vi-VN")
-                : "-";
-            const status = order.status || "-";
-            const requiresVat = order.requires_vat === true;
-            const paymentMethod = String(order.payment_method || "").toLowerCase().trim();
-            const isSplit = paymentMethod === "split";
-            const cashAmount = getOrderCashAmount(order);
-
-            let paymentMethodDisplay = (paymentMethod || "-").toUpperCase();
-            if (isSplit) {
-                paymentMethodDisplay = `SPLIT (Tiền mặt: ${cashAmount !== null ? money(cashAmount) + " ₫" : "—"})`;
-            } else if (paymentMethod === "cash") {
-                paymentMethodDisplay = "TIỀN MẶT (CASH)";
-            }
-
-            const pageWidth = doc.internal.pageSize.getWidth();
-            let currentY = 16;
-
-            // --- Header Title ---
-            doc.setFont("Roboto", "bold");
-            doc.setFontSize(16);
-            doc.setTextColor(30, 41, 59);
-            doc.text(`CHI TIẾT MÓN ĂN - ĐƠN HÀNG #${orderId}`, 14, currentY);
-
-            currentY += 7;
-
-            // Subtitle / Date printed
-            doc.setFont("Roboto", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(100, 116, 139);
-            const printedAt = new Date().toLocaleString("vi-VN");
-            doc.text(`Ngày in file: ${printedAt}`, 14, currentY);
-
-            // VAT Alert Banner if requires_vat is true
-            if (requiresVat) {
-                currentY += 5;
-                doc.setFillColor(254, 226, 226); // light red
-                doc.setDrawColor(220, 38, 38);   // red border
-                doc.roundedRect(14, currentY, pageWidth - 28, 9, 1.5, 1.5, "FD");
-
-                doc.setFont("Roboto", "bold");
-                doc.setFontSize(10.5);
-                doc.setTextColor(185, 28, 28);
-                doc.text("CẦN XUẤT HÓA ĐƠN VAT", 18, currentY + 6);
-                currentY += 11;
-            } else {
-                currentY += 5;
-            }
-
-            // --- Order Info Box ---
-            doc.setFillColor(248, 250, 252);
-            doc.setDrawColor(226, 232, 240);
-            const infoBoxHeight = 22;
-            doc.roundedRect(14, currentY, pageWidth - 28, infoBoxHeight, 2, 2, "FD");
-
-            doc.setFontSize(9.5);
-            const col1X = 18;
-            const col2X = 80;
-            const col3X = 145;
-
-            // Row 1
-            doc.setFont("Roboto", "bold");
-            doc.setTextColor(71, 85, 105);
-            doc.text("Bàn:", col1X, currentY + 6.5);
-            doc.setFont("Roboto", "normal");
-            doc.setTextColor(15, 23, 42);
-            doc.text(String(tableName), col1X + 10, currentY + 6.5);
-
-            doc.setFont("Roboto", "bold");
-            doc.setTextColor(71, 85, 105);
-            doc.text("Thời gian tạo:", col2X, currentY + 6.5);
-            doc.setFont("Roboto", "normal");
-            doc.setTextColor(15, 23, 42);
-            doc.text(String(orderDate), col2X + 24, currentY + 6.5);
-
-            doc.setFont("Roboto", "bold");
-            doc.setTextColor(71, 85, 105);
-            doc.text("Trạng thái:", col3X, currentY + 6.5);
-            doc.setFont("Roboto", "normal");
-            doc.setTextColor(15, 23, 42);
-            doc.text(String(status), col3X + 20, currentY + 6.5);
-
-            // Row 2
-            doc.setFont("Roboto", "bold");
-            doc.setTextColor(71, 85, 105);
-            doc.text("Thanh toán:", col1X, currentY + 15);
-            doc.setFont("Roboto", "normal");
-            doc.setTextColor(15, 23, 42);
-            doc.text(paymentMethodDisplay, col1X + 22, currentY + 15);
-
-            doc.setFont("Roboto", "bold");
-            doc.setTextColor(71, 85, 105);
-            doc.text("Tổng tiền đơn:", col2X, currentY + 15);
-            doc.setFont("Roboto", "bold");
-            doc.setTextColor(15, 23, 42);
-            doc.text(`${money(order.total_price)} ₫`, col2X + 24, currentY + 15);
-
-            currentY += infoBoxHeight + 6;
-
-            // --- Order Items Table ---
-            let totalQuantity = 0;
-            let totalDiscount = 0;
-
-            const tableBody = items.map((item, index) => {
-                const itemId = item.id ? `#${item.id}` : "-";
-                const viName = item.product_name_vi || item.name || `Món #${item.id}`;
-                const enName = item.product_name_en && item.product_name_en !== viName ? `(${item.product_name_en})` : "";
-                const fullName = enName ? `${viName}\n${enName}` : viName;
-
-                const rawType = (item.type || "").toLowerCase();
-                let typeLabel = item.type || "-";
-                if (rawType === "food") typeLabel = "Đồ ăn";
-                else if (rawType === "drink") typeLabel = "Đồ uống";
-                else if (rawType === "packaged_drink") typeLabel = "Đồ uống đóng chai";
-
-                const qty = Number(item.quantity || 1);
-                totalQuantity += qty;
-
-                const unitPrice = Number(item.price || 0);
-                const discount = Number(item.discount_amount || 0);
-                totalDiscount += discount;
-
-                const finalPrice = item.final_price !== undefined
-                    ? Number(item.final_price)
-                    : Math.max(0, qty * unitPrice - discount);
-
-                const discountStr = discount > 0 ? `-${money(discount)} ₫` : "-";
-                const note = item.note || "-";
-
-                return [
-                    String(index + 1),
-                    itemId,
-                    fullName,
-                    typeLabel,
-                    String(qty),
-                    `${money(unitPrice)} ₫`,
-                    discountStr,
-                    `${money(finalPrice)} ₫`,
-                    note
-                ];
-            });
-
-            doc.autoTable({
-                startY: currentY,
-                head: [["STT", "Mã", "Tên món", "Loại", "SL", "Đơn giá", "Giảm giá", "Thành tiền", "Ghi chú"]],
-                body: tableBody,
-                margin: { left: 14, right: 14 },
-                styles: {
-                    font: "Roboto",
-                    fontStyle: "normal",
-                    fontSize: 8.5,
-                    cellPadding: 2.8,
-                    textColor: [30, 41, 59],
-                    lineColor: [226, 232, 240],
-                    lineWidth: 0.1
-                },
-                headStyles: {
-                    font: "Roboto",
-                    fontStyle: "bold",
-                    fillColor: [241, 245, 249],
-                    textColor: [51, 65, 85],
-                    fontSize: 8.5,
-                    halign: "left"
-                },
-                alternateRowStyles: {
-                    fillColor: [248, 250, 252]
-                },
-                columnStyles: {
-                    0: { halign: "center", cellWidth: 12 },
-                    1: { halign: "center", cellWidth: 14 },
-                    2: { halign: "left", cellWidth: 46 },
-                    3: { halign: "center", cellWidth: 20 },
-                    4: { halign: "center", cellWidth: 10, fontStyle: "bold" },
-                    5: { halign: "right", cellWidth: 20 },
-                    6: { halign: "right", cellWidth: 18 },
-                    7: { halign: "right", cellWidth: 22, fontStyle: "bold" },
-                    8: { halign: "left" }
-                },
-                didDrawPage: (data) => {
-                    const pageCount = doc.internal.getNumberOfPages();
-                    const currentPage = data.pageNumber;
-                    doc.setFont("Roboto", "normal");
-                    doc.setFontSize(8);
-                    doc.setTextColor(148, 163, 184);
-
-                    const footerText = `Trang ${currentPage} / ${pageCount}`;
-                    doc.text(footerText, pageWidth - 14, doc.internal.pageSize.getHeight() - 8, { align: "right" });
-
-                    const brandText = `Madam System | Đơn hàng #${orderId}`;
-                    doc.text(brandText, 14, doc.internal.pageSize.getHeight() - 8);
-                }
-            });
-
-            // Summary Box after table
-            let finalY = doc.lastAutoTable.finalY + 6;
-            if (finalY > doc.internal.pageSize.getHeight() - 35) {
-                doc.addPage();
-                finalY = 20;
-            }
-
-            doc.setFillColor(248, 250, 252);
-            doc.setDrawColor(203, 213, 225);
-            const summaryWidth = 85;
-            const summaryX = pageWidth - 14 - summaryWidth;
-            const summaryHeight = totalDiscount > 0 ? 28 : 22;
-
-            doc.roundedRect(summaryX, finalY, summaryWidth, summaryHeight, 2, 2, "FD");
-
-            doc.setFontSize(9);
-            doc.setFont("Roboto", "normal");
-            doc.setTextColor(71, 85, 105);
-            doc.text("Tổng số dòng món:", summaryX + 6, finalY + 6);
-            doc.text("Tổng số lượng món:", summaryX + 6, finalY + 12);
-
-            doc.setFont("Roboto", "bold");
-            doc.setTextColor(15, 23, 42);
-            doc.text(String(items.length), summaryX + summaryWidth - 6, finalY + 6, { align: "right" });
-            doc.text(String(totalQuantity), summaryX + summaryWidth - 6, finalY + 12, { align: "right" });
-
-            if (totalDiscount > 0) {
-                doc.setFont("Roboto", "normal");
-                doc.setTextColor(220, 38, 38);
-                doc.text("Tổng giảm giá:", summaryX + 6, finalY + 18);
-                doc.setFont("Roboto", "bold");
-                doc.text(`-${money(totalDiscount)} ₫`, summaryX + summaryWidth - 6, finalY + 18, { align: "right" });
-
-                doc.setFont("Roboto", "bold");
-                doc.setTextColor(15, 23, 42);
-                doc.text("TỔNG TIỀN ĐƠN:", summaryX + 6, finalY + 24);
-                doc.text(`${money(order.total_price)} ₫`, summaryX + summaryWidth - 6, finalY + 24, { align: "right" });
-            } else {
-                doc.setFont("Roboto", "bold");
-                doc.setTextColor(15, 23, 42);
-                doc.text("TỔNG TIỀN ĐƠN:", summaryX + 6, finalY + 18);
-                doc.text(`${money(order.total_price)} ₫`, summaryX + summaryWidth - 6, finalY + 18, { align: "right" });
-            }
-
-            // Build filename: order-{id}-items-{YYYY-MM-DD}.pdf
-            let datePart = "";
-            if (order.created_at) {
-                const d = new Date(order.created_at);
-                if (!isNaN(d.getTime())) {
-                    const year = d.getFullYear();
-                    const month = String(d.getMonth() + 1).padStart(2, "0");
-                    const day = String(d.getDate()).padStart(2, "0");
-                    datePart = `${year}-${month}-${day}`;
-                }
-            }
-            if (!datePart) {
-                const now = new Date();
-                datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-            }
-
-            const fileName = `order-${order.id}-items-${datePart}.pdf`;
-            doc.save(fileName);
-        }
 
         // ---------------------------------------------------------------------
         // Date Filter Helpers
@@ -1880,6 +1916,18 @@ applyPlugin(jsPDF);
 
                 loadOrders(page);
             });
+
+            document.addEventListener("click", (event) => {
+                const target = event.target;
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                if (target.closest("[data-export-deleted-pdf]")) {
+                    event.preventDefault();
+                    exportAllDeletedItemsToPdf();
+                }
+            });
         }
 
         // ---------------------------------------------------------------------
@@ -1890,6 +1938,7 @@ applyPlugin(jsPDF);
         setDefaultDates();
         updateFilterFields();
         bindEvents();
+        syncDeletedPdfButtonState();
     };
 
     $(document).ready(function () {

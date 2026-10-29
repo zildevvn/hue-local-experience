@@ -16114,26 +16114,6 @@ body.vm-order-modal-open {
 .vm-order-modal__footer button:focus-visible {
   box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.3);
 }
-.vm-order-modal__footer .vm-order-modal__download {
-  padding: 0 18px;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: #166534;
-  border-color: #166534;
-  box-shadow: 0 1px 2px rgba(22, 101, 52, 0.2);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.vm-order-modal__footer .vm-order-modal__download:hover:not(:disabled) {
-  background-color: #14532d;
-  border-color: #14532d;
-  color: #ffffff;
-  box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.3);
-}
-.vm-order-modal__footer .vm-order-modal__download:focus-visible {
-  box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.3);
-}
 .vm-order-modal__footer .vm-order-modal__delete {
   padding: 0 22px;
   font-weight: 600;
@@ -16212,28 +16192,47 @@ body.vm-order-modal-open {
     transition-duration: 0.01ms !important;
   }
 }
-.vm-order-modal__download {
+.vm-export-deleted-toolbar {
+  margin-top: 14px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.vm-btn-export-deleted {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 9px 16px;
   border: 1px solid #166534;
   border-radius: 8px;
   background: #166534;
-  color: #fff;
+  color: #ffffff;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(22, 101, 52, 0.15);
+  transition: background-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
 }
-
-.vm-order-modal__download:hover {
+.vm-btn-export-deleted:hover:not(:disabled) {
   background: #14532d;
+  border-color: #14532d;
+  box-shadow: 0 2px 4px rgba(22, 101, 52, 0.25);
 }
-
-.vm-order-modal__download:disabled {
-  opacity: 0.6;
+.vm-btn-export-deleted:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.35);
+}
+.vm-btn-export-deleted:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.vm-btn-export-deleted:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+  background: #94a3b8;
+  border-color: #94a3b8;
+  box-shadow: none;
 }
 
 .vm-order-link {
