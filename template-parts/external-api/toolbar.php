@@ -55,7 +55,12 @@ if (!defined('ABSPATH')) {
 
     <div class="vm-api-summary__item vm-api-summary__item--deleted">
         <span>Tổng tiền món đã xóa:</span>
-        <strong data-total-deleted-amount>0 ₫</strong>
+        <strong data-total-deleted-amount>0 ₫ / —</strong>
+    </div>
+
+    <div class="vm-api-summary__item vm-api-summary__item--rate">
+        <span>Tỷ lệ tiền món đã xóa:</span>
+        <strong data-deleted-items-rate>—</strong>
     </div>
 </div>
 

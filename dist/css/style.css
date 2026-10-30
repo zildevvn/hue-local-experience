@@ -15496,6 +15496,9 @@ body.page-template-external-api .main-footer {
 .vm-api-summary__item--deleted strong {
   color: #dc2626;
 }
+.vm-api-summary__item--rate strong {
+  color: #d97706;
+}
 @media (max-width: 640px) {
   .vm-api-summary {
     flex-direction: column;
@@ -16329,6 +16332,13 @@ body.vm-order-modal-open {
 }
 .vm-order-items-modal__stat--deleted strong {
   color: #dc2626;
+}
+.vm-order-items-modal__stat--rate strong {
+  color: #d97706;
+}
+.vm-order-items-modal__stat--rate.is-projected span {
+  color: #b45309;
+  font-weight: 600;
 }
 .vm-order-items-modal__stat--order-deleted strong {
   color: #dc2626;

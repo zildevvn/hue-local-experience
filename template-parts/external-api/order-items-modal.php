@@ -57,6 +57,11 @@ $can_delete = current_user_can('manage_options');
                     <strong data-items-modal-deleted-amount>0 ₫</strong>
                 </div>
 
+                <div class="vm-order-items-modal__stat vm-order-items-modal__stat--rate">
+                    <span data-items-modal-deleted-rate-label>Tỷ lệ tiền món đã xóa:</span>
+                    <strong data-items-modal-deleted-rate>—</strong>
+                </div>
+
                 <div class="vm-order-items-modal__stat vm-order-items-modal__stat--order-deleted">
                     <span>Số tiền xóa của bàn đang chọn:</span>
                     <strong data-items-modal-order-deleted-amount>0 ₫</strong>

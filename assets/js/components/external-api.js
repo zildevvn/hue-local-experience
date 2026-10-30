@@ -47,6 +47,7 @@ applyPlugin(jsPDF);
         const totalCashLabelEl = app.querySelector("[data-total-cash-label]");
         const totalCashAmountEl = app.querySelector("[data-total-cash-amount]");
         const totalDeletedAmountEl = app.querySelector("[data-total-deleted-amount]");
+        const deletedItemsRateEl = app.querySelector("[data-deleted-items-rate]");
 
         if (
             !timeType ||
@@ -82,6 +83,7 @@ applyPlugin(jsPDF);
         let currentCashTotalAmount = 0;
         const LOCAL_STORAGE_KEY = "accountant_deleted_order_items";
         let ramFallbackDeletedItems = [];
+        let ramFallbackCashAmount = null;
         let ramFallbackDateKey = "";
         const processedActionTokens = new Set();
         let midnightTimerId = null;
@@ -425,7 +427,7 @@ applyPlugin(jsPDF);
             }
 
             if (subtitleEl) {
-                subtitleEl.textContent = `Bàn: ${tableName}${paymentMethodInfo} | Thời gian: ${orderCreated}`;
+                subtitleEl.textContent = `${tableName}${paymentMethodInfo} | Thời gian: ${orderCreated}`;
             }
 
             if (totalCountEl) totalCountEl.textContent = "-";
@@ -666,12 +668,104 @@ applyPlugin(jsPDF);
             };
         }
 
+        function calculateDeletedRate(deletedAmount, cashAmount, includeBase = true) {
+            if (deletedAmount === null || deletedAmount === undefined || isNaN(Number(deletedAmount))) {
+                return "—";
+            }
+            if (cashAmount === null || cashAmount === undefined || isNaN(Number(cashAmount))) {
+                return "—";
+            }
+
+            const deleted = Number(deletedAmount);
+            const cash = Number(cashAmount);
+
+            if (deleted < 0 || cash < 0) {
+                return "—";
+            }
+
+            const denominator = cash + deleted;
+            if (denominator <= 0) {
+                return "—";
+            }
+
+            const rate = (deleted / denominator) * 100;
+            if (!isFinite(rate) || isNaN(rate)) {
+                return "—";
+            }
+
+            const formattedRate = rate.toLocaleString("vi-VN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (!includeBase) {
+                return `${formattedRate}%`;
+            }
+            const formattedBase = `${denominator.toLocaleString("vi-VN")} ₫`;
+
+            return `${formattedRate}% (${formattedBase})`;
+        }
+
+        function getStoredLatestCashAmount() {
+            const todayVnKey = checkAndPurgeExpiredDailyCycle();
+            if (isLocalStorageAvailable()) {
+                try {
+                    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && typeof parsed === "object" && parsed.date === todayVnKey && parsed.latest_cash_amount !== undefined && parsed.latest_cash_amount !== null && !isNaN(Number(parsed.latest_cash_amount))) {
+                            return Number(parsed.latest_cash_amount);
+                        }
+                    }
+                } catch (e) {
+                    // error
+                }
+            }
+            if (ramFallbackDateKey === todayVnKey && ramFallbackCashAmount !== null && !isNaN(Number(ramFallbackCashAmount))) {
+                return Number(ramFallbackCashAmount);
+            }
+            return null;
+        }
+
+        function saveLatestCashAmountToStorage(cashAmount) {
+            if (cashAmount === null || cashAmount === undefined || isNaN(Number(cashAmount))) return;
+            const numCash = Math.max(0, Number(cashAmount));
+            const todayVnKey = checkAndPurgeExpiredDailyCycle();
+
+            if (isLocalStorageAvailable()) {
+                try {
+                    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    let currentItems = [];
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && typeof parsed === "object" && parsed.date === todayVnKey && Array.isArray(parsed.items)) {
+                            currentItems = parsed.items;
+                        }
+                    }
+                    const payload = {
+                        date: todayVnKey,
+                        items: currentItems,
+                        latest_cash_amount: numCash
+                    };
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
+                } catch (e) {
+                    console.warn("[ExternalAPI] Không thể cập nhật latest_cash_amount vào localStorage:", e);
+                }
+            }
+
+            ramFallbackCashAmount = numCash;
+            ramFallbackDateKey = todayVnKey;
+        }
+
         function updateAllOrdersDeletedAmountDisplay(summary = null) {
             const activeSummary = summary || getAggregatedDeletedSummary();
-            const formatted = formatVnd(activeSummary.totalAmount);
+            const deletedFormatted = formatVnd(activeSummary.totalAmount);
+            const storedCash = getStoredLatestCashAmount();
 
             if (totalDeletedAmountEl) {
-                totalDeletedAmountEl.textContent = formatted;
+                if (storedCash !== null && !isNaN(storedCash) && storedCash >= 0) {
+                    const denominator = storedCash + activeSummary.totalAmount;
+                    totalDeletedAmountEl.textContent = `${deletedFormatted} / ${formatVnd(denominator)}`;
+                } else {
+                    totalDeletedAmountEl.textContent = `${deletedFormatted} / —`;
+                }
+
                 if (activeSummary.hasUnknownPrice) {
                     totalDeletedAmountEl.title = "Lưu ý: Có món chưa đủ thông tin giá thành tiền trong tổng này.";
                 } else {
@@ -683,7 +777,7 @@ applyPlugin(jsPDF);
             if (modal) {
                 const modalDeletedEl = modal.querySelector("[data-items-modal-deleted-amount]");
                 if (modalDeletedEl) {
-                    modalDeletedEl.textContent = formatted;
+                    modalDeletedEl.textContent = deletedFormatted;
                     if (activeSummary.hasUnknownPrice) {
                         modalDeletedEl.title = "Lưu ý: Có món chưa đủ thông tin giá thành tiền trong tổng này.";
                     } else {
@@ -691,6 +785,68 @@ applyPlugin(jsPDF);
                     }
                 }
             }
+
+            const actualRateFormatted = (storedCash !== null && !isNaN(storedCash))
+                ? calculateDeletedRate(activeSummary.totalAmount, storedCash, false)
+                : "—";
+
+            if (deletedItemsRateEl) {
+                deletedItemsRateEl.textContent = actualRateFormatted;
+            }
+
+            updateModalDeletedRateDisplay(activeSummary.totalAmount, storedCash);
+        }
+
+        function updateModalDeletedRateDisplay(historicalDeletedAmount = null, storedCash = null) {
+            const modal = getOrderItemsModal();
+            if (!modal) return;
+
+            const modalRateEl = modal.querySelector("[data-items-modal-deleted-rate]");
+            const modalRateLabelEl = modal.querySelector("[data-items-modal-deleted-rate-label]");
+            if (!modalRateEl) return;
+
+            const currentStoredCash = (storedCash !== null && !isNaN(storedCash))
+                ? storedCash
+                : getStoredLatestCashAmount();
+
+            const histDeleted = (historicalDeletedAmount !== null && !isNaN(Number(historicalDeletedAmount)))
+                ? Number(historicalDeletedAmount)
+                : getAggregatedDeletedSummary().totalAmount;
+
+            const selectedAmount = getSelectedItemsAmount();
+            const isProjected = selectedAmount > 0 && selectedItemIds.size > 0;
+
+            const statRateContainer = modalRateEl.closest(".vm-order-items-modal__stat--rate");
+            if (statRateContainer) {
+                statRateContainer.classList.toggle("is-projected", isProjected);
+            }
+
+            if (modalRateLabelEl) {
+                modalRateLabelEl.textContent = isProjected
+                    ? "Tỷ lệ tiền món đã xóa (dự kiến):"
+                    : "Tỷ lệ tiền món đã xóa:";
+            }
+
+            if (currentStoredCash === null || isNaN(currentStoredCash)) {
+                modalRateEl.textContent = "—";
+                return;
+            }
+
+            if (!isProjected) {
+                modalRateEl.textContent = calculateDeletedRate(histDeleted, currentStoredCash);
+                return;
+            }
+
+            const currentOrder = currentItemsOrderId ? orderCache.get(Number(currentItemsOrderId)) : null;
+            const method = String(currentOrder?.payment_method || "").toLowerCase().trim();
+            const isCashOrder = method === "cash";
+
+            const projectedDeletedAmount = histDeleted + selectedAmount;
+            const projectedCashReceived = isCashOrder
+                ? Math.max(0, currentStoredCash - selectedAmount)
+                : currentStoredCash;
+
+            modalRateEl.textContent = calculateDeletedRate(projectedDeletedAmount, projectedCashReceived);
         }
 
         function getVietnamDateKey(date = new Date()) {
@@ -741,6 +897,7 @@ applyPlugin(jsPDF);
 
             if (ramFallbackDateKey && ramFallbackDateKey !== todayVnKey) {
                 ramFallbackDeletedItems = [];
+                ramFallbackCashAmount = null;
                 ramFallbackDateKey = todayVnKey;
                 hasPurged = true;
             } else if (!ramFallbackDateKey) {
@@ -754,7 +911,12 @@ applyPlugin(jsPDF);
                         const parsed = JSON.parse(raw);
                         if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
                             if (parsed.date !== todayVnKey) {
-                                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                                const resetPayload = {
+                                    date: todayVnKey,
+                                    items: [],
+                                    latest_cash_amount: null
+                                };
+                                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(resetPayload));
                                 hasPurged = true;
                             }
                         } else if (Array.isArray(parsed)) {
@@ -768,6 +930,10 @@ applyPlugin(jsPDF);
             }
 
             if (hasPurged) {
+                currentCashTotalAmount = 0;
+                if (totalCashAmountEl) {
+                    totalCashAmountEl.textContent = "—";
+                }
                 syncDeletedPdfButtonState();
             }
 
@@ -827,16 +993,23 @@ applyPlugin(jsPDF);
                 try {
                     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
                     let currentItems = [];
+                    let storedCash = null;
                     if (raw) {
                         const parsed = JSON.parse(raw);
-                        if (parsed && typeof parsed === "object" && parsed.date === todayVnKey && Array.isArray(parsed.items)) {
-                            currentItems = parsed.items;
+                        if (parsed && typeof parsed === "object" && parsed.date === todayVnKey) {
+                            if (Array.isArray(parsed.items)) {
+                                currentItems = parsed.items;
+                            }
+                            if (parsed.latest_cash_amount !== undefined && parsed.latest_cash_amount !== null && !isNaN(Number(parsed.latest_cash_amount))) {
+                                storedCash = Number(parsed.latest_cash_amount);
+                            }
                         }
                     }
                     const updatedItems = [...currentItems, ...newRecords];
                     const payload = {
                         date: todayVnKey,
-                        items: updatedItems
+                        items: updatedItems,
+                        latest_cash_amount: storedCash
                     };
                     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
                     storageSuccess = true;
@@ -1096,10 +1269,22 @@ applyPlugin(jsPDF);
                             if (totalCashAmountEl) {
                                 totalCashAmountEl.textContent = formatVnd(currentCashTotalAmount);
                             }
+
+                            const storedCash = getStoredLatestCashAmount();
+                            if (storedCash !== null && !isNaN(storedCash)) {
+                                const newStoredCash = Math.max(0, storedCash - priceDiff);
+                                saveLatestCashAmountToStorage(newStoredCash);
+                            }
                         }
                     }
 
                     cachedOrder.total_price = newTotalPrice;
+                    const orderMethod = String(cachedOrder.payment_method || "").toLowerCase().trim();
+                    if (orderMethod === "cash") {
+                        if (cachedOrder.cash_amount !== undefined && cachedOrder.cash_amount !== null) {
+                            cachedOrder.cash_amount = newTotalPrice;
+                        }
+                    }
                     if (orderSummary.subtotal !== undefined) cachedOrder.subtotal = orderSummary.subtotal;
                     if (orderSummary.discount_amount !== undefined) cachedOrder.discount_amount = orderSummary.discount_amount;
                     if (Array.isArray(cachedOrder.items)) {
@@ -1651,10 +1836,12 @@ applyPlugin(jsPDF);
             clearMessage();
 
             const formData = buildRequestData(page, range);
+            const todayVnKey = getVietnamDateKey();
+            const isTodayScope = !orderId && Boolean(range && range.date_from === todayVnKey && range.date_to === todayVnKey);
 
             try {
                 const apiResponse = await requestOrders(formData);
-                renderOrders(apiResponse);
+                renderOrders(apiResponse, isTodayScope);
             } catch (error) {
                 console.error("External API error:", error);
                 renderError(error.message);
@@ -1669,7 +1856,7 @@ applyPlugin(jsPDF);
         // Orders Rendering
         // ---------------------------------------------------------------------
 
-        function renderOrders(apiResponse) {
+        function renderOrders(apiResponse, isTodayScope = false) {
             const orders = apiResponse?.data || [];
             const meta = apiResponse?.meta || {};
 
@@ -1706,6 +1893,12 @@ applyPlugin(jsPDF);
                 totalCashAmountEl.textContent = formatVnd(currentCashTotalAmount);
             }
 
+            const isSingleOrderSearch = Boolean(orderIdInput && orderIdInput.value.trim());
+            const isCompleteDailyScope = !isSingleOrderSearch && !isMultiPage && isTodayScope;
+
+            if (isCompleteDailyScope) {
+                saveLatestCashAmountToStorage(currentCashTotalAmount);
+            }
             updateAllOrdersDeletedAmountDisplay();
 
             summary.hidden = false;
@@ -2051,6 +2244,14 @@ applyPlugin(jsPDF);
         // ---------------------------------------------------------------------
 
         checkAndPurgeExpiredDailyCycle();
+        const storedCash = getStoredLatestCashAmount();
+        if (storedCash !== null && storedCash > 0) {
+            currentCashTotalAmount = storedCash;
+            if (totalCashAmountEl) {
+                totalCashAmountEl.textContent = formatVnd(currentCashTotalAmount);
+            }
+            summary.hidden = false;
+        }
         bindOrderItemsModalEvents();
         setDefaultDates();
         updateFilterFields();

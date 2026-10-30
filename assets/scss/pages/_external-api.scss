@@ -352,6 +352,10 @@ body.page-template-external-api {
         &--deleted strong {
             color: #dc2626;
         }
+
+        &--rate strong {
+            color: #d97706;
+        }
     }
 
     @media (max-width: 640px) {
@@ -1317,6 +1321,17 @@ body.vm-order-modal-open {
 
         &--deleted strong {
             color: #dc2626;
+        }
+
+        &--rate {
+            strong {
+                color: #d97706;
+            }
+
+            &.is-projected span {
+                color: #b45309;
+                font-weight: 600;
+            }
         }
 
         &--order-deleted strong {
